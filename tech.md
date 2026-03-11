@@ -24,7 +24,7 @@
 
 ```
 src/
-  middleware.ts                   # Auth middleware (see below)
+  proxy.ts                        # Auth proxy (see below)
   app/
     (auth)/                     # Login/register + landing info (no navbar)
       page.tsx
@@ -47,6 +47,7 @@ src/
     db/
       connection.ts             # Neon Postgres connection
       queries/                  # SQL query functions grouped by entity (sections.ts, files.ts, messages.ts, etc.)
+    i18n/                       # Translation strings (pt-BR.ts, en.ts) + useTranslation hook
     auth.ts                     # JWT signing/verification, cookie helpers
     ai.ts                       # LLM call wrappers (chat, extraction, plan generation, embedding)
   config/
@@ -61,7 +62,7 @@ db/
 - **Root page (`/`)**: For non-logged-in users, shows the login/register page with general information about the platform around the login form. Logged-in users are redirected to the dashboard.
 - **API routes** follow the structure defined in the API Routes section below.
 - **Migrations** live outside `src/` at the project root.
-- **Middleware** (`src/middleware.ts`): Runs on every request. Verifies the JWT cookie and:
+- **Proxy** (`src/proxy.ts`): Runs on every request. Verifies the JWT cookie and:
   - **Unauthenticated users** visiting `(main)/` routes → redirected to `/`.
   - **Authenticated users** visiting `/` → redirected to `/dashboard`.
   - **Unauthenticated API calls** to protected endpoints (everything except `/api/auth/*`) → returns 401.

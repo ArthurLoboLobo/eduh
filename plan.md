@@ -16,14 +16,14 @@ The default language of the platform is **Brazilian Portuguese**. English is the
 - `@neondatabase/serverless` — database queries (HTTP mode for single queries, WebSocket `Pool` for transactions)
 - `@vercel/blob` — file storage
 - `node-pg-migrate` — database migrations
-- `jose` — JWT signing and verification (Edge Runtime compatible — required because Next.js middleware runs on Edge, where `jsonwebtoken` does not work)
+- `jose` — JWT signing and verification (lightweight, no native dependencies, works in all Next.js runtimes)
 - `resend` — email sending
 - `ai` and `@ai-sdk/google` — Vercel AI SDK for streaming, tool calling, and embeddings (covers all Gemini interactions — no need for `@google/genai` separately)
 - File conversion libraries for text extraction (e.g., `pdf-img-convert` or `pdfjs-dist` for PDF-to-image, and a DOCX/PPTX conversion solution — see Phase 6.5 note on Vercel constraints)
 - Any other utility packages needed (e.g., `uuid` if not using `crypto.randomUUID()`)
 
 ### 1.3 Configure Tailwind CSS
-- Set up the custom color palette as CSS variables or Tailwind `extend` colors:
+- Set up the custom color palette as CSS variables in `src/app/globals.css` using the `@theme inline` block (Tailwind v4 — no `tailwind.config.js` extend):
   - `background: #191B1F`
   - `surface: #21242B`
   - `border: #2D3140`
@@ -41,7 +41,7 @@ The default language of the platform is **Brazilian Portuguese**. English is the
 Create all directories following the structure defined in `tech.md`:
 ```
 src/
-  middleware.ts
+  proxy.ts
   app/
     (auth)/
       page.tsx
@@ -96,7 +96,7 @@ Place empty placeholder files where needed so the structure exists from the star
 
 ### 2.1 Set up node-pg-migrate
 - Add a migration script to `package.json` pointing to the `db/migrations/` folder.
-- Configure it to use the `DATABASE_URL` environment variable.
+- Configure it to use the `DATABASE_URL_UNPOOLED` environment variable (direct connection, required for DDL/migrations).
 - Run a test migration to confirm the connection works and the tracking table (`pgmigrations`) is created.
 
 ### 2.2 Enable pgvector
@@ -143,8 +143,8 @@ Add appropriate indexes:
 - `removeAuthCookie(response)` — deletes the auth cookie.
 - `getUserIdFromRequest(request): string | null` — extracts and verifies the JWT from the request cookies.
 
-### 3.2 Middleware (`src/middleware.ts`)
-- Runs on every request (use Next.js middleware matcher to include all routes).
+### 3.2 Proxy (`src/proxy.ts`)
+- Runs on every request (use the `config.matcher` export to include all routes).
 - Reads the JWT from the cookie and verifies it.
 - **Unauthenticated users** visiting any `(main)/` route → redirect to `/`.
 - **Authenticated users** visiting `/` → redirect to `/dashboard`.
@@ -201,9 +201,9 @@ Add appropriate indexes:
 
 ## Phase 4 — Layout & UI Foundation
 
-### 4.1 Internationalization infrastructure (`src/i18n/`)
+### 4.1 Internationalization infrastructure (`src/lib/i18n/`)
 Set up i18n early so all subsequent phases use translation keys from the start, avoiding a costly retrofit later:
-- Create `src/i18n/pt-BR.ts` and `src/i18n/en.ts` — each exports an object with all UI strings, keyed by a consistent identifier (e.g., `dashboard.createSection`, `uploading.startPlanning`). Start with a small set of keys and expand as each phase adds new UI.
+- Create `src/lib/i18n/pt-BR.ts` and `src/lib/i18n/en.ts` — each exports an object with all UI strings, keyed by a consistent identifier (e.g., `dashboard.createSection`, `uploading.startPlanning`). Start with a small set of keys and expand as each phase adds new UI.
 - Create a `useTranslation()` hook that reads the language cookie (default: `pt-BR`) and returns the correct strings object.
 - Create a helper to get/set the language cookie.
 - All UI text from Phase 4 onward must use translation keys, not hardcoded strings.
@@ -666,7 +666,7 @@ Add all remaining prompts:
   - AI messages: no bubble, aligned to the left. Just text with different styling.
 - **Rendering**: Support LaTeX (inline `$...$` and block `$$...$$`), Markdown, and syntax-highlighted code blocks. Use libraries like `react-markdown`, `remark-math`, `rehype-katex`, and a syntax highlighter.
 - **Undo button (↩)**: Appears on hover next to each user message. Clicking it calls `POST /api/chats/:id/undo/:messageId`, removes the message and all subsequent messages from the display, and places the message text back in the input box.
-- **Streaming**: When the AI responds, display the response token-by-token as it arrives. Use the Vercel AI SDK's `useChat` hook or manual streaming with `fetch` and `ReadableStream`.
+- **Streaming**: When the AI responds, display the response token-by-token as it arrives. Use the Vercel AI SDK's `useChat` hook.
 - **Input area**:
   - Single-line text field that grows as the user types, up to a max height, then scrolls.
   - **Enter** sends the message. **Shift+Enter** inserts a newline.
