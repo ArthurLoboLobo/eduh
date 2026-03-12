@@ -41,24 +41,31 @@ Progress tracker and implementation notes. Updated after each phase.
 ---
 
 ## Phase 3 — Authentication
-- [ ] 3.1 JWT utilities (`src/lib/auth.ts`)
-- [ ] 3.2 Proxy (`src/proxy.ts`)
-- [ ] 3.3 Database queries (`src/lib/db/queries/users.ts`)
-- [ ] 3.4 API routes
-- [ ] 3.5 Login / Register page (`src/app/(auth)/page.tsx`)
+- [x] 3.1 JWT utilities (`src/lib/auth.ts`)
+- [x] 3.2 Proxy (`src/proxy.ts`)
+- [x] 3.3 Database queries (`src/lib/db/queries/users.ts`)
+- [x] 3.4 API routes
+- [x] 3.5 Login / Register page (`src/app/(auth)/page.tsx`)
 
 **Notes:**
+- Auth flow: email → OTP via Resend → JWT in HTTP-only cookie (`ditchy_token`, 30-day expiry).
+- `src/proxy.ts` is recognized as Next.js middleware via the exported `config.matcher`. Exempts `/api/auth/*` from both the 401 guard and the page-redirect guard (both checks must skip API routes to avoid redirecting API calls to `/`).
+- `getLatestOtpCode` returns `elapsed_seconds` computed via `EXTRACT(EPOCH FROM (now() - created_at))` in SQL. This avoids a timezone mismatch bug: the `TIMESTAMP` column stores time in the DB server's local timezone, but `Date.now()` in Node.js is always UTC — computing elapsed time in SQL keeps both sides in the same timezone.
+- Login/Register page (`src/app/(auth)/page.tsx`) is `'use client'`. Two-step form (email → code). Redirect after auth uses `window.location.href` (not `router.push`) so the proxy reads the freshly set cookie on a full navigation.
+- `RESEND_FROM_EMAIL` defaults to `onboarding@resend.dev`; on Resend's free tier, can only send to your own verified email address.
 
 ---
 
 ## Phase 4 — Layout & UI Foundation
-- [ ] 4.1 Internationalization infrastructure (`src/lib/i18n/`)
+- [x] 4.1 Internationalization infrastructure (`src/lib/i18n/`)
 - [ ] 4.2 Generic UI components (`src/components/ui/`)
 - [ ] 4.3 Navbar (`src/components/Navbar.tsx`)
 - [ ] 4.4 Breadcrumb bar (`src/components/Breadcrumb.tsx`)
 - [ ] 4.5 Main layout (`src/app/(main)/layout.tsx`)
 
 **Notes:**
+- i18n: `pt-BR.ts` defines the `Translations` interface and default strings; `en.ts` implements the same interface. `index.ts` exports `useTranslation()` hook (reads/writes `ditchy_language` cookie, 1-year expiry, default pt-BR) and `Language` type.
+- Language switcher on auth page is absolute-positioned top-right (standalone, no navbar available on auth routes).
 
 ---
 
