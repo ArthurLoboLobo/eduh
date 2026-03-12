@@ -229,9 +229,9 @@ Build the reusable components that will be used across the app. Each component f
 ### 4.3 Navbar (`src/components/Navbar.tsx`)
 - Slim, fixed at the top of the page.
 - **Left side**: Text "Ditchy" as the logo (clicking it navigates to `/dashboard`).
-- **Right side**: Profile avatar (placeholder — could be a circle with the first letter of the email).
-  - Clicking the avatar opens a dropdown menu:
-    - **Idioma** (Language) — clicking it reveals language options inline: "Português" and "English". Selecting one saves the preference in a cookie.
+- **Right side** (left to right):
+  - **Language switcher**: A standalone toggle showing the current language ("PT" / "EN"). Clicking it switches between `'pt-BR'` and `'en'` and saves the preference in a cookie. Positioned to the left of the profile avatar.
+  - **Profile avatar**: A generic person/avatar icon (SVG symbol — no letter, no photo). Clicking it opens a dropdown menu:
     - **Sair** (Logout) — calls `POST /api/auth/logout` and redirects to `/`.
 
 ### 4.4 Breadcrumb bar (`src/components/Breadcrumb.tsx`)
