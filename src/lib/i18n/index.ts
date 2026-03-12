@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import ptBR from './pt-BR';
 import type { Translations } from './pt-BR';
 import en from './en';
@@ -26,12 +26,27 @@ export function setLanguageCookie(language: Language): void {
   document.cookie = `${COOKIE_NAME}=${language}; path=/; max-age=${ONE_YEAR_SECONDS}; SameSite=Lax`;
 }
 
+const LANGUAGE_EVENT = 'ditchy:language-change';
+
 export function useTranslation() {
-  const [language, setLang] = useState<Language>(getLanguageFromCookie);
+  // Always start with 'pt-BR' so SSR and client initial render match.
+  // Sync to the actual cookie value after hydration.
+  const [language, setLang] = useState<Language>('pt-BR');
+
+  useEffect(() => {
+    setLang(getLanguageFromCookie());
+
+    function handleChange(e: Event) {
+      setLang((e as CustomEvent<Language>).detail);
+    }
+    window.addEventListener(LANGUAGE_EVENT, handleChange);
+    return () => window.removeEventListener(LANGUAGE_EVENT, handleChange);
+  }, []);
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageCookie(lang);
     setLang(lang);
+    window.dispatchEvent(new CustomEvent<Language>(LANGUAGE_EVENT, { detail: lang }));
   }, []);
 
   return {

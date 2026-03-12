@@ -1,0 +1,57 @@
+'use client';
+
+import { ReactNode, useEffect } from 'react';
+
+interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  title?: string;
+  children: ReactNode;
+  className?: string;
+}
+
+export default function Modal({ open, onClose, title, children, className = '' }: ModalProps) {
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="absolute inset-0 bg-black/60"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div
+        className={`
+          relative z-10 w-full max-w-md
+          bg-surface border border-border rounded-md p-6
+          ${className}
+        `}
+      >
+        <div className="flex items-start justify-between mb-4">
+          {title && <h2 className="text-base font-semibold text-primary-text">{title}</h2>}
+          <button
+            onClick={onClose}
+            className="ml-auto text-muted-text hover:text-primary-text cursor-pointer"
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}

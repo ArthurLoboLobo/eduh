@@ -15,8 +15,48 @@ export interface Translations {
     sending: string;
     verifying: string;
   };
+  nav: {
+    language: string;
+    logout: string;
+    dashboard: string;
+  };
+  dashboard: {
+    searchPlaceholder: string;
+    createSection: string;
+    emptyTitle: string;
+    emptyDescription: string;
+    topicsCompleted: string;
+    deleteConfirmTitle: string;
+    deleteConfirmMessage: string;
+    confirm: string;
+    cancel: string;
+    status: {
+      uploading: string;
+      planning: string;
+      studying: string;
+    };
+    createModal: {
+      title: string;
+      nameLabel: string;
+      namePlaceholder: string;
+      descriptionLabel: string;
+      descriptionPlaceholder: string;
+      create: string;
+    };
+    maxSectionsError: string;
+  };
+  section: {
+    notFound: string;
+    loading: string;
+    uploadingPlaceholder: string;
+    planningPlaceholder: string;
+    studyingPlaceholder: string;
+  };
   errors: {
     EMAIL_INVALID: string;
+    EMAIL_MISSING: string;
+    CODE_MISSING: string;
+    CONFIG_ERROR: string;
     RATE_LIMITED: string;
     USER_NOT_FOUND: string;
     OTP_NOT_FOUND: string;
@@ -50,8 +90,48 @@ const ptBR: Translations = {
     sending: 'Enviando...',
     verifying: 'Verificando...',
   },
+  nav: {
+    language: 'Idioma',
+    logout: 'Sair',
+    dashboard: 'Painel',
+  },
+  dashboard: {
+    searchPlaceholder: 'Buscar secoes...',
+    createSection: 'Criar nova Secao',
+    emptyTitle: 'Nenhuma secao criada ainda.',
+    emptyDescription: 'Clique em Criar nova Secao para comecar.',
+    topicsCompleted: 'topicos completos',
+    deleteConfirmTitle: 'Excluir secao',
+    deleteConfirmMessage: 'Tem certeza que deseja excluir esta secao? Essa acao nao pode ser desfeita.',
+    confirm: 'Confirmar',
+    cancel: 'Cancelar',
+    status: {
+      uploading: 'Enviando',
+      planning: 'Planejando',
+      studying: 'Estudando',
+    },
+    createModal: {
+      title: 'Criar nova Secao',
+      nameLabel: 'Nome',
+      namePlaceholder: 'Ex: Calculo II',
+      descriptionLabel: 'Descricao (opcional)',
+      descriptionPlaceholder: 'Uma breve descricao da secao',
+      create: 'Criar',
+    },
+    maxSectionsError: 'Voce atingiu o limite de 10 secoes.',
+  },
+  section: {
+    notFound: 'Secao nao encontrada.',
+    loading: 'Carregando...',
+    uploadingPlaceholder: 'Envio de arquivos',
+    planningPlaceholder: 'Planejamento de estudos',
+    studyingPlaceholder: 'Estudando',
+  },
   errors: {
     EMAIL_INVALID: 'E-mail invalido.',
+    EMAIL_MISSING: 'Informe seu e-mail.',
+    CODE_MISSING: 'Informe o codigo.',
+    CONFIG_ERROR: 'Erro de configuracao no servidor.',
     RATE_LIMITED: 'Aguarde antes de enviar outro codigo.',
     USER_NOT_FOUND: 'Usuario nao encontrado.',
     OTP_NOT_FOUND: 'Codigo nao encontrado. Solicite um novo.',
