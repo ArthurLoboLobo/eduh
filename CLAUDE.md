@@ -61,7 +61,7 @@ db/
 
 ### Key Patterns
 
-- **Route groups**: `(auth)` has no navbar, `(main)` has navbar + breadcrumb. No `src/app/page.tsx` — the root `/` is served by `(auth)/page.tsx`.
+- **Route groups**: `(auth)` has no navbar, `(main)` has navbar + breadcrumb. No `src/app/page.tsx` — the root `/` is served by `(auth)/page.tsx`. The auth page has a standalone language switcher (top-right) since there is no navbar.
 - **Self-chaining background jobs**: Long-running tasks (file extraction, plan generation) use self-invoking serverless functions to stay within Vercel's 60s timeout.
 - **RAG pipeline**: Extracted text → chunked (~1000 tokens, ~100 overlap) → embedded with `gemini-embedding-001` → stored in pgvector → retrieved via similarity search (top 4 chunks).
 - **Lazy chat creation**: Chat records created on first open, not upfront.
@@ -101,6 +101,7 @@ Custom colors are defined as CSS variables in `src/app/globals.css` and exposed 
 | `DATABASE_URL_UNPOOLED` | Neon direct connection (migrations) | Yes (Neon integration) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob access | Yes (Blob integration) |
 | `RESEND_API_KEY` | Resend email service | No |
+| `RESEND_FROM_EMAIL` | Sender address (free tier: `onboarding@resend.dev`) | No |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini API (default for `@ai-sdk/google`) | No |
 | `JWT_SECRET` | JWT signing secret | No |
 

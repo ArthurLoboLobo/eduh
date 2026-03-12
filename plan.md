@@ -80,6 +80,7 @@ Place empty placeholder files where needed so the structure exists from the star
   - `DATABASE_URL_UNPOOLED`
   - `BLOB_READ_WRITE_TOKEN`
   - `RESEND_API_KEY`
+  - `RESEND_FROM_EMAIL` — sender address (use `onboarding@resend.dev` for Resend free tier; set to your verified domain in production)
   - `GOOGLE_GENERATIVE_AI_API_KEY`
   - `JWT_SECRET`
 - Add `.env.local` to `.gitignore` (Next.js does this by default).
@@ -162,12 +163,14 @@ Add appropriate indexes:
 ### 3.4 API routes
 
 #### `POST /api/auth/send-code`
-- Receives `{ email }` in the request body.
+- Receives `{ email, language }` in the request body. `language` is `'pt-BR'` or `'en'` (default: `'pt-BR'`).
 - Validates the email format.
 - Finds or creates the user in the database.
+- Checks if the user already has an OTP code created less than 60 seconds ago — if so, return 429 with `{ error: 'RATE_LIMITED', retryAfterSeconds: N }` where N is `60 - elapsed seconds since last code`.
+- Deletes any existing OTP codes for the user.
 - Generates a random 6-digit code.
 - Stores the OTP code in the `otp_codes` table (expires in 10 minutes).
-- Sends the code via Resend to the user's email.
+- Sends the code via Resend to the user's email, in the language specified by the request.
 - Returns success (does not reveal whether the email already existed).
 
 #### `POST /api/auth/verify-code`
@@ -193,9 +196,11 @@ Add appropriate indexes:
   - After the code is sent, the form transitions to show:
     - A code input field (6 digits).
     - "Verificar" (Verify) button.
+    - A "Reenviar código" (Resend code) button. If the API returns 429 with `retryAfterSeconds`, disable this button and show a live countdown (e.g., "Aguarde 42s") using a client-side `setInterval` that ticks every second. Re-enable the button automatically when the counter reaches 0.
   - On successful verification, redirect to `/dashboard`.
-- All text on this page is in Brazilian Portuguese by default.
-- Handle error states: invalid email, wrong code, too many attempts, network errors.
+- **Language switcher**: A standalone language toggle at the top-right of the page (since there is no navbar on auth pages). Clicking it switches between `'pt-BR'` and `'en'` and saves the preference to the language cookie. All page text re-renders immediately. The form sends the current language value alongside the email in the `POST /api/auth/send-code` request.
+- The page defaults to `'pt-BR'` if no language cookie is set.
+- Handle error states: invalid email, wrong code, too many attempts, rate limit (countdown), network errors.
 
 ---
 
