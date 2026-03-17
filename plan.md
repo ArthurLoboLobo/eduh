@@ -350,23 +350,15 @@ Build the reusable components that will be used across the app. Each component f
 - Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
 - Returns all files in the section via `listFiles(sectionId)`.
 
-#### `POST /api/files/presign`
-- Receives `{ sectionId, fileName, fileType, fileSize }`.
-- Validates:
-  - Calls `verifySectionOwnership(sectionId, userId)` — returns 404 (`SECTION_NOT_FOUND`) if not owned.
-  - Calls `getSection(sectionId)` — returns 400 (`INVALID_SECTION_STATUS`) if section is not in `uploading` status.
-  - File type is allowed — returns 400 (`INVALID_FILE_TYPE`) if not. Accepted MIME types (matching Gemini's native support): `application/pdf`, `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.presentationml.presentation` (PPTX), `image/jpeg`, `image/png`, `image/webp`, `image/heif`.
-  - Adding this file would not exceed the **10 MB section limit** (check `getTotalSizeForSection` + new file size) — returns 409 (`SIZE_LIMIT_EXCEEDED`) if exceeded. There is no separate per-file limit — in practice, a single file is also capped at 10 MB.
-- Generates a signed upload URL from Vercel Blob (short expiry, ~5 minutes).
-- Returns the signed URL.
-
 #### `POST /api/files`
-- Receives `{ sectionId, blobUrl, originalName, fileType, sizeBytes }`.
+- Receives multipart form data: the file itself + `sectionId` field.
 - Validates:
   - Calls `verifySectionOwnership(sectionId, userId)` — returns 404 (`SECTION_NOT_FOUND`) if not owned.
   - Calls `getSection(sectionId)` — returns 400 (`INVALID_SECTION_STATUS`) if section is not in `uploading` status.
-  - Re-validates `fileType` against the allowed MIME types list — returns 400 (`INVALID_FILE_TYPE`) if not allowed.
-  - Re-validates `getTotalSizeForSection(sectionId) + sizeBytes` does not exceed 10 MB — returns 409 (`SIZE_LIMIT_EXCEEDED`) if exceeded.
+  - File MIME type is allowed — returns 400 (`INVALID_FILE_TYPE`) if not. Accepted MIME types (matching Gemini's native support): `application/pdf`, `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.presentationml.presentation` (PPTX), `image/jpeg`, `image/png`, `image/webp`, `image/heif`.
+  - File size does not exceed **4 MB** — returns 400 (`FILE_TOO_LARGE`) if exceeded.
+  - Adding this file would not exceed the **10 MB section limit** (check `getTotalSizeForSection` + file size) — returns 409 (`SIZE_LIMIT_EXCEEDED`) if exceeded.
+- Uploads the file to Vercel Blob using `put()` from `@vercel/blob` (server-side upload — the file passes through the serverless function).
 - Creates the file row in the database with status `uploading`.
 - Returns the created file (no call to `process` — the client is responsible for calling it).
 
@@ -408,7 +400,7 @@ Create the config file with the initial parameters needed for this phase:
 - `extractTextFromFile(fileBuffer: Buffer, mimeType: string): Promise<string>` — uses `generateText` from the `ai` package with the `google()` provider from `@ai-sdk/google` to send the raw file bytes to Gemini as a multimodal prompt (file content part + extraction instructions from `src/prompts/index.ts`). Returns the extracted text. No image conversion needed — Gemini natively handles all accepted file types (PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, HEIF).
 
 ### 6.6 Uploading UI (`src/app/(main)/sections/[id]/` — Uploading component)
-- **Upload flow (per file)**: `POST /api/files/presign` → upload to Blob → `POST /api/files` → immediately call `POST /api/files/:id/process`. Multiple files upload and process concurrently.
+- **Upload flow (per file)**: `POST /api/files` (sends the file + sectionId) → immediately call `POST /api/files/:id/process`. Multiple files upload and process concurrently.
 - **File upload zone**: Dashed border area. Clicking it opens the system file picker. Also supports drag-and-drop.
 - **File list**: Below the upload zone, shows all uploaded files with:
   - File name.

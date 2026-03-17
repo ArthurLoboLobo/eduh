@@ -99,13 +99,13 @@ db/
 
 ### Storage
 - Files are stored in **Vercel Blob**.
-- **10 MB limit per section** (total across all files in a section).
-- **Upload flow** (direct-to-Blob with server-side validation):
-  1. Client requests a signed upload URL: `POST /api/files/presign`
-  2. Server validates: user is authenticated, section belongs to them, section is in "Uploading" status, file type is allowed, adding this file wouldn't exceed the 10 MB section limit.
-  3. If valid, the server generates a **signed upload URL** from Vercel Blob (short expiry, ~5 minutes) and returns it.
-  4. Client uploads directly to Blob using the signed URL (no file data passes through the serverless function).
-  5. Client creates the file record: `POST /api/files` — server creates the file row in the database. Client then immediately calls `POST /api/files/:id/process` to trigger text extraction.
+- **4 MB limit per file**, **10 MB limit per section** (total across all files in a section).
+- **Upload flow** (server-side upload via `put()`):
+  1. Client sends the file + `sectionId` to `POST /api/files` (multipart form data).
+  2. Server validates: user is authenticated, section belongs to them, section is in "Uploading" status, file type is allowed, file is under 4 MB, adding this file wouldn't exceed the 10 MB section limit.
+  3. Server uploads the file to Vercel Blob using `put()` from `@vercel/blob`.
+  4. Server creates the file row in the database and returns it.
+  5. Client immediately calls `POST /api/files/:id/process` to trigger text extraction.
 
 ### Processing (Text Extraction)
 - Files are sent **directly to Gemini** as multimodal input — no image conversion step. Gemini natively handles PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, and HEIF.
@@ -403,8 +403,7 @@ All routes are REST. Protected routes require a valid JWT in the HTTP-only cooki
 | Method | Route                              | Description                                          |
 | ------ | ---------------------------------- | ---------------------------------------------------- |
 | GET    | `/api/sections/:id/files`          | List files in a section                              |
-| POST   | `/api/files/presign`               | Get a signed Vercel Blob upload URL (with validation)|
-| POST   | `/api/files`                       | Create file record in DB after Blob upload           |
+| POST   | `/api/files`                       | Upload file to Blob, create DB record                |
 | POST   | `/api/files/:id/process`           | Trigger text extraction for a single file            |
 | DELETE | `/api/files/:id`                   | Remove file from section and Blob                    |
 
