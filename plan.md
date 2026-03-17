@@ -281,7 +281,7 @@ Build the reusable components that will be used across the app. Each component f
 - `deleteSection(sectionId)` — deletes the section (cascade handles related data).
 
 #### `src/lib/db/queries/files.ts`
-- `listFileBlobUrls(sectionId)` — returns an array of `blob_url` strings for all files in the section. Used by `DELETE /api/sections/:id` to clean up Vercel Blob.
+- `listFiles(sectionId)` — returns all files in a section, ordered by `created_at`. Used by `DELETE /api/sections/:id` to clean up Vercel Blob, and later by `GET /api/sections/:id/files`.
 
 ### 5.2 API routes
 
@@ -301,7 +301,7 @@ Build the reusable components that will be used across the app. Each component f
 
 #### `DELETE /api/sections/:id`
 - Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Calls `listFileBlobUrls(sectionId)` (from `files.ts`) to get all blob URLs, deletes them from Vercel Blob.
+- Calls `listFiles(sectionId)` (from `files.ts`) to get all files, extracts blob URLs, deletes them from Vercel Blob.
 - Deletes the section from the database via `deleteSection(id)` (cascade handles the rest).
 
 ### 5.3 Dashboard page (`src/app/(main)/dashboard/page.tsx`)
@@ -335,17 +335,14 @@ Build the reusable components that will be used across the app. Each component f
 
 #### `src/lib/db/queries/files.ts` — additions
 - `verifyFileOwnership(fileId, userId)` — joins `files → sections` and returns `true` if the file's section belongs to the user.
-- `listFiles(sectionId)` — returns all files in a section, ordered by `created_at`.
 - `listFileStatuses(sectionId)` — returns `id`, `original_name`, and `status` for all files in a section. Used by `GET /api/sections/:id/files/status` for polling.
+- Note: `listFiles(sectionId)` already exists from Phase 5.1.
 - `createFile(sectionId, blobUrl, originalName, fileType, sizeBytes)` — inserts a file row with status `uploading`.
 - `updateFileStatus(fileId, status)` — updates the file status.
 - `updateFileExtractedText(fileId, extractedText)` — saves the extracted text and sets status to `processed`.
 - `deleteFile(fileId)` — deletes the file row.
 - `getFile(fileId)` — returns a single file.
 - `getTotalSizeForSection(sectionId)` — returns the sum of `size_bytes` for all files in the section.
-
-#### `src/lib/db/queries/embeddings.ts`
-- `deleteEmbeddingsByFile(fileId)` — deletes all embeddings for a file. Used by `DELETE /api/files/:id`. Safe to call even before embeddings exist (Phase 8).
 
 ### 6.2 API routes
 
@@ -356,22 +353,27 @@ Build the reusable components that will be used across the app. Each component f
 #### `POST /api/files/presign`
 - Receives `{ sectionId, fileName, fileType, fileSize }`.
 - Validates:
-  - Calls `verifySectionOwnership(sectionId, userId)` — returns 404 if not owned.
-  - Calls `getSection(sectionId)` to check the section is in `uploading` status.
-  - File type is allowed. Accepted MIME types (matching Gemini's native support): `application/pdf`, `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.presentationml.presentation` (PPTX), `image/jpeg`, `image/png`, `image/webp`, `image/heif`.
-  - Adding this file would not exceed the **10 MB section limit** (check `getTotalSizeForSection` + new file size). There is no separate per-file limit — in practice, a single file is also capped at 10 MB.
+  - Calls `verifySectionOwnership(sectionId, userId)` — returns 404 (`SECTION_NOT_FOUND`) if not owned.
+  - Calls `getSection(sectionId)` — returns 400 (`INVALID_SECTION_STATUS`) if section is not in `uploading` status.
+  - File type is allowed — returns 400 (`INVALID_FILE_TYPE`) if not. Accepted MIME types (matching Gemini's native support): `application/pdf`, `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.presentationml.presentation` (PPTX), `image/jpeg`, `image/png`, `image/webp`, `image/heif`.
+  - Adding this file would not exceed the **10 MB section limit** (check `getTotalSizeForSection` + new file size) — returns 409 (`SIZE_LIMIT_EXCEEDED`) if exceeded. There is no separate per-file limit — in practice, a single file is also capped at 10 MB.
 - Generates a signed upload URL from Vercel Blob (short expiry, ~5 minutes).
 - Returns the signed URL.
 
 #### `POST /api/files`
 - Receives `{ sectionId, blobUrl, originalName, fileType, sizeBytes }`.
-- Calls `verifySectionOwnership(sectionId, userId)` — returns 404 if not owned. Calls `getSection(sectionId)` to validate section status.
+- Validates:
+  - Calls `verifySectionOwnership(sectionId, userId)` — returns 404 (`SECTION_NOT_FOUND`) if not owned.
+  - Calls `getSection(sectionId)` — returns 400 (`INVALID_SECTION_STATUS`) if section is not in `uploading` status.
+  - Re-validates `fileType` against the allowed MIME types list — returns 400 (`INVALID_FILE_TYPE`) if not allowed.
+  - Re-validates `getTotalSizeForSection(sectionId) + sizeBytes` does not exceed 10 MB — returns 409 (`SIZE_LIMIT_EXCEEDED`) if exceeded.
 - Creates the file row in the database with status `uploading`.
 - Returns the created file (no call to `process` — the client is responsible for calling it).
 
 #### `POST /api/files/:id/process`
 - File ID is taken from the URL path parameter.
-- Calls `verifyFileOwnership(fileId, userId)` — returns 404 if not owned. Calls `getFile(fileId)` to validate that the file status is `uploading`, `processing`, or `error` (to allow retries).
+- Calls `verifyFileOwnership(fileId, userId)` — returns 404 (`FILE_NOT_FOUND`) if not owned.
+- Calls `getFile(fileId)` to validate that the file status is `uploading`, `processing`, or `error` (to allow retries). Returns 409 (`ALREADY_PROCESSED`) if status is `processed`.
 - Processes exactly one file and returns:
   1. Update status to `processing`.
   2. Download the raw file bytes from Vercel Blob.
@@ -383,12 +385,7 @@ Build the reusable components that will be used across the app. Each component f
 #### `DELETE /api/files/:id`
 - Calls `verifyFileOwnership(fileId, userId)` — returns 404 if not owned.
 - Calls `getFile(fileId)` to get the `blob_url`, then deletes it from Vercel Blob.
-- Deletes the file row from the database via `deleteFile(fileId)`.
-- Also deletes any embeddings associated with this file via `deleteEmbeddingsByFile(fileId)`.
-
-#### `GET /api/files/:id/preview`
-- Calls `verifyFileOwnership(fileId, userId)` — returns 404 if not owned.
-- Calls `getFile(fileId)` and returns the `blob_url` for the original file so the client can display it in the preview modal.
+- Deletes the file row from the database via `deleteFile(fileId)`. (Embeddings are deleted automatically via CASCADE.)
 
 #### `GET /api/sections/:id/files/status`
 - Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
@@ -400,15 +397,15 @@ Build the reusable components that will be used across the app. Each component f
   - Math formulas converted to LaTeX.
   - Detailed descriptions of any images, diagrams, or non-text content.
 - Use the `gemini-3-flash-preview` model (configured in `src/config/ai.ts`).
-- Supported file types sent directly to Gemini: PDF, JPEG, PNG, TXT. No conversion step needed.
+- Supported file types sent directly to Gemini: PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, HEIF. No conversion step needed.
 
 ### 6.4 `src/config/ai.ts` (initial version)
 Create the config file with the initial parameters needed for this phase:
-- `TEXT_EXTRACTION_MODEL: 'gemini-2.5-flash-lite'`
+- `TEXT_EXTRACTION_MODEL: 'gemini-3-flash-preview'`
 - Other parameters will be added in later phases as needed.
 
 ### 6.5 AI wrapper (`src/lib/ai.ts`) — initial version
-- `extractTextFromFile(fileBuffer: Buffer, mimeType: string): Promise<string>` — sends the raw file bytes to Gemini as a multimodal prompt using the extraction instructions from `src/prompts/index.ts`. Returns the extracted text. No image conversion needed — Gemini handles PDF, JPEG, PNG, and TXT natively.
+- `extractTextFromFile(fileBuffer: Buffer, mimeType: string): Promise<string>` — uses `generateText` from the `ai` package with the `google()` provider from `@ai-sdk/google` to send the raw file bytes to Gemini as a multimodal prompt (file content part + extraction instructions from `src/prompts/index.ts`). Returns the extracted text. No image conversion needed — Gemini natively handles all accepted file types (PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, HEIF).
 
 ### 6.6 Uploading UI (`src/app/(main)/sections/[id]/` — Uploading component)
 - **Upload flow (per file)**: `POST /api/files/presign` → upload to Blob → `POST /api/files` → immediately call `POST /api/files/:id/process`. Multiple files upload and process concurrently.
@@ -417,7 +414,7 @@ Create the config file with the initial parameters needed for this phase:
   - File name.
   - Status label: `Enviando` → `Processando` → `Processado`. If extraction fails: `Erro`.
   - Click on the file name to preview (opens a modal showing the original file — PDF rendered in an iframe, images displayed directly).
-  - Remove button (X icon) to delete the file.
+  - Remove button (trash icon) to delete the file.
   - If a file has `error` status, show a "Tentar novamente" (Retry) button that re-triggers processing by calling `POST /api/files/:id/process`.
 - **Polling**: Use `setInterval` to poll `GET /api/sections/:id/files/status` every few seconds to update file statuses.
 - **"Iniciar Planejamento" (Start Planning) button**: Only enabled when all uploaded files have status `processed` (no files with `uploading`, `processing`, or `error` status) and there is at least one file. Clicking it calls `POST /api/sections/:id/start-planning` (Phase 7) and transitions the section.

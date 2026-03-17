@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { del } from '@vercel/blob';
 import { getUserIdFromRequest } from '@/lib/auth';
 import { verifySectionOwnership, getSection, deleteSection } from '@/lib/db/queries/sections';
-import { listFileBlobUrls } from '@/lib/db/queries/files';
+import { listFiles } from '@/lib/db/queries/files';
 
 export async function GET(
   request: NextRequest,
@@ -45,7 +45,8 @@ export async function DELETE(
     }
 
     // Delete all associated files from Vercel Blob
-    const blobUrls = await listFileBlobUrls(id);
+    const files = await listFiles(id);
+    const blobUrls = files.map((f) => f.blob_url).filter(Boolean);
     if (blobUrls.length > 0) {
       await del(blobUrls);
     }

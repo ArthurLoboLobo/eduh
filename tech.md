@@ -108,7 +108,7 @@ db/
   5. Client creates the file record: `POST /api/files` — server creates the file row in the database. Client then immediately calls `POST /api/files/:id/process` to trigger text extraction.
 
 ### Processing (Text Extraction)
-- Files are sent **directly to Gemini** as multimodal input — no image conversion step. Gemini natively handles PDF, JPEG, PNG, and TXT.
+- Files are sent **directly to Gemini** as multimodal input — no image conversion step. Gemini natively handles PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, and HEIF.
 - The AI extracts:
   - All readable text (in Markdown)
   - Math formulas (converted to LaTeX)
@@ -407,7 +407,6 @@ All routes are REST. Protected routes require a valid JWT in the HTTP-only cooki
 | POST   | `/api/files`                       | Create file record in DB after Blob upload           |
 | POST   | `/api/files/:id/process`           | Trigger text extraction for a single file            |
 | DELETE | `/api/files/:id`                   | Remove file from section and Blob                    |
-| GET    | `/api/files/:id/preview`           | Get file URL for preview modal                       |
 
 ### Planning
 | Method | Route                                  | Description                                     |

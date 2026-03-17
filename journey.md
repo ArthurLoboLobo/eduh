@@ -85,7 +85,7 @@ Progress tracker and implementation notes. Updated after each phase.
 - [ ] 6.3 AI text extraction setup
 - [ ] 6.4 `src/config/ai.ts` (initial version)
 - [ ] 6.5 AI wrapper (`src/lib/ai.ts`) — initial version
-- [ ] 6.7 Uploading UI (`src/app/(main)/sections/[id]/` — Uploading component)
+- [ ] 6.6 Uploading UI (`src/app/(main)/sections/[id]/` — Uploading component)
 
 **Notes:**
 
