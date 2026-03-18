@@ -1,1 +1,1 @@
-// AI model configuration — implemented in Phase 6+
+export const TEXT_EXTRACTION_MODEL = 'gemini-3-flash-preview';

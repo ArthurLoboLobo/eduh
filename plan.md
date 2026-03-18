@@ -400,17 +400,19 @@ Create the config file with the initial parameters needed for this phase:
 ### 6.5 AI wrapper (`src/lib/ai.ts`) — initial version
 - `extractTextFromFile(fileBuffer: Buffer, mimeType: string): Promise<string>` — uses `generateText` from the `ai` package with the `google()` provider from `@ai-sdk/google` to send the raw file bytes to Gemini as a multimodal prompt (file content part + extraction instructions from `src/prompts/index.ts`). Returns the extracted text. No image conversion needed — Gemini natively handles all accepted file types (PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, HEIF).
 
-### 6.6 Uploading UI (`src/app/(main)/sections/[id]/` — Uploading component)
+### 6.6 Uploading UI (`src/components/UploadingView.tsx`)
+- **i18n**: Add all necessary translation keys to `src/lib/i18n/pt-BR.ts` and `src/lib/i18n/en.ts` for the uploading UI (upload zone text, file status labels, button labels, error messages, etc.).
+- **Component location**: Create `src/components/UploadingView.tsx` and replace the `UploadingPlaceholder` in `src/app/(main)/sections/[id]/page.tsx` with it.
 - **Upload flow (per file)**: `POST /api/files` (sends the file + sectionId) → immediately call `POST /api/files/:id/process`. Multiple files upload and process concurrently.
 - **File upload zone**: Dashed border area. Clicking it opens the system file picker. Also supports drag-and-drop.
 - **File list**: Below the upload zone, shows all uploaded files with:
   - File name.
   - Status label: `Enviando` → `Processando` → `Processado`. If extraction fails: `Erro`.
-  - Click on the file name to preview (opens a modal showing the original file — PDF rendered in an iframe, images displayed directly).
+  - Click on the file name to preview (opens a modal showing the original file — PDF rendered in an iframe, images displayed directly). For file types that cannot be previewed in the browser (DOCX, PPTX, TXT), show a "no preview available" message.
   - Remove button (trash icon) to delete the file.
   - If a file has `error` status, show a "Tentar novamente" (Retry) button that re-triggers processing by calling `POST /api/files/:id/process`.
-- **Polling**: Use `setInterval` to poll `GET /api/sections/:id/files/status` every few seconds to update file statuses.
-- **"Iniciar Planejamento" (Start Planning) button**: Only enabled when all uploaded files have status `processed` (no files with `uploading`, `processing`, or `error` status) and there is at least one file. Clicking it does nothing for now — the behavior will be implemented in Phase 7.
+- **Polling**: Use `setInterval` to poll `GET /api/sections/:id/files/status` every 3 seconds to update file statuses.
+- **"Iniciar Planejamento" (Start Planning) button**: Only enabled when all uploaded files have status `processed` (no files with `uploading`, `processing`, or `error` status) and there is at least one file. Clicking it is a no-op for now — the behavior will be implemented in Phase 7.
 
 ---
 
@@ -785,3 +787,9 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 - Run database migrations against the production database.
 - Test the deployed application end-to-end.
 - Set up a custom domain if desired.
+
+---
+
+## Future TODOs
+
+- **File preview improvements**: Currently, non-PDF/non-image files (DOCX, PPTX, TXT) show a "no preview available" message in the preview modal. In the future, implement proper rendering for these file types (e.g., convert to HTML/PDF on the server, or use a document viewer library).
