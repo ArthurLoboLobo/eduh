@@ -6,8 +6,6 @@ export type Section = {
   name: string;
   description: string | null;
   status: string;
-  plan_total_batches: number | null;
-  plan_processed_batches: number | null;
   created_at: Date;
 };
 

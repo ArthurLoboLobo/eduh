@@ -82,7 +82,7 @@ Dark mode only. No light mode.
 
 ### Section — Planning
 
-- **Loading state**: A spinner with a notice ("Creating your study plan...") and a **progress bar** showing a percentage (e.g., "43%") while the LLM generates the plan.
+- **Loading state**: A spinner with a notice ("Creating your study plan...") while the LLM generates the plan. No progress bar (plan generation is a single AI call).
 - **Study plan display**: A vertical list of topic cards, each always showing all its subtopics (no collapse/expand).
 - **Topic card**:
   - Drag handle on the left side for reordering.

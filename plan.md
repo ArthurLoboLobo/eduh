@@ -127,11 +127,10 @@ Write migration files that create the tables in dependency order:
 
 1. **`users`** — `id` (UUID PK, default `gen_random_uuid()`), `email` (TEXT, UNIQUE), `created_at` (TIMESTAMP, default `now()`).
 2. **`otp_codes`** — `id` (UUID PK), `user_id` (UUID FK → users, ON DELETE CASCADE), `code` (TEXT), `attempts` (INTEGER, default 0), `expires_at` (TIMESTAMP), `created_at` (TIMESTAMP).
-3. **`sections`** — `id` (UUID PK), `user_id` (UUID FK → users, ON DELETE CASCADE), `name` (TEXT), `description` (TEXT, nullable), `status` (TEXT, default `'uploading'`), `plan_total_batches` (INTEGER, nullable), `plan_processed_batches` (INTEGER, nullable), `created_at` (TIMESTAMP).
+3. **`sections`** — `id` (UUID PK), `user_id` (UUID FK → users, ON DELETE CASCADE), `name` (TEXT), `description` (TEXT, nullable), `status` (TEXT, default `'uploading'`), `created_at` (TIMESTAMP).
 4. **`files`** — `id` (UUID PK), `section_id` (UUID FK → sections, ON DELETE CASCADE), `blob_url` (TEXT), `original_name` (TEXT), `file_type` (TEXT), `size_bytes` (INTEGER), `status` (TEXT, default `'uploading'`), `extracted_text` (TEXT, nullable), `created_at` (TIMESTAMP).
 5. **`plan_drafts`** — `id` (UUID PK), `section_id` (UUID FK → sections, ON DELETE CASCADE), `plan_json` (JSONB), `created_at` (TIMESTAMP).
-6. **`plan_batches`** — `id` (UUID PK), `section_id` (UUID FK → sections, ON DELETE CASCADE), `batch_index` (INTEGER), `content` (TEXT). Stores the pre-split text batches during plan generation so each chained function call can retrieve the next batch by index. Deleted after generation completes.
-7. **`topics`** — `id` (UUID PK), `section_id` (UUID FK → sections, ON DELETE CASCADE), `title` (TEXT), `order` (INTEGER), `is_completed` (BOOLEAN, default false), `created_at` (TIMESTAMP).
+6. **`topics`** — `id` (UUID PK), `section_id` (UUID FK → sections, ON DELETE CASCADE), `title` (TEXT), `order` (INTEGER), `is_completed` (BOOLEAN, default false), `created_at` (TIMESTAMP).
 8. **`subtopics`** — `id` (UUID PK), `topic_id` (UUID FK → topics, ON DELETE CASCADE), `text` (TEXT), `order` (INTEGER).
 9. **`chats`** — `id` (UUID PK), `section_id` (UUID FK → sections, ON DELETE CASCADE), `topic_id` (UUID FK → topics, ON DELETE CASCADE, nullable), `type` (TEXT), `created_at` (TIMESTAMP).
 10. **`messages`** — `id` (SERIAL PK), `chat_id` (UUID FK → chats, ON DELETE CASCADE), `role` (TEXT), `content` (TEXT), `created_at` (TIMESTAMP).
@@ -418,12 +417,12 @@ Create the config file with the initial parameters needed for this phase:
 
 ## Phase 7 — Study Plan Generation
 
-### 7.1 Plan JSON schema
+### 7.1 Plan JSON schema (`src/lib/ai.ts` — type export)
 
-Both AI-generated and user-edited plans use the same structure:
+Both AI-generated and user-edited plans use the same structure. Define and export the `PlanJSON` type in `src/lib/ai.ts` alongside `generatePlan`/`regeneratePlan`:
 
 ```typescript
-type PlanJSON = {
+export type PlanJSON = {
   topics: {
     title: string;
     subtopics: string[];
@@ -469,11 +468,11 @@ Add:
 ### 7.6 API routes
 
 #### `POST /api/sections/:id/start-planning`
-- **Update the Uploading UI (Phase 6.6)**: Wire up the "Iniciar Planejamento" button to call this endpoint. On success, transition the section page to the Planning component.
+- **Update the Uploading UI (Phase 6.6)**: Wire up the "Iniciar Planejamento" button to call this endpoint. `UploadingView` takes an `onStatusChange` callback prop. After a successful response, it calls `onStatusChange('planning')`. The section page updates its local `section.status`, which triggers rendering `PlanningView` instead of `UploadingView`.
 - Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Locks the section row with `SELECT ... FOR UPDATE` (using the WebSocket `Pool` connection) and validates that the section is in `uploading` status. The lock prevents concurrent `start-planning` requests from both passing the status check.
+- Calls `getSection(id)` to validate that the section is in `uploading` status — returns 400 (`INVALID_SECTION_STATUS`) if not.
 - Calls `listFiles(sectionId)` to verify that at least one file exists and that every file has `processed` status — returns 400 (`FILES_NOT_READY`) if not.
-- Changes section status to `planning` and commits the transaction (releases the lock before the long AI call).
+- Changes section status to `planning` via `updateSectionStatus(id, 'planning')`.
 - Calls `getExtractedTexts(sectionId)` to gather all extracted text from the section's files.
 - Calls `generatePlan(allText)` — waits for the result.
 - Validates the AI response against the `PlanJSON` schema (must have a non-empty `topics` array, each topic must have a non-empty `title` and a non-empty `subtopics` array of non-empty strings). If validation fails, treats it as a generation failure.
@@ -509,16 +508,18 @@ Add:
 
 #### `POST /api/sections/:id/start-studying`
 - Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Opens a database transaction (using the WebSocket `Pool` connection) for all remaining steps:
-  - Locks the section row with `SELECT ... FOR UPDATE` and validates that the section is in `planning` status — returns 400 (`INVALID_SECTION_STATUS`) if not. The lock prevents concurrent `start-studying` requests from both passing the status check.
-  - Gets the current plan draft via `getCurrentPlanDraft()` — returns 400 if none exists.
-  - Validates that the plan has at least one topic with at least one subtopic — returns 400 (`EMPTY_PLAN`) if the plan has no topics.
-  - Calls `createTopicsFromPlan()` to write topics and subtopics to their tables.
-  - Deletes all plan drafts for the section.
-  - Changes section status to `studying`.
-- If any step fails, the entire transaction rolls back — no partial state changes.
+- Calls `getSection(id)` to validate that the section is in `planning` status — returns 400 (`INVALID_SECTION_STATUS`) if not.
+- Gets the current plan draft via `getCurrentPlanDraft()` — returns 400 if none exists.
+- Validates that the plan has at least one topic with at least one subtopic — returns 400 (`EMPTY_PLAN`) if the plan has no topics.
+- Calls `createTopicsFromPlan()` to write topics and subtopics to their tables.
+- Deletes all plan drafts for the section via `deleteAllPlanDrafts()`.
+- Changes section status to `studying` via `updateSectionStatus(id, 'studying')`.
 
-### 7.7 Planning UI (`src/app/(main)/sections/[id]/` — Planning component)
+### 7.7 Planning UI (`src/components/PlanningView.tsx`)
+
+**Prerequisites**: Install `@dnd-kit/core` and `@dnd-kit/sortable` (`npm install @dnd-kit/core @dnd-kit/sortable`).
+
+**i18n**: Add a `planning` section to the `Translations` interface and both language files with all keys needed for the Planning UI (loading message, error message, retry, undo, regenerate, guidance placeholder, start studying, already known, add topic/subtopic labels, etc.) — same pattern as Phase 6.6's `uploading` section.
 
 #### Loading state
 While `POST /api/sections/:id/start-planning` (or `POST /api/sections/:id/plan/regenerate`) is in flight:
@@ -548,7 +549,7 @@ If `start-planning` or `regenerate` returns an error (network error, AI failure)
 - **"Começar a Estudar" (Start Studying) button**: At the bottom. Calls `POST /api/sections/:id/start-studying`. Disabled immediately after click to prevent double-submission.
 
 #### Drag-and-drop
-- Use a drag-and-drop library (e.g., `@dnd-kit/core` and `@dnd-kit/sortable`) for reordering topics and subtopics within the same topic only (no cross-topic subtopic movement).
+- Use `@dnd-kit/core` and `@dnd-kit/sortable` for reordering topics and subtopics within the same topic only (no cross-topic subtopic movement).
 - After each reorder, save the updated plan as a new draft.
 
 #### Edit behavior (pessimistic updates)
