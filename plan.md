@@ -384,6 +384,7 @@ Build the reusable components that will be used across the app. Each component f
 - Returns the status of all files in the section via `listFileStatuses(sectionId)` (for polling).
 
 ### 6.3 AI text extraction setup
+- **All prompts in `src/prompts/index.ts` must use XML-style formatting** — use XML tags (e.g., `<instructions>`, `<context>`, `<rules>`, `<output_format>`) to structure prompt sections. This applies to every prompt defined in this file across all phases (text extraction, plan generation, plan regeneration, chat system prompts, and summarization).
 - Write the text extraction prompt in `src/prompts/index.ts`. The prompt instructs the AI to extract:
   - All readable text (in Markdown).
   - Math formulas converted to LaTeX.
