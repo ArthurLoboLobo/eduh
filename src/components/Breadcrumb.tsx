@@ -10,21 +10,27 @@ interface Section {
   name: string;
 }
 
-interface BreadcrumbProps {
-  sections: Section[];
-}
-
-export default function Breadcrumb({ sections }: BreadcrumbProps) {
+export default function Breadcrumb() {
   const { t } = useTranslation();
   const pathname = usePathname();
   const params = useParams();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  const [sections, setSections] = useState<Section[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const sectionId = typeof params?.id === 'string' ? params.id : null;
   const currentSection = sectionId ? sections.find((s) => s.id === sectionId) : null;
+
+  useEffect(() => {
+    fetch('/api/sections')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.sections) setSections(data.sections);
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   const isOnDashboard = pathname === '/dashboard';
   const isOnSection = !!sectionId;

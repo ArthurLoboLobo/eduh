@@ -52,6 +52,31 @@ export interface Translations {
     planningPlaceholder: string;
     studyingPlaceholder: string;
   };
+  uploading: {
+    dropZoneLabel: string;
+    dropZoneActive: string;
+    fileStatus: {
+      uploading: string;
+      processing: string;
+      processed: string;
+      error: string;
+    };
+    retry: string;
+    startPlanning: string;
+    deleteConfirmTitle: string;
+    deleteConfirmMessage: string;
+    confirm: string;
+    cancel: string;
+    previewTitle: string;
+    noPreview: string;
+    errors: {
+      INVALID_FILE_TYPE: string;
+      FILE_TOO_LARGE: string;
+      SIZE_LIMIT_EXCEEDED: string;
+      UPLOAD_FAILED: string;
+    };
+    emptyFiles: string;
+  };
   errors: {
     EMAIL_INVALID: string;
     EMAIL_MISSING: string;
@@ -126,6 +151,31 @@ const ptBR: Translations = {
     uploadingPlaceholder: 'Envio de arquivos',
     planningPlaceholder: 'Planejamento de estudos',
     studyingPlaceholder: 'Estudando',
+  },
+  uploading: {
+    dropZoneLabel: 'Arraste arquivos aqui ou clique para selecionar',
+    dropZoneActive: 'Solte os arquivos aqui',
+    fileStatus: {
+      uploading: 'Enviando',
+      processing: 'Processando',
+      processed: 'Processado',
+      error: 'Erro',
+    },
+    retry: 'Tentar novamente',
+    startPlanning: 'Iniciar Planejamento',
+    deleteConfirmTitle: 'Excluir arquivo',
+    deleteConfirmMessage: 'Tem certeza que deseja excluir este arquivo?',
+    confirm: 'Confirmar',
+    cancel: 'Cancelar',
+    previewTitle: 'Visualizar arquivo',
+    noPreview: 'Visualizacao nao disponivel para este tipo de arquivo.',
+    errors: {
+      INVALID_FILE_TYPE: 'Tipo de arquivo nao suportado.',
+      FILE_TOO_LARGE: 'Arquivo excede o limite de 4 MB.',
+      SIZE_LIMIT_EXCEEDED: 'Limite de 10 MB da secao atingido.',
+      UPLOAD_FAILED: 'Falha ao enviar o arquivo.',
+    },
+    emptyFiles: 'Nenhum arquivo enviado ainda.',
   },
   errors: {
     EMAIL_INVALID: 'E-mail invalido.',

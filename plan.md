@@ -355,7 +355,7 @@ Build the reusable components that will be used across the app. Each component f
 - Validates:
   - Calls `verifySectionOwnership(sectionId, userId)` — returns 404 (`SECTION_NOT_FOUND`) if not owned.
   - Calls `getSection(sectionId)` — returns 400 (`INVALID_SECTION_STATUS`) if section is not in `uploading` status.
-  - File MIME type is allowed — returns 400 (`INVALID_FILE_TYPE`) if not. Accepted MIME types (matching Gemini's native support): `application/pdf`, `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.presentationml.presentation` (PPTX), `image/jpeg`, `image/png`, `image/webp`, `image/heif`.
+  - File MIME type is allowed — returns 400 (`INVALID_FILE_TYPE`) if not. Accepted MIME types (matching Gemini's native support): `application/pdf`, `text/plain`, `image/jpeg`, `image/png`, `image/webp`, `image/heif`.
   - File size does not exceed **4 MB** — returns 400 (`FILE_TOO_LARGE`) if exceeded.
   - Adding this file would not exceed the **10 MB section limit** (check `getTotalSizeForSection` + file size) — returns 409 (`SIZE_LIMIT_EXCEEDED`) if exceeded.
 - Uploads the file to Vercel Blob using `put()` from `@vercel/blob` (server-side upload — the file passes through the serverless function).
@@ -390,7 +390,7 @@ Build the reusable components that will be used across the app. Each component f
   - Math formulas converted to LaTeX.
   - Detailed descriptions of any images, diagrams, or non-text content.
 - Use the `gemini-3-flash-preview` model (configured in `src/config/ai.ts`).
-- Supported file types sent directly to Gemini: PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, HEIF. No conversion step needed.
+- Supported file types sent directly to Gemini: PDF, TXT, JPEG, PNG, WEBP, HEIF. No conversion step needed.
 
 ### 6.4 `src/config/ai.ts` (initial version)
 Create the config file with the initial parameters needed for this phase:
@@ -398,7 +398,7 @@ Create the config file with the initial parameters needed for this phase:
 - Other parameters will be added in later phases as needed.
 
 ### 6.5 AI wrapper (`src/lib/ai.ts`) — initial version
-- `extractTextFromFile(fileBuffer: Buffer, mimeType: string): Promise<string>` — uses `generateText` from the `ai` package with the `google()` provider from `@ai-sdk/google` to send the raw file bytes to Gemini as a multimodal prompt (file content part + extraction instructions from `src/prompts/index.ts`). Returns the extracted text. No image conversion needed — Gemini natively handles all accepted file types (PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, HEIF).
+- `extractTextFromFile(fileBuffer: Buffer, mimeType: string): Promise<string>` — uses `generateText` from the `ai` package with the `google()` provider from `@ai-sdk/google` to send the raw file bytes to Gemini as a multimodal prompt (file content part + extraction instructions from `src/prompts/index.ts`). Returns the extracted text. No image conversion needed — Gemini natively handles all accepted file types (PDF, TXT, JPEG, PNG, WEBP, HEIF).
 
 ### 6.6 Uploading UI (`src/components/UploadingView.tsx`)
 - **i18n**: Add all necessary translation keys to `src/lib/i18n/pt-BR.ts` and `src/lib/i18n/en.ts` for the uploading UI (upload zone text, file status labels, button labels, error messages, etc.).
@@ -408,7 +408,7 @@ Create the config file with the initial parameters needed for this phase:
 - **File list**: Below the upload zone, shows all uploaded files with:
   - File name.
   - Status label: `Enviando` → `Processando` → `Processado`. If extraction fails: `Erro`.
-  - Click on the file name to preview (opens a modal showing the original file — PDF rendered in an iframe, images displayed directly). For file types that cannot be previewed in the browser (DOCX, PPTX, TXT), show a "no preview available" message.
+  - Click on the file name to preview (opens a modal showing the original file — PDF rendered in an iframe, images displayed directly). For file types that cannot be previewed in the browser (TXT), show a "no preview available" message.
   - Remove button (trash icon) to delete the file.
   - If a file has `error` status, show a "Tentar novamente" (Retry) button that re-triggers processing by calling `POST /api/files/:id/process`.
 - **Polling**: Use `setInterval` to poll `GET /api/sections/:id/files/status` every 3 seconds to update file statuses.
@@ -792,4 +792,4 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 
 ## Future TODOs
 
-- **File preview improvements**: Currently, non-PDF/non-image files (DOCX, PPTX, TXT) show a "no preview available" message in the preview modal. In the future, implement proper rendering for these file types (e.g., convert to HTML/PDF on the server, or use a document viewer library).
+- **File preview improvements**: Currently, non-PDF/non-image files (TXT) show a "no preview available" message in the preview modal. In the future, implement proper rendering for these file types (e.g., display plain text content directly).

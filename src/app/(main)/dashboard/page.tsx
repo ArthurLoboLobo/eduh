@@ -91,10 +91,7 @@ export default function DashboardPage() {
         return;
       }
       const data = await res.json();
-      setSections((prev) => [data.section, ...prev]);
-      setCreateOpen(false);
-      setCreateName('');
-      setCreateDesc('');
+      router.push(`/sections/${data.section.id}`);
     } catch {
       setCreateError(t.errors.UNKNOWN);
     } finally {

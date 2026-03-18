@@ -7,8 +7,6 @@ import { createFile, getTotalSizeForSection } from '@/lib/db/queries/files';
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
   'text/plain',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'image/jpeg',
   'image/png',
   'image/webp',
@@ -57,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'SIZE_LIMIT_EXCEEDED' }, { status: 409 });
     }
 
-    const blob = await put(file.name, file, { access: 'public' });
+    const blob = await put(`${sectionId}/${file.name}`, file, { access: 'public' });
 
     const dbFile = await createFile(
       sectionId,

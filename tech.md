@@ -95,7 +95,7 @@ db/
 ## File Handling
 
 ### Supported File Types
-- PDF, images (JPEG, PNG, etc.), TXT, DOCX, PPTX, and similar document formats.
+- PDF, images (JPEG, PNG, etc.), TXT, and similar document formats.
 
 ### Storage
 - Files are stored in **Vercel Blob**.
@@ -108,7 +108,7 @@ db/
   5. Client immediately calls `POST /api/files/:id/process` to trigger text extraction.
 
 ### Processing (Text Extraction)
-- Files are sent **directly to Gemini** as multimodal input — no image conversion step. Gemini natively handles PDF, TXT, DOCX, PPTX, JPEG, PNG, WEBP, and HEIF.
+- Files are sent **directly to Gemini** as multimodal input — no image conversion step. Gemini natively handles PDF, TXT, JPEG, PNG, WEBP, and HEIF.
 - The AI extracts:
   - All readable text (in Markdown)
   - Math formulas (converted to LaTeX)
