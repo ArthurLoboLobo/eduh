@@ -53,9 +53,9 @@ Ditchy is a platform that helps university students prepare for exams using AI. 
     - Create a new subtopic: By clicking a "+" button that appears below the last subtopic when hovering over a topic card. By clicking it, a new empty subtopic will be created at the end of the topic. The user will edit the subtopic text.
     - Reorder topics: Users can drag and drop the topics to reorder them. On the left side of the card, there will be a small icon to drag and drop the whole card.
     - Reorder subtopics: Users can drag and drop subtopics within a topic to reorder them.
-    - Mark as known: In the top left, there will be a small "Already Known" checkbox to click and mark the topic as known. The topics marked as "known" won't be excluded from the studying page (the next one); they will just start marked as completed, and the user can unmark them in the future if needed.
+    - Mark as known: In the top right, there will be a small "Already Known" checkbox to click and mark the topic as known. The topics marked as "known" won't be excluded from the studying page (the next one); they will just start marked as completed, and the user can unmark them in the future if needed.
     - Undo: The user can undo any editing action (deletes, edits, reorders, etc.) using an undo button at the top of the planning interface.
-- The user can click a "Regenerate Plan" button to have the AI create a new study plan from scratch. An optional text box allows the user to give guidance (e.g., "Focus more on calculus, less on statistics").
+- The user can click a "Regenerate Plan" button to have the AI create a new study plan from scratch. An inline text box appears for required guidance (e.g., "Focus more on calculus, less on statistics") — the confirm button is disabled until the user types something.
 - After finishing the edits, the user clicks "Start Studying" and the study plan can no longer be changed.
 
 #### Studying

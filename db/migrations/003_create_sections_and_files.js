@@ -2,14 +2,12 @@
 exports.up = (pgm) => {
   pgm.sql(`
     CREATE TABLE sections (
-      id                     UUID      PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id                UUID      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      name                   TEXT      NOT NULL,
-      description            TEXT,
-      status                 TEXT      NOT NULL DEFAULT 'uploading',
-      plan_total_batches     INTEGER,
-      plan_processed_batches INTEGER,
-      created_at             TIMESTAMP NOT NULL DEFAULT now()
+      id          UUID      PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     UUID      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name        TEXT      NOT NULL,
+      description TEXT,
+      status      TEXT      NOT NULL DEFAULT 'uploading',
+      created_at  TIMESTAMP NOT NULL DEFAULT now()
     );
 
     CREATE INDEX sections_user_id_idx ON sections(user_id);

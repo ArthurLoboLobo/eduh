@@ -409,126 +409,130 @@ Create the config file with the initial parameters needed for this phase:
   - Remove button (trash icon) to delete the file.
   - If a file has `error` status, show a "Tentar novamente" (Retry) button that re-triggers processing by calling `POST /api/files/:id/process`.
 - **Polling**: Use `setInterval` to poll `GET /api/sections/:id/files/status` every few seconds to update file statuses.
-- **"Iniciar Planejamento" (Start Planning) button**: Only enabled when all uploaded files have status `processed` (no files with `uploading`, `processing`, or `error` status) and there is at least one file. Clicking it calls `POST /api/sections/:id/start-planning` (Phase 7) and transitions the section.
+- **"Iniciar Planejamento" (Start Planning) button**: Only enabled when all uploaded files have status `processed` (no files with `uploading`, `processing`, or `error` status) and there is at least one file. Clicking it does nothing for now — the behavior will be implemented in Phase 7.
 
 ---
 
 ## Phase 7 — Study Plan Generation
 
-### 7.1 Prompts (`src/prompts/index.ts` — additions)
-Add the study plan generation prompt:
-- Instructs the AI to create a structured study plan from the provided text.
-- The plan must be a JSON object with an array of topics, each containing a title and an array of subtopic strings.
-- The order matters — topics should be in the recommended study order.
-- The AI receives the current plan (if any) and a new batch of text, and outputs an updated plan incorporating the new material.
-- Include a field for optional user guidance (used during regeneration).
+### 7.1 Plan JSON schema
 
-### 7.2 AI config additions (`src/config/ai.ts`)
+Both AI-generated and user-edited plans use the same structure:
+
+```typescript
+type PlanJSON = {
+  topics: {
+    title: string;
+    subtopics: string[];
+    isKnown?: boolean; // only set by user edits, never by AI
+  }[];
+};
+```
+
+The AI generates plans without `isKnown`. The field is added by the UI when the user marks a topic as "Already Known". `createTopicsFromPlan` maps `isKnown: true` to `is_completed = true` in the `topics` table.
+
+### 7.2 Prompts (`src/prompts/index.ts` — additions)
+Add two separate prompts:
+- **Plan generation prompt**: Instructs the AI to create a structured study plan from the provided text. The plan must follow the `PlanJSON` schema — a JSON object with an array of topics, each containing a `title` and an array of `subtopics` strings. The order matters — topics should be in the recommended study order.
+- **Plan regeneration prompt**: Same structure as above, but also receives the user's guidance text and instructs the AI to take it into account when producing the new plan.
+
+### 7.3 AI config additions (`src/config/ai.ts`)
 Add:
-- `PLAN_GENERATION_MODEL: 'gemini-2.5-flash-lite'`
-- `PLAN_BATCH_SIZE` — max token/character limit per batch.
+- `PLAN_GENERATION_MODEL: 'gemini-3-flash-preview'`
 
-### 7.3 AI wrapper additions (`src/lib/ai.ts`)
-- `generatePlanBatch(currentPlan, textBatch, guidance?): PlanJSON` — sends the current plan and a batch of text to the LLM, returns the updated plan as structured JSON.
+### 7.4 AI wrapper additions (`src/lib/ai.ts`)
+- `generatePlan(allText): PlanJSON` — sends all extracted text to the LLM using the generation prompt, returns the full plan as structured JSON.
+- `regeneratePlan(allText, guidance): PlanJSON` — sends all extracted text and the user's guidance to the LLM using the regeneration prompt, returns the updated plan as structured JSON.
 
-### 7.4 Database queries
+### 7.5 Database queries
 
 #### `src/lib/db/queries/sections.ts` (additions)
 - `updateSectionStatus(sectionId, status)` — updates the section's status. Used by `start-planning` and `start-studying` routes.
 
 #### `src/lib/db/queries/files.ts` (additions)
-- `getExtractedTexts(sectionId)` — returns the `extracted_text` of all processed files in a section, concatenated or as an array. Used by plan generation and regeneration.
+- `getExtractedTexts(sectionId)` — returns the `extracted_text` of all processed files in a section, as an array. Used by plan generation and regeneration.
 
 #### `src/lib/db/queries/plans.ts`
 - `createPlanDraft(sectionId, planJson)` — inserts a new plan draft row.
-- `upsertGeneratingDraft(sectionId, planJson)` — during generation, updates the in-progress draft instead of creating a new one. If no draft exists yet for this generation cycle, creates one. This ensures each generation cycle (initial or regeneration) produces only one draft row, keeping the undo stack clean.
 - `getCurrentPlanDraft(sectionId)` — returns the draft with the highest `created_at`.
+- `getDraftCount(sectionId)` — returns the number of drafts for a section.
 - `deleteNewestPlanDraft(sectionId)` — deletes the most recent draft (undo).
 - `deleteAllPlanDrafts(sectionId)` — removes all drafts for a section (cleanup after "Start Studying").
-- `updateSectionPlanProgress(sectionId, totalBatches, processedBatches)` — updates the batch progress fields.
-- `storePlanBatches(sectionId, batches)` — inserts the text batches into the `plan_batches` table with sequential `batch_index` values.
-- `getPlanBatch(sectionId, batchIndex)` — returns the text content of a specific batch by index.
-- `deletePlanBatches(sectionId)` — deletes all stored batches for a section (cleanup after generation completes).
 
-### 7.5 Database queries (`src/lib/db/queries/topics.ts`)
+#### `src/lib/db/queries/topics.ts`
 - `createTopicsFromPlan(sectionId, planJson)` — takes the final plan JSON and inserts rows into `topics` and `subtopics` tables with the correct order values. Topics marked as "known" in the plan get `is_completed = true`.
 - `listTopics(sectionId)` — returns all topics with their subtopics, ordered by `order`.
 
 ### 7.6 API routes
 
 #### `POST /api/sections/:id/start-planning`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned. Calls `getSection(id)` to validate that the section is in `uploading` status.
-- Changes section status to `planning`.
+- **Update the Uploading UI (Phase 6.6)**: Wire up the "Iniciar Planejamento" button to call this endpoint. On success, transition the section page to the Planning component.
+- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
+- Locks the section row with `SELECT ... FOR UPDATE` (using the WebSocket `Pool` connection) and validates that the section is in `uploading` status. The lock prevents concurrent `start-planning` requests from both passing the status check.
+- Calls `listFiles(sectionId)` to verify that at least one file exists and that every file has `processed` status — returns 400 (`FILES_NOT_READY`) if not.
+- Changes section status to `planning` and commits the transaction (releases the lock before the long AI call).
 - Calls `getExtractedTexts(sectionId)` to gather all extracted text from the section's files.
-- Splits the text into batches based on `PLAN_BATCH_SIZE`.
-- Stores the batches in the `plan_batches` table via `storePlanBatches()`.
-- Sets `plan_total_batches` and `plan_processed_batches = 0` on the section.
-- Triggers the first batch by making a non-awaited `fetch()` to `POST /api/sections/:id/plan/generate-batch`.
-- Returns success.
-
-#### `POST /api/sections/:id/plan/generate-batch` (internal — background job)
-- This is an internal endpoint. Calls `getSection(id)` to verify the section is in `planning` status and `plan_processed_batches < plan_total_batches` to prevent external abuse.
-- Self-chaining job:
-  1. Get the current in-progress plan (via `getCurrentPlanDraft`) and retrieve the next batch from `plan_batches` using `getPlanBatch(sectionId, plan_processed_batches)`.
-  2. Call `generatePlanBatch()` with the current plan and text batch.
-  3. Update the same draft row with the result using `upsertGeneratingDraft()` (do NOT create a new draft per batch — this keeps the undo stack clean so intermediate batch results don't pollute it).
-  4. Increment `plan_processed_batches` on the section.
-  5. If more batches remain, make a non-awaited `fetch()` to this same endpoint, then return.
-  6. If this was the last batch, delete the stored batches via `deletePlanBatches()` and the plan is ready.
+- Calls `generatePlan(allText)` — waits for the result.
+- Validates the AI response against the `PlanJSON` schema (must have a non-empty `topics` array, each topic must have a non-empty `title` and a non-empty `subtopics` array of non-empty strings). If validation fails, treats it as a generation failure.
+- On success: stores the result via `createPlanDraft(sectionId, planJson)` and returns 200.
+- On failure: reverts section status to `uploading` and returns 500.
 
 #### `GET /api/sections/:id/plan`
 - Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Returns the current plan draft's `plan_json`.
+- Returns the current plan draft's `plan_json`, or `null` if no draft exists.
 
 #### `PUT /api/sections/:id/plan`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
+- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned. Calls `getSection(id)` to validate that the section is in `planning` status — returns 400 (`INVALID_SECTION_STATUS`) if not.
 - Receives the updated `plan_json` from the client (after user edits).
+- Validates the received JSON against the `PlanJSON` schema (must have a `topics` array, each topic must have a non-empty `title` and a `subtopics` array of strings; `isKnown` is optional boolean). Returns 400 (`INVALID_PLAN_JSON`) if validation fails — the existing draft is not changed.
 - Creates a new plan draft row with the updated JSON.
 
 #### `POST /api/sections/:id/plan/undo`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
+- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned. Calls `getSection(id)` to validate that the section is in `planning` status — returns 400 (`INVALID_SECTION_STATUS`) if not.
+- Calls `getDraftCount(sectionId)` — returns 400 (`NOTHING_TO_UNDO`) if fewer than 2 drafts exist.
 - Deletes the newest plan draft for the section.
 - Returns the new current draft (the previous one).
-- If no drafts remain, returns an error.
 
 #### `POST /api/sections/:id/plan/regenerate`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Receives `{ guidance }` (optional text).
+- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned. Calls `getSection(id)` to validate that the section is in `planning` status — returns 400 (`INVALID_SECTION_STATUS`) if not.
+- Calls `getCurrentPlanDraft(sectionId)` to verify a draft exists — returns 400 (`NO_PLAN_DRAFT`) if not.
+- Receives `{ guidance }` (required). Returns 400 if `guidance` is missing or blank.
 - Does NOT delete existing drafts — old drafts are kept so the user can undo back to the pre-regeneration plan.
-- Deletes any leftover `plan_batches` for the section, then calls `getExtractedTexts(sectionId)` to re-gather all extracted text, re-splits into batches, and stores them via `storePlanBatches()`.
-- Resets `plan_processed_batches` to 0 and recalculates `plan_total_batches`.
-- Creates a new empty draft via `createPlanDraft(sectionId, null)` — this becomes the new "top" of the undo stack while preserving old drafts below it. Then starts the batch chain. Each batch updates this newest draft via `upsertGeneratingDraft()`. The guidance text is passed to the prompt.
-- When complete, the regenerated plan is one new draft on top of the existing stack. Undo walks back to the previous plan.
-
-#### `GET /api/sections/:id/plan/status`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Calls `getSection(id)` to read `plan_processed_batches` and `plan_total_batches`.
-- Returns the current generation status:
-  - `generating` if `plan_processed_batches < plan_total_batches`.
-  - `ready` if all batches are processed.
-- Returns the progress as a percentage: `(plan_processed_batches / plan_total_batches) * 100`.
+- Calls `getExtractedTexts(sectionId)` to re-gather all extracted text.
+- Calls `regeneratePlan(allText, guidance)` — waits for the result.
+- Validates the AI response against the `PlanJSON` schema (same validation as `start-planning`). If validation fails, treats it as a regeneration failure.
+- On success: creates a new draft via `createPlanDraft(sectionId, planJson)` and returns 200. The regenerated plan is one new draft on top of the existing stack. Undo walks back to the previous plan.
+- On failure: returns 500 (existing drafts are untouched).
 
 #### `POST /api/sections/:id/start-studying`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned. Calls `getSection(id)` to validate that the section is in `planning` status and the plan is ready.
-- Gets the current plan draft.
-- Calls `createTopicsFromPlan()` to write topics and subtopics to their tables.
-- Deletes all plan drafts for the section.
-- Changes section status to `studying`.
+- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
+- Opens a database transaction (using the WebSocket `Pool` connection) for all remaining steps:
+  - Locks the section row with `SELECT ... FOR UPDATE` and validates that the section is in `planning` status — returns 400 (`INVALID_SECTION_STATUS`) if not. The lock prevents concurrent `start-studying` requests from both passing the status check.
+  - Gets the current plan draft via `getCurrentPlanDraft()` — returns 400 if none exists.
+  - Validates that the plan has at least one topic with at least one subtopic — returns 400 (`EMPTY_PLAN`) if the plan has no topics.
+  - Calls `createTopicsFromPlan()` to write topics and subtopics to their tables.
+  - Deletes all plan drafts for the section.
+  - Changes section status to `studying`.
+- If any step fails, the entire transaction rolls back — no partial state changes.
 
 ### 7.7 Planning UI (`src/app/(main)/sections/[id]/` — Planning component)
 
 #### Loading state
-- While `status` from `GET /api/sections/:id/plan/status` is `generating`:
-  - Show a spinner with the message "Criando seu plano de estudos..." (Creating your study plan...).
-  - Show a progress bar with the percentage (e.g., "43%").
-  - Poll the status endpoint every few seconds using `setInterval`.
+While `POST /api/sections/:id/start-planning` (or `POST /api/sections/:id/plan/regenerate`) is in flight:
+- Show a spinner with the message "Criando seu plano de estudos..." (Creating your study plan...).
+- No progress bar.
 
-#### Plan editor (shown when status is `ready`)
+#### Error state
+If `start-planning` or `regenerate` returns an error (network error, AI failure):
+- Show an error message with a "Tentar novamente" (Try again) button that re-calls the same endpoint.
+- Also shown on page load if the section is in `planning` status but `GET /api/sections/:id/plan` returns `null` — indicates the previous generation was interrupted (e.g., page refresh mid-generation).
+
+#### Plan editor (shown after successful generation or on page load when a draft exists)
 - Display the plan as a vertical list of topic cards.
 - **Each topic card**:
   - Drag handle on the left side (for reordering topics via drag-and-drop).
   - Topic title — click to edit (inline editing). The editable state appears on hover.
-  - "Já conheço" (Already Known) checkbox in the top-left corner. Marking it dims the card.
+  - "Já domino" (Already Known) checkbox in the top-right corner. Marking it dims the card.
   - Trash button — appears on hover. Clicking it removes the topic and all its subtopics from the plan.
   - List of subtopics inside the card:
     - Each subtopic text is click-to-edit (inline). Editable on hover.
@@ -536,13 +540,18 @@ Add:
     - Subtopics are reorderable via drag-and-drop within the topic.
     - "+" button below the last subtopic — appears on hover. Creates a new empty subtopic.
 - **"+" button** below all topic cards: creates a new empty topic at the end.
-- **Undo button** ("Desfazer"): Top-right, above the plan. Every edit (delete, edit text, reorder, create, mark as known) saves a new draft via `PUT /api/sections/:id/plan`. Clicking undo calls `POST /api/sections/:id/plan/undo` and loads the previous draft.
-- **"Regenerar Plano" (Regenerate Plan) button**: Below the plan. Clicking it reveals an inline text box for optional guidance (e.g., "Focar mais em cálculo"). Confirming calls `POST /api/sections/:id/plan/regenerate` and returns to the loading state.
-- **"Começar a Estudar" (Start Studying) button**: At the bottom. Calls `POST /api/sections/:id/start-studying`.
+- **Undo button** ("Desfazer"): Top-right, above the plan. Every edit saves a new draft via `PUT /api/sections/:id/plan`. Clicking undo calls `POST /api/sections/:id/plan/undo` and loads the previous draft. The button is disabled when there is only 1 draft (nothing to undo back to). **What counts as one edit**: structural changes (delete, reorder, create, mark as known) save a draft immediately. Text edits (topic title or subtopic text) save a draft on blur — clicking into a text field starts an edit session, and clicking outside ends it and saves one draft, regardless of how many characters were changed.
+- **"Regenerar Plano" (Regenerate Plan) button**: Below the plan. Clicking it reveals an inline text box for required guidance (e.g., "Focar mais em cálculo"). The confirm button is disabled until the user types something. Confirming calls `POST /api/sections/:id/plan/regenerate` and returns to the loading state.
+- **"Começar a Estudar" (Start Studying) button**: At the bottom. Calls `POST /api/sections/:id/start-studying`. Disabled immediately after click to prevent double-submission.
 
 #### Drag-and-drop
-- Use a drag-and-drop library (e.g., `@dnd-kit/core` and `@dnd-kit/sortable`) for reordering topics and subtopics.
+- Use a drag-and-drop library (e.g., `@dnd-kit/core` and `@dnd-kit/sortable`) for reordering topics and subtopics within the same topic only (no cross-topic subtopic movement).
 - After each reorder, save the updated plan as a new draft.
+
+#### Edit behavior (pessimistic updates)
+- All edit operations (save draft, undo, delete, reorder, mark as known, start studying) use **pessimistic updates**: the UI waits for the server response before reflecting the change.
+- While a `PUT /plan`, `POST /plan/undo`, or `POST /start-studying` request is in flight, disable all plan editing controls (drag handles, text fields, buttons) to prevent concurrent edits. Show a subtle loading indicator (e.g., a small spinner near the undo button).
+- If a save or undo request fails, show a brief inline error toast and restore the plan to its last known server state.
 
 ---
 
@@ -567,7 +576,7 @@ Add:
 ### 8.2 AI config additions (`src/config/ai.ts`)
 Add all remaining parameters:
 - `TEACHING_CHAT_MODEL: 'gemini-3.1-flash-lite-preview'`
-- `SUMMARIZATION_MODEL: 'gemini-2.5-flash-lite'`
+- `SUMMARIZATION_MODEL: 'gemini-3-flash-preview'`
 - `EMBEDDING_MODEL: 'gemini-embedding-001'`
 - `CHUNK_SIZE: 1000` (tokens)
 - `CHUNK_OVERLAP: 100` (tokens)

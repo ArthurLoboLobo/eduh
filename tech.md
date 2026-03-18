@@ -90,7 +90,7 @@ db/
 ## Client-Side Data Fetching
 
 - Plain `fetch` for all API calls. No data fetching library (no SWR, React Query, etc.).
-- Polling (file processing status, plan generation progress) uses `setInterval` with `fetch`.
+- Polling (file processing status) uses `setInterval` with `fetch`.
 
 ## File Handling
 
@@ -119,13 +119,9 @@ db/
 
 ## Background Jobs
 
-- Study plan generation runs as a **self-chaining serverless function**.
-- Each step is a separate API call that fits within Vercel's 60s function limit.
-- **Chaining mechanism**: At the end of each step, the function fires a non-awaited `fetch()` call to its own API to trigger the next step, then returns. Vercel spins up a new function invocation for the next step. This means jobs complete even if the user closes the browser.
-- **File processing**: Triggered by the client calling `POST /api/files/:id/process` immediately after `POST /api/files`. Processes one file per call. The client calls it once per file; multiple concurrent calls for different files are fine.
-- **Plan generation**: The first step is triggered by `POST /api/sections/:id/start-planning`. Each step processes one batch (current plan + next batch → updated plan), then self-calls for the next batch. Stops after the last batch.
-- The client polls for status updates (no WebSockets/SSE).
-- This approach avoids the need for external queue services (QStash, Inngest, etc.) and works on Vercel's free tier.
+- **File processing**: Triggered by the client calling `POST /api/files/:id/process` immediately after `POST /api/files`. Processes one file per call and runs as a background job using the self-chaining pattern (non-awaited `fetch()`). The client calls it once per file; multiple concurrent calls for different files are fine.
+- **Plan generation**: Runs synchronously inside `POST /api/sections/:id/start-planning`. The entire extracted text is sent to the LLM in a single call. No self-chaining; the client waits for the response and shows a spinner.
+- The client polls for file processing status (no WebSockets/SSE).
 
 ## Internationalization
 
@@ -154,7 +150,6 @@ db/
 
 A single configuration file containing all tunable AI parameters:
 - Model identifiers (per task)
-- Batch size (tokens/chars) for plan generation
 - Chunk size for RAG (1000 tokens)
 - Chunk overlap (100 tokens)
 - Top N chunks returned per search tool call (4)
@@ -175,13 +170,10 @@ All prompts are hardcoded in the codebase. When a prompt is needed, it is import
 
 ### Study Plan Generation
 
-- Runs as a **background job** with status polling.
-- Uses a **sequential batch approach**:
-  1. All extracted text from the section's files is split into batches according to a max token/char limit (defined in config).
-  2. The first batch is sent to the LLM with no existing plan — the LLM creates an initial plan from scratch.
-  3. Each subsequent batch is sent together with the current plan. The LLM outputs an updated plan incorporating the new material.
-  4. After the last batch is processed, the resulting plan is the final study plan.
+- Runs **synchronously** inside `POST /api/sections/:id/start-planning`. The client waits for the response.
+- All extracted text from the section's files is concatenated and sent to the LLM in a **single call**. Gemini's 1M token context window makes this feasible for typical student uploads.
 - The LLM returns the plan as **structured JSON** (easy to parse and store directly in the database).
+- On failure, the section status is reverted to `uploading` and the client shows an error with a retry button.
 
 ### RAG (Retrieval-Augmented Generation)
 
@@ -278,8 +270,6 @@ All tables use UUID primary keys and `created_at` timestamps. Messages use seria
 | `name`        | TEXT      |                                                |
 | `description` | TEXT      | Nullable                                       |
 | `status`      | TEXT      | `uploading` / `planning` / `studying`          |
-| `plan_total_batches`     | INTEGER   | Nullable. Total batches for plan generation. Set when planning starts. |
-| `plan_processed_batches` | INTEGER   | Nullable. Number of batches processed so far. |
 | `created_at`  | TIMESTAMP |                                                |
 
 ### `files`
@@ -307,17 +297,6 @@ All tables use UUID primary keys and `created_at` timestamps. Messages use seria
 - **Undo** = delete the newest draft; the previous one becomes current.
 - **Regenerate Plan** = create a new draft row with the regenerated plan. Old drafts remain, so undo can walk back through regenerations.
 - When the user clicks "Start Studying", the current draft's `plan_json` is written into the `topics` and `subtopics` tables. All drafts for the section are then deleted.
-
-### `plan_batches`
-| Column        | Type      | Notes                              |
-| ------------- | --------- | ---------------------------------- |
-| `id`          | UUID (PK) |                                    |
-| `section_id`  | UUID (FK) | References `sections.id`           |
-| `batch_index` | INTEGER   | Sequential index (0, 1, 2, ...)    |
-| `content`     | TEXT      | Text content for this batch        |
-
-- Stores pre-split text batches during plan generation so each chained function call can retrieve the next batch by index.
-- Deleted after generation completes.
 
 ### `topics`
 | Column         | Type      | Notes                              |
@@ -410,12 +389,11 @@ All routes are REST. Protected routes require a valid JWT in the HTTP-only cooki
 ### Planning
 | Method | Route                                  | Description                                     |
 | ------ | -------------------------------------- | ----------------------------------------------- |
-| POST   | `/api/sections/:id/start-planning`     | Transition section to planning, trigger plan generation |
-| GET    | `/api/sections/:id/plan`               | Get the current plan draft                       |
+| POST   | `/api/sections/:id/start-planning`     | Generate plan synchronously, transition section to planning |
+| GET    | `/api/sections/:id/plan`               | Get the current plan draft (`null` if none)      |
 | PUT    | `/api/sections/:id/plan`               | Save a new plan draft (after user edit)          |
 | POST   | `/api/sections/:id/plan/undo`          | Delete the newest draft (undo)                   |
-| POST   | `/api/sections/:id/plan/regenerate`    | Regenerate plan with optional guidance text      |
-| GET    | `/api/sections/:id/plan/status`        | Poll planning job status (generating / ready) + batch progress as percentage |
+| POST   | `/api/sections/:id/plan/regenerate`    | Regenerate plan synchronously with optional guidance text |
 | POST   | `/api/sections/:id/start-studying`     | Finalize plan, write to topics/subtopics, transition to studying |
 
 ### Topics

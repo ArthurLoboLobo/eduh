@@ -72,7 +72,7 @@ db/
 |------|-------|
 | Teaching chat | `gemini-3.1-flash-lite-preview` |
 | Text extraction | `gemini-3-flash-preview` |
-| Plan generation | `gemini-2.5-flash-lite` |
+| Plan generation | `gemini-3-flash-preview` |
 | Summarization | `gemini-2.5-flash-lite` |
 | Embeddings | `gemini-embedding-001` |
 

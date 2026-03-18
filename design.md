@@ -87,7 +87,7 @@ Dark mode only. No light mode.
 - **Topic card**:
   - Drag handle on the left side for reordering.
   - Topic title — editable on click (appears when hovering over the title).
-  - "Already Known" checkbox in the top-left corner. Marking it dims the entire card visually (same appearance as completed topics in the Studying phase — they start as completed).
+  - "Already Known" checkbox in the top-right corner. Marking it dims the entire card visually (same appearance as completed topics in the Studying phase — they start as completed).
   - Trash button — appears on hover over the card. Deletes the topic and all its subtopics.
   - Subtopics listed inside the card:
     - Each subtopic text is editable on click (appears when hovering).
@@ -96,7 +96,7 @@ Dark mode only. No light mode.
     - "+" button below the last subtopic — appears on hover over the card. Creates a new empty subtopic at the end.
 - **"+" button** below all topic cards: Creates a new empty topic at the end of the list.
 - **Undo button**: Positioned at the top-right, just above the plan. Applies to all editing actions (deletes, edits, reorders, creation, etc.). No redo.
-- **"Regenerate Plan" button**: Below the plan or in a prominent position. Clicking it reveals an optional guidance text box **inline below the button**. The user can type guidance (e.g., "Focus more on calculus") or leave it empty, then confirm to regenerate.
+- **"Regenerate Plan" button**: Below the plan or in a prominent position. Clicking it reveals a required guidance text box **inline below the button**. The confirm button is disabled until the user types something (e.g., "Focus more on calculus").
 - **"Start Studying" button**: Finalizes the plan and transitions the section to the Studying status.
 
 ### Section — Studying
