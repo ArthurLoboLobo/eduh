@@ -136,7 +136,7 @@ db/
 ### Provider & Models
 
 - **Provider**: Google Gemini (official SDK).
-- **Embedding model**: `gemini-embedding-001`
+- **Embedding model**: `gemini-embedding-2-preview`
 - Model identifiers are defined in a single config file (`config/ai.ts`) so they can be swapped by changing one constant.
 
 | Task                          | Model                            |
@@ -150,7 +150,7 @@ db/
 
 A single configuration file containing all tunable AI parameters:
 - Model identifiers (per task)
-- Chunk size for RAG (1000 tokens)
+- Chunk size for RAG (512 tokens)
 - Chunk overlap (100 tokens)
 - Top N chunks returned per search tool call (4)
 - Token threshold for summary + message history size (triggers summarization when exceeded)
@@ -177,8 +177,8 @@ All prompts are hardcoded in the codebase. When a prompt is needed, it is import
 
 ### RAG (Retrieval-Augmented Generation)
 
-- Extracted text from uploaded files is split into **~1000 token chunks with ~100 token overlap**.
-- Chunks are embedded using `gemini-embedding-001` and stored in **pgvector** (via the pgvector extension on Neon Postgres).
+- Extracted text from uploaded files is split into **~512 token chunks with ~100 token overlap**.
+- Chunks are embedded using `gemini-embedding-2-preview` with `taskType: RETRIEVAL_DOCUMENT` and stored in **pgvector** (via the pgvector extension on Neon Postgres). When searching, the user's query is embedded with `taskType: RETRIEVAL_QUERY` for optimized asymmetric retrieval.
 - Chunks are stored alongside metadata (section ID, source file name, chunk index) for filtering.
 
 ### Topic Chat
@@ -356,7 +356,7 @@ All tables use UUID primary keys and `created_at` timestamps. Messages use seria
 | `file_id`     | UUID (FK)    | References `files.id`              |
 | `chunk_index` | INTEGER      | Order of chunk within the file     |
 | `chunk_text`  | TEXT         | The text content of this chunk     |
-| `embedding`   | VECTOR(1536) | pgvector column (`gemini-embedding-001` with `outputDimensionality=1536`) |
+| `embedding`   | VECTOR(1536) | pgvector column (`gemini-embedding-2-preview` with `outputDimensionality=1536`) |
 | `created_at`  | TIMESTAMP    |                                    |
 
 ## API Routes

@@ -564,9 +564,9 @@ If `start-planning` or `regenerate` returns an error (network error, AI failure)
 ### 8.1 RAG setup
 
 #### Chunking and embedding (`src/lib/ai.ts` — additions)
-- `chunkText(text, chunkSize, overlap): string[]` — splits text into chunks of ~1000 tokens with ~100 token overlap.
-- `embedText(text): number[]` — calls Gemini embedding API (`gemini-embedding-001`) with `outputDimensionality: 1536` and returns the vector.
-- `embedChunks(chunks): number[][]` — embeds multiple chunks (can batch API calls for efficiency).
+- `chunkText(text, chunkSize, overlap): string[]` — splits text into chunks of ~512 tokens with ~100 token overlap.
+- `embedText(text, taskType): number[]` — calls Gemini embedding API (`gemini-embedding-2-preview`) with `outputDimensionality: 1536` and the specified `taskType` (`RETRIEVAL_DOCUMENT` or `RETRIEVAL_QUERY`). Returns the vector.
+- `embedChunks(chunks): number[][]` — embeds multiple chunks using `taskType: RETRIEVAL_DOCUMENT` (can batch API calls for efficiency).
 
 #### Database queries (`src/lib/db/queries/embeddings.ts` — additions)
 - `createEmbeddings(sectionId, fileId, chunks, embeddings)` — bulk inserts chunk text and embedding vectors into the `embeddings` table.
@@ -581,8 +581,8 @@ If `start-planning` or `regenerate` returns an error (network error, AI failure)
 Add all remaining parameters:
 - `TEACHING_CHAT_MODEL: 'gemini-3.1-flash-lite-preview'`
 - `SUMMARIZATION_MODEL: 'gemini-3-flash-preview'`
-- `EMBEDDING_MODEL: 'gemini-embedding-001'`
-- `CHUNK_SIZE: 1000` (tokens)
+- `EMBEDDING_MODEL: 'gemini-embedding-2-preview'`
+- `CHUNK_SIZE: 512` (tokens)
 - `CHUNK_OVERLAP: 100` (tokens)
 - `TOP_N_CHUNKS: 4`
 - `SUMMARIZATION_TOKEN_THRESHOLD` — the token count that triggers summarization.
@@ -672,7 +672,7 @@ Add all remaining prompts:
   - Description: "Search the student's uploaded files for relevant content."
   - Parameters: `{ query: string }`
 - When the LLM calls this tool:
-  1. Embed the `query` using `embedText()`.
+  1. Embed the `query` using `embedText(query, 'RETRIEVAL_QUERY')`.
   2. Call `searchChunks(sectionId, queryEmbedding, TOP_N_CHUNKS)`.
   3. Return the chunk texts to the LLM as the tool result.
 
@@ -794,3 +794,10 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 ## Future TODOs
 
 - **File preview improvements**: Currently, non-PDF/non-image files (TXT) show a "no preview available" message in the preview modal. In the future, implement proper rendering for these file types (e.g., display plain text content directly).
+- **Send current plan in regenerate request**: Include the current plan JSON in the `POST /api/sections/:id/plan/regenerate` payload and pass it to the regeneration prompt, so the AI can see what the user already has and make targeted adjustments instead of generating from scratch.
+- **UI redesign**: Redesign the components to improve visual quality and aesthetics across the app.
+  - Increase the base font size — current text is too small.
+  - Improve text contrast — the current white (`#E4E6EB`) doesn't stand out enough against the dark background.
+  - Make the navbar match the content width instead of spanning the full viewport width.
+  - Use icons instead of text labels for action buttons where possible (e.g., an undo icon instead of writing "Desfazer").
+- **Optimistic uploading UI**: Switch the uploading page from pessimistic to optimistic updates — show files as added immediately in the UI before the server confirms, and handle errors by reverting.

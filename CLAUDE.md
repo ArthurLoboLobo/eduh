@@ -6,7 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Ditchy is an AI-powered exam preparation platform for university students. Users upload study materials (past exams, slides, notes), the AI generates a structured study plan, and then provides interactive AI tutoring through topic-specific and revision chats.
 
-Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (technical architecture), `plan.md` (10-phase implementation plan). Progress is tracked in `journey.md`.
+Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (technical architecture), `plan.md` (10-phase implementation plan).
+
+### Implementation Status
+
+Phases 1–7 are complete. Next up is Phase 8 (Studying & Chat).
+
+| Phase | Status |
+|-------|--------|
+| 1. Project Setup | Done |
+| 2. Database | Done |
+| 3. Authentication | Done |
+| 4. Layout & UI Foundation | Done |
+| 5. Dashboard & Sections | Done |
+| 6. File Upload & Processing | Done |
+| 7. Study Plan Generation | Done |
+| 8. Studying & Chat | Not started |
+| 9. i18n Review | Not started |
+| 10. Polish & Deploy | Not started |
 
 ## Build & Run
 
@@ -63,22 +80,60 @@ db/
 
 - **Route groups**: `(auth)` has no navbar, `(main)` has navbar + breadcrumb. No `src/app/page.tsx` — the root `/` is served by `(auth)/page.tsx`. The auth page has a standalone language switcher (top-right) since there is no navbar.
 - **Self-chaining background jobs**: Plan generation uses self-invoking serverless functions to stay within Vercel's 60s timeout. File processing is triggered by the client (one call per file) and does not self-chain.
-- **RAG pipeline**: Extracted text → chunked (~1000 tokens, ~100 overlap) → embedded with `gemini-embedding-001` → stored in pgvector → retrieved via similarity search (top 4 chunks).
-- **Lazy chat creation**: Chat records created on first open, not upfront.
+- **RAG pipeline** (not yet implemented): Extracted text → chunked (~512 tokens, ~100 overlap) → embedded with `gemini-embedding-2-preview` (taskType: `RETRIEVAL_DOCUMENT`) → stored in pgvector → retrieved via similarity search (top 4 chunks, query embedded with taskType: `RETRIEVAL_QUERY`).
+- **Lazy chat creation** (not yet implemented): Chat records created on first open, not upfront.
+- **Ownership verification**: Each entity has a dedicated `verify*Ownership(entityId, userId)` query. API routes call it explicitly before proceeding — queries themselves don't embed ownership checks.
+- **Plan draft stack**: Plan edits create new `plan_drafts` rows. Undo deletes the newest draft, revealing the previous one. Drafts are cleaned up when the user starts studying.
 
 ### AI Models
 
-| Task | Model |
-|------|-------|
-| Teaching chat | `gemini-3.1-flash-lite-preview` |
-| Text extraction | `gemini-3-flash-preview` |
-| Plan generation | `gemini-3-flash-preview` |
-| Summarization | `gemini-2.5-flash-lite` |
-| Embeddings | `gemini-embedding-001` |
+| Task | Model | Implemented? |
+|------|-------|--------------|
+| Text extraction | `gemini-3-flash-preview` | Yes |
+| Plan generation | `gemini-3-flash-preview` | Yes |
+| Teaching chat | `gemini-3.1-flash-lite-preview` | No |
+| Summarization | `gemini-2.5-flash-lite` | No |
+| Embeddings | `gemini-embedding-2-preview` | No |
 
 ### Database
 
-12 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. See `tech.md` for full schema.
+12 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. See `tech.md` for full schema. 6 migrations exist in `db/migrations/`.
+
+### Existing API Routes
+
+```
+POST /api/auth/send-code          # Send OTP email
+POST /api/auth/verify-code        # Verify OTP, set JWT cookie
+POST /api/auth/logout             # Clear auth cookie
+
+GET|POST /api/sections            # List / create sections
+GET|DELETE /api/sections/:id      # Get / delete section
+GET /api/sections/:id/files       # List files in section
+GET /api/sections/:id/files/status # Poll file processing status
+POST /api/sections/:id/start-planning   # Transition uploading → planning
+GET|PUT /api/sections/:id/plan          # Get / update plan draft
+POST /api/sections/:id/plan/undo        # Undo last plan edit
+POST /api/sections/:id/plan/regenerate  # AI-regenerate plan with guidance
+POST /api/sections/:id/start-studying   # Transition planning → studying
+
+POST /api/files                   # Upload file
+DELETE /api/files/:id             # Delete file
+POST /api/files/:id/process       # Extract text from file via AI
+```
+
+### Existing Components
+
+- **UI** (`src/components/ui/`): Button, Input, Modal, Card, Badge, Checkbox, ConfirmDialog, ProgressBar, Spinner
+- **Layout**: Navbar, Breadcrumb
+- **Views**: UploadingView (file upload + processing), PlanningView (plan editor with drag-and-drop via `@dnd-kit`)
+
+### Database Query Files
+
+- `users.ts` — user/OTP queries
+- `sections.ts` — section CRUD, ownership verification, status updates
+- `files.ts` — file CRUD, ownership verification, text extraction storage
+- `plans.ts` — plan draft management (create, get current, undo, delete all)
+- `topics.ts` — create topics from plan, list topics
 
 ## Tailwind v4
 
