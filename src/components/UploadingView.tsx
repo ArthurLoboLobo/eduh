@@ -220,6 +220,15 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
   const allProcessed =
     files.length > 0 && files.every((f) => f.status === 'processed');
 
+  if (startingPlan) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <Spinner size={28} />
+        <p className="text-sm text-muted-text">{t.uploading.startPlanning}...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Upload drop zone */}
