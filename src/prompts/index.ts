@@ -29,7 +29,7 @@ You are a study plan creator. Given extracted text from a student's study materi
 - Subtopics are specific concepts, skills, or knowledge areas within the topic.
 - Preserve the original language of the materials — do NOT translate topic or subtopic names.
 - Do NOT include an "isKnown" field — that is set by the user, not the AI.
-- Aim for a reasonable number of topics (typically 5–15) depending on the breadth of the material.
+- Aim for a reasonable number of topics (typically 4-12) depending on the breadth of the material.
 </rules>
 
 <output_format>

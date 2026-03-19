@@ -512,6 +512,8 @@ Add:
 - Gets the current plan draft via `getCurrentPlanDraft()` — returns 400 if none exists.
 - Validates that the plan has at least one topic with at least one subtopic — returns 400 (`EMPTY_PLAN`) if the plan has no topics.
 - Calls `createTopicsFromPlan()` to write topics and subtopics to their tables.
+- Chunks and embeds all extracted texts, storing vectors in the `embeddings` table (added in Phase 8).
+- Creates all chats (one per topic + one revision chat) via `createChatsForSection()` (added in Phase 9).
 - Deletes all plan drafts for the section via `deleteAllPlanDrafts()`.
 - Changes section status to `studying` via `updateSectionStatus(id, 'studying')`.
 
@@ -559,55 +561,128 @@ If `start-planning` or `regenerate` returns an error (network error, AI failure)
 
 ---
 
-## Phase 8 — Studying & Chat
+## Phase 8 — Embeddings (RAG Pipeline)
 
-### 8.1 RAG setup
-
-#### Chunking and embedding (`src/lib/ai.ts` — additions)
+### 8.1 AI functions (`src/lib/ai.ts` — additions)
 - `chunkText(text, chunkSize, overlap): string[]` — splits text into chunks of ~512 tokens with ~100 token overlap.
 - `embedText(text, taskType): number[]` — calls Gemini embedding API (`gemini-embedding-2-preview`) with `outputDimensionality: 1536` and the specified `taskType` (`RETRIEVAL_DOCUMENT` or `RETRIEVAL_QUERY`). Returns the vector.
 - `embedChunks(chunks): number[][]` — embeds multiple chunks using `taskType: RETRIEVAL_DOCUMENT` (can batch API calls for efficiency).
 
-#### Database queries (`src/lib/db/queries/embeddings.ts` — additions)
-- `createEmbeddings(sectionId, fileId, chunks, embeddings)` — bulk inserts chunk text and embedding vectors into the `embeddings` table.
-- `searchChunks(sectionId, queryEmbedding, topN)` — performs a vector similarity search (`<=>` cosine distance) on the `embeddings` table, filtered by `section_id`, returning the top N chunks.
-
-#### Embedding pipeline
-- After file processing is complete (Phase 6), add a step that chunks the extracted text and creates embeddings.
-- This should happen during the file processing background job: after extracting text, chunk it, embed the chunks, and store them.
-- Update the file processing flow in `POST /api/files/:id/process` to include this step.
-
 ### 8.2 AI config additions (`src/config/ai.ts`)
-Add all remaining parameters:
-- `TEACHING_CHAT_MODEL: 'gemini-3.1-flash-lite-preview'`
-- `SUMMARIZATION_MODEL: 'gemini-3-flash-preview'`
+Add embedding-related parameters:
 - `EMBEDDING_MODEL: 'gemini-embedding-2-preview'`
 - `CHUNK_SIZE: 512` (tokens)
 - `CHUNK_OVERLAP: 100` (tokens)
 - `TOP_N_CHUNKS: 4`
-- `SUMMARIZATION_TOKEN_THRESHOLD` — the token count that triggers summarization.
-- `MIN_UNSUMMARIZED_MESSAGES: 2`
-- `RATE_LIMIT_MESSAGES_PER_MINUTE` — max messages per minute per user.
 
-### 8.3 Prompts (`src/prompts/index.ts` — additions)
-Add all remaining prompts:
+### 8.3 Database queries (`src/lib/db/queries/embeddings.ts`)
+- `createEmbeddings(sectionId, fileId, chunks, embeddings)` — bulk inserts chunk text and embedding vectors into the `embeddings` table.
+- `searchChunks(sectionId, queryEmbedding, topN)` — performs a vector similarity search (`<=>` cosine distance) on the `embeddings` table, filtered by `section_id`, returning the top N chunks.
 
-- **Topic chat system prompt**: Includes the full study plan with completion status, the current topic and subtopics, pedagogical instructions (introduce → explain → solve problem → student practice → next subtopic → topic complete), language rules.
-- **Revision chat system prompt**: Similar to topic chat but framed for general revision across all topics. No specific topic/subtopics — the student asks about anything.
-- **Chat summarization prompt**: Instructs the AI to create a concise cumulative summary of the conversation up to a certain point, preserving key context.
+### 8.4 `searchFiles` tool implementation
+- Define the tool schema for the Vercel AI SDK:
+  - Name: `searchFiles`
+  - Description: "Search the student's uploaded files for relevant content."
+  - Parameters: `{ query: string }`
+- When the LLM calls this tool:
+  1. Embed the `query` using `embedText(query, 'RETRIEVAL_QUERY')`.
+  2. Call `searchChunks(sectionId, queryEmbedding, TOP_N_CHUNKS)`.
+  3. Return the chunk texts to the LLM as the tool result.
 
-### 8.4 Database queries
+### 8.5 Update `POST /api/sections/:id/start-studying`
+Add an embedding step to the existing `start-studying` endpoint. After creating topics from the plan:
+1. Call `getExtractedTexts(sectionId)` to gather all extracted text from the section's files.
+2. For each file's extracted text, chunk it using `chunkText()`.
+3. Embed all chunks using `embedChunks()`.
+4. Store the embeddings via `createEmbeddings()`.
+
+The updated endpoint flow becomes:
+1. Verify ownership and validate section is in `planning` status.
+2. Get the current plan draft — return 400 if none exists.
+3. Validate the plan has at least one topic with at least one subtopic.
+4. Create topics and subtopics from the plan via `createTopicsFromPlan()`.
+5. **[New]** Chunk and embed all extracted texts, storing vectors in the `embeddings` table.
+6. Delete all plan drafts via `deleteAllPlanDrafts()`.
+7. Change section status to `studying` via `updateSectionStatus(id, 'studying')`.
+
+---
+
+## Phase 9 — Studying Section Page
+
+### 9.1 Database queries
 
 #### `src/lib/db/queries/topics.ts` (additions)
 - `verifyTopicOwnership(topicId, userId)` — joins `topics → sections` and returns `true` if the topic's section belongs to the user.
 - `getTopic(topicId)` — returns a single topic with its subtopics.
 - `toggleTopicCompletion(topicId)` — flips `is_completed`.
 - `getTopicProgress(sectionId)` — returns `{ completed: number, total: number }`.
-- `listTopicsWithMessageCount(sectionId)` — returns all topics with subtopics, ordered by `order`, each including the count of user messages in its chat (LEFT JOIN through `chats` → `messages` where `role = 'user'`). Used by the Studying UI and `GET /api/sections/:id/topics`.
+- `listTopicsWithChatInfo(sectionId)` — returns all topics with subtopics, ordered by `order`, each including the associated `chatId` and the count of user messages in its chat (LEFT JOIN through `chats` → `messages` where `role = 'user'`). Since chats are pre-created during `start-studying`, every topic already has a chat. Used by the Studying UI and `GET /api/sections/:id/topics`.
 
 #### `src/lib/db/queries/chats.ts`
+- `createChatsForSection(sectionId, topicIds)` — bulk-creates one chat per topic (with `type: 'topic'` and `topic_id` set) plus one revision chat (with `type: 'revision'` and `topic_id: null`). Used by `start-studying`.
+- `getRevisionChat(sectionId)` — returns the revision chat for the section (the chat with `type = 'revision'`).
+
+### 9.2 Update `POST /api/sections/:id/start-studying`
+Add chat creation to the existing `start-studying` endpoint. After creating embeddings (Phase 8.5):
+1. Collect all newly created topic IDs.
+2. Call `createChatsForSection(sectionId, topicIds)` to create one chat per topic + one revision chat.
+
+The final endpoint flow becomes:
+1. Verify ownership and validate section is in `planning` status.
+2. Get the current plan draft — return 400 if none exists.
+3. Validate the plan has at least one topic with at least one subtopic.
+4. Create topics and subtopics from the plan via `createTopicsFromPlan()`.
+5. Chunk and embed all extracted texts (Phase 8.5).
+6. **[New]** Create all chats via `createChatsForSection()`.
+7. Delete all plan drafts via `deleteAllPlanDrafts()`.
+8. Change section status to `studying` via `updateSectionStatus(id, 'studying')`.
+
+### 9.3 API routes
+
+#### `GET /api/sections/:id/topics`
+- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
+- Returns all topics via `listTopicsWithChatInfo(sectionId)` — includes subtopics, completion status, `chatId`, and message count for each topic's chat.
+- Also returns the revision chat ID via `getRevisionChat(sectionId)`.
+
+#### `PATCH /api/topics/:id`
+- Calls `verifyTopicOwnership(topicId, userId)` — returns 404 if not owned.
+- Toggles `is_completed` for the topic.
+
+### 9.4 Studying UI (`src/components/StudyingView.tsx`)
+
+- **i18n**: Add a `studying` section to the `Translations` interface and both language files with all keys needed for the Studying UI (progress text, card labels, revision label, etc.).
+- **Top area**: Progress bar showing overall completion (e.g., "3/8 tópicos completos") with the green progress bar.
+- **Topic card list**: Vertical list of cards, each showing:
+  - Topic title.
+  - Completion checkbox (top-right) — clicking it calls `PATCH /api/topics/:id`.
+  - Number of interactions (message count from the chat).
+  - Completed topics appear dimmed.
+- Clicking a topic card navigates directly to `/sections/[id]/chat/[chatId]` using the `chatId` from the topic data. No lazy chat creation needed — chats already exist.
+- **Revision chat card**: A special card at the bottom of the list labeled "Revisão" (Revision). Clicking it navigates directly to `/sections/[id]/chat/[chatId]` using the revision chat ID returned by the topics endpoint.
+
+---
+
+## Phase 10 — Chat
+
+### 10.1 AI config additions (`src/config/ai.ts`)
+Add chat-related parameters:
+- `TEACHING_CHAT_MODEL: 'gemini-3-flash-preview'`
+- `SUMMARIZATION_MODEL: 'gemini-2.5-flash-lite'`
+- `SUMMARIZATION_TOKEN_THRESHOLD` — the token count that triggers summarization.
+- `MIN_UNSUMMARIZED_MESSAGES: 2`
+- `RATE_LIMIT_MESSAGES_PER_MINUTE` — max messages per minute per user.
+
+### 10.2 Prompts (`src/prompts/index.ts` — additions)
+Add all remaining prompts:
+
+- **Topic chat system prompt**: Includes the full study plan with completion status, the current topic and subtopics, pedagogical instructions (introduce → explain → solve problem → student practice → next subtopic → topic complete), language rules.
+- **Revision chat system prompt**: Similar to topic chat but framed for general revision across all topics. No specific topic/subtopics — the student asks about anything.
+- **Chat summarization prompt**: Instructs the AI to create a concise cumulative summary of the conversation up to a certain point, preserving key context.
+
+### 10.3 Database queries
+
+#### `src/lib/db/queries/chats.ts` (additions)
 - `verifyChatOwnership(chatId, userId)` — joins `chats → sections` and returns `true` if the chat's section belongs to the user.
-- `findOrCreateChat(sectionId, topicId, type)` — finds an existing chat or creates one. For topic chats, `topicId` is set. For revision chats, `topicId` is null and `type` is `'revision'`.
 - `getChat(chatId)` — returns the chat with its section and topic info.
 
 #### `src/lib/db/queries/messages.ts`
@@ -622,28 +697,14 @@ Add all remaining prompts:
 - `getSummary(chatId)` — returns the current summary for the chat (if any).
 - `upsertSummary(chatId, summaryText, summarizedUpToMessageId)` — creates or updates the summary row.
 
-### 8.5 API routes
-
-#### `GET /api/sections/:id/topics`
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Returns all topics via `listTopicsWithMessageCount(sectionId)` — includes subtopics, completion status, and message count for each topic's chat.
-
-#### `PATCH /api/topics/:id`
-- Calls `verifyTopicOwnership(topicId, userId)` — returns 404 if not owned.
-- Toggles `is_completed` for the topic.
-
-#### `POST /api/sections/:id/chats`
-- Receives either `{ topicId }` for topic chats, or `{ type: 'revision' }` for the revision chat.
-- Calls `verifySectionOwnership(id, userId)` — returns 404 if not owned.
-- Calls `findOrCreateChat(sectionId, topicId, type)` — finds an existing chat or creates one.
-- Returns the chat (including its `id`, which the client uses to navigate to `/sections/[id]/chat/[chatId]`).
+### 10.4 API routes
 
 #### `GET /api/chats/:id/messages`
 - Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned.
 - Returns:
   - The summary text (if any).
   - All messages after the summary (unsummarized messages).
-  - If no messages exist and this is the first load, generate the initial AI introductory message (see 8.7).
+  - If no messages exist and this is the first load, generate the initial AI introductory message (see 10.6).
 
 #### `POST /api/chats/:id/messages`
 - Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned.
@@ -658,7 +719,7 @@ Add all remaining prompts:
 - Call the LLM with streaming enabled, including the `searchFiles` tool definition.
 - Stream the response back to the client token-by-token.
 - When the stream completes, save the full assistant message to the database.
-- After saving, check if summarization is needed (see 8.8).
+- After saving, check if summarization is needed (see 10.7).
 
 #### `POST /api/chats/:id/undo/:messageId`
 - Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned. Calls `getSummary(chatId)` to validate that the message hasn't been summarized (`messageId > summarized_up_to_message_id`).
@@ -666,22 +727,15 @@ Add all remaining prompts:
 - Calls `deleteMessagesFrom(chatId, messageId)` to delete the message and all subsequent messages.
 - Returns `{ content }` — the text of the undone message.
 
-### 8.6 `searchFiles` tool implementation
-- Define the tool schema for the Vercel AI SDK:
-  - Name: `searchFiles`
-  - Description: "Search the student's uploaded files for relevant content."
-  - Parameters: `{ query: string }`
-- When the LLM calls this tool:
-  1. Embed the `query` using `embedText(query, 'RETRIEVAL_QUERY')`.
-  2. Call `searchChunks(sectionId, queryEmbedding, TOP_N_CHUNKS)`.
-  3. Return the chunk texts to the LLM as the tool result.
+### 10.5 AI wrapper additions (`src/lib/ai.ts`)
+- `summarizeChat(summary, messages): string` — sends the previous summary (if any) and messages to the summarization model, returns the new cumulative summary.
 
-### 8.7 Initial chat message
+### 10.6 Initial chat message
 - When a chat has no messages (first load):
   - For **topic chats**: Generate an AI message introducing the topic and its subtopics, and asking the student for confirmation to start. Save this as the first assistant message.
   - For the **revision chat**: Generate an AI message introducing the revision chat and what the student can do here. Save this as the first assistant message.
 
-### 8.8 Chat summarization
+### 10.7 Chat summarization
 - After saving an assistant message, count the tokens in the summary + all unsummarized messages.
 - If the total exceeds `SUMMARIZATION_TOKEN_THRESHOLD`:
   1. Identify which messages to summarize: all unsummarized messages except the last `MIN_UNSUMMARIZED_MESSAGES` (at least 2).
@@ -689,20 +743,9 @@ Add all remaining prompts:
   3. Call the summarization model with the summarization prompt.
   4. Save the new cumulative summary via `upsertSummary()`.
 
-### 8.9 Studying UI (`src/app/(main)/sections/[id]/` — Studying component)
+### 10.8 Chat UI (`src/app/(main)/sections/[id]/chat/[chatId]/page.tsx`)
 
-- **Top area**: Progress bar showing overall completion (e.g., "3/8 tópicos completos") with the green progress bar.
-- **Topic card list**: Vertical list of cards, each showing:
-  - Topic title.
-  - Completion checkbox (top-right) — clicking it calls `PATCH /api/topics/:id`.
-  - Number of interactions (message count from the chat).
-  - Completed topics appear dimmed.
-- Clicking a topic card navigates to `/sections/[id]/chat/[chatId]`.
-  - Before navigating, call `POST /api/sections/:id/chats` with `{ topicId }` to ensure the chat exists. Use the returned chat ID for the URL.
-- **Revision chat card**: A special card at the bottom of the list labeled "Revisão" (Revision). Clicking it calls `POST /api/sections/:id/chats` with `{ type: 'revision' }` (no `topicId`) to get/create the revision chat, then navigates to its chat page.
-
-### 8.10 Chat UI (`src/app/(main)/sections/[id]/chat/[chatId]/page.tsx`)
-
+- **i18n**: Add a `chat` section to the `Translations` interface and both language files with all keys needed for the Chat UI (error messages, retry button, rate limit message, input placeholder, etc.).
 - **Message display**:
   - User messages: inside a bubble, aligned to the right.
   - AI messages: no bubble, aligned to the left. Just text with different styling.
@@ -720,11 +763,11 @@ Add all remaining prompts:
 
 ---
 
-## Phase 9 — Internationalization Review
+## Phase 11 — Internationalization Review
 
-The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) was set up in Phase 4.1, and all UI built in Phases 4–8 already uses translation keys. This phase is about completing and verifying full coverage.
+The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) was set up in Phase 4.1, and all UI built in Phases 4–10 already uses translation keys. This phase is about completing and verifying full coverage.
 
-### 9.1 Translation coverage audit
+### 11.1 Translation coverage audit
 - Review every component and page to confirm all user-facing strings use translation keys (no hardcoded text).
 - Ensure both `pt-BR.ts` and `en.ts` have complete translations for every key. Fill in any missing translations.
 - Check all the following areas:
@@ -738,12 +781,12 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
   - Chat: error messages, retry button, rate limit message, input placeholder.
   - All modals and confirmation dialogs.
 
-### 9.2 Language switcher verification
+### 11.2 Language switcher verification
 - Verify the navbar language switcher correctly updates the cookie and re-renders the page.
 - Test switching between "Português" and "English" on every page.
 - Default language is `pt-BR`.
 
-### 9.3 LLM language
+### 11.3 LLM language
 - Verify the system prompts include language rules:
   1. Match the language of the user's last message.
   2. If unclear, match the language of the uploaded materials.
@@ -751,37 +794,37 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 
 ---
 
-## Phase 10 — Polish & Deploy
+## Phase 12 — Polish & Deploy
 
-### 10.1 Error handling
+### 12.1 Error handling
 - Review all API calls in the frontend and ensure every one has proper error handling.
 - Show user-friendly error messages in Portuguese (or English, depending on the selected language).
 - AI calls (chat, extraction, plan generation) show an error message with a "Tentar novamente" (Retry) button. No silent auto-retry.
 
-### 10.2 Empty states
+### 12.2 Empty states
 - Review all lists and ensure they have appropriate empty state messages:
   - Dashboard with no sections.
   - Section with no files uploaded.
   - Chat with no messages (handled by initial message generation).
 
-### 10.3 Responsive design
+### 12.3 Responsive design
 - Test and adjust the layout for different screen sizes.
 - Dashboard grid: 3 columns on desktop, 2 on medium screens, 1 on small screens.
 - Topic/plan lists: full width on all sizes.
 - Chat: full width, input area fixed at the bottom.
 - Navbar: ensure it works on mobile (may need a compact version).
 
-### 10.4 Loading states
+### 12.4 Loading states
 - Ensure all data fetching shows a spinner while loading.
 - Buttons show a loading spinner when an action is in progress.
 
-### 10.5 Final review
+### 12.5 Final review
 - Test the complete user flow end-to-end: register → create section → upload files → wait for processing → plan generation → edit plan → start studying → chat with AI → complete topics.
 - Test edge cases: rate limiting, max sections, max file size, undo at boundaries, summarization.
 - Test language switching.
 - Check for any inconsistencies between the UI and the spec documents.
 
-### 10.6 Vercel deployment
+### 12.6 Vercel deployment
 - Push the code to the Git repository.
 - Vercel auto-deploys from the connected branch.
 - Verify all environment variables are set in Vercel project settings.

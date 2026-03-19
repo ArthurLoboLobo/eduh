@@ -91,7 +91,7 @@ db/
 |------|-------|--------------|
 | Text extraction | `gemini-3-flash-preview` | Yes |
 | Plan generation | `gemini-3-flash-preview` | Yes |
-| Teaching chat | `gemini-3.1-flash-lite-preview` | No |
+| Teaching chat | `gemini-3-flash-preview` | No |
 | Summarization | `gemini-2.5-flash-lite` | No |
 | Embeddings | `gemini-embedding-2-preview` | No |
 
