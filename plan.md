@@ -664,18 +664,19 @@ The final endpoint flow becomes:
 
 ## Phase 10 — Chat
 
-### 10.1 AI config additions (`src/config/ai.ts`)
-Add chat-related parameters:
+### 10.1 Prerequisites and AI config
+
+**AI config additions** (`src/config/ai.ts`) — add chat-related parameters:
 - `TEACHING_CHAT_MODEL: 'gemini-3-flash-preview'`
-- `SUMMARIZATION_MODEL: 'gemini-2.5-flash-lite'`
-- `SUMMARIZATION_TOKEN_THRESHOLD` — the token count that triggers summarization.
+- `SUMMARIZATION_MODEL: 'gemini-3-flash-preview'`
+- `SUMMARIZATION_TOKEN_THRESHOLD: 30000` — the approximate token count (measured as `chars / 4`) that triggers summarization.
 - `MIN_UNSUMMARIZED_MESSAGES: 2`
-- `RATE_LIMIT_MESSAGES_PER_MINUTE` — max messages per minute per user.
+- `RATE_LIMIT_MESSAGES_PER_MINUTE: 10` — max messages per minute per user (global across all chats).
 
 ### 10.2 Prompts (`src/prompts/index.ts` — additions)
 Add all remaining prompts:
 
-- **Topic chat system prompt**: Includes the full study plan with completion status, the current topic and subtopics, pedagogical instructions (introduce → explain → solve problem → student practice → next subtopic → topic complete), language rules.
+- **Topic chat system prompt**: Includes the full study plan with completion status, the current topic and subtopics, pedagogical instructions (introduce → explain → solve problem → student practice → next subtopic → topic complete), language rules. Topic completion is manual — the AI does NOT mark topics as complete. When the AI judges the student has covered all subtopics and seems confident, it should suggest they mark the topic as complete on the studying page and move on.
 - **Revision chat system prompt**: Similar to topic chat but framed for general revision across all topics. No specific topic/subtopics — the student asks about anything.
 - **Chat summarization prompt**: Instructs the AI to create a concise cumulative summary of the conversation up to a certain point, preserving key context.
 
@@ -683,7 +684,12 @@ Add all remaining prompts:
 
 #### `src/lib/db/queries/chats.ts` (additions)
 - `verifyChatOwnership(chatId, userId)` — joins `chats → sections` and returns `true` if the chat's section belongs to the user.
-- `getChat(chatId)` — returns the chat with its section and topic info.
+- `getChat(chatId)` — returns the chat with section and topic details via JOINs. Returns:
+  - Chat fields: `id`, `section_id`, `topic_id`, `type`
+  - Section name: `section_name` (from `sections.name`)
+  - Topic title: `topic_title` (from `topics.title`, NULL for revision chats)
+  - Subtopics: fetched separately or via a second query — array of `{ text, order }` for the chat's topic (empty for revision chats)
+  - All topics summary: for the system prompt, a list of `{ title, is_completed }` for all topics in the section (fetched via existing `listTopics`)
 
 #### `src/lib/db/queries/messages.ts`
 - `getMessage(messageId)` — returns a single message by ID. Used by undo to retrieve the message content before deletion.
@@ -701,34 +707,41 @@ Add all remaining prompts:
 
 #### `GET /api/chats/:id/messages`
 - Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned.
-- Returns:
-  - The summary text (if any).
-  - All messages after the summary (unsummarized messages).
-  - If no messages exist and this is the first load, generate the initial AI introductory message (see 10.6).
+- Calls `getMessages(chatId)` — returns ALL messages ordered by `id`.
+- If no messages exist (first load), generate the initial AI introductory message (see 10.6), save it, and include it in the response.
+- Returns `{ messages }` — the full message history. The summary is NOT included here — it is LLM-only context.
 
 #### `POST /api/chats/:id/messages`
 - Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned.
-- Receives `{ content }` (the user's message).
-- **Rate limiting**: Check `getMessageCountLastMinute(userId)`. If over the limit, return 429 with an error message.
-- Save the user's message to the database.
-- Build the context for the LLM:
-  - System prompt (topic or revision).
-  - Summary (if any).
-  - Recent messages (unsummarized).
-  - The new user message.
-- Call the LLM with streaming enabled, including the `searchStudentMaterials` tool definition.
-- Stream the response back to the client token-by-token.
-- When the stream completes, save the full assistant message to the database.
-- After saving, check if summarization is needed (see 10.7).
+- Receives the user's message via the `useChat` request format (Vercel AI SDK data stream protocol).
+- **Rate limiting**: Check `getMessageCountLastMinute(userId)`. If over the limit, return 429.
+- Save the user's message to the database via `createMessage(chatId, 'user', content)`.
+- Build the LLM context (server-side only — not sent to the client):
+  1. System prompt (topic or revision, from `getChat` data).
+  2. Summary text (from `getSummary(chatId)`), if any — injected as a system/context message.
+  3. Unsummarized messages (from `getMessagesAfterSummary(chatId)`).
+  4. The new user message (already included in the unsummarized messages after saving).
+- Call `streamText` from the `ai` package with:
+  - `model: google(TEACHING_CHAT_MODEL)`
+  - `maxSteps: 3` — allows the LLM to call `searchStudentMaterials` and continue generating (one extra step as safety margin).
+  - `tools: { searchStudentMaterials }` — the RAG tool from Phase 8.4.
+  - `messages` — the built context above.
+- Return `toDataStreamResponse()` — streams the response to `useChat` on the client.
+- **After stream completes**: Extract the final assistant text content and save it via `createMessage(chatId, 'assistant', finalText)`. Only the final text is stored — tool call/result steps are NOT saved.
+- **After saving**: Check if summarization is needed (see 10.7).
+- **On stream failure**: Delete the user message that was saved at the start of this request via `deleteMessagesFrom(chatId, userMessageId)`. Return an error response. The client handles this via `useChat`'s `onError` — it restores the message text to the input field (see 10.8).
 
 #### `POST /api/chats/:id/undo/:messageId`
-- Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned. Calls `getSummary(chatId)` to validate that the message hasn't been summarized (`messageId > summarized_up_to_message_id`).
-- Calls `getMessage(messageId)` to get the content of the message being undone.
-- Calls `deleteMessagesFrom(chatId, messageId)` to delete the message and all subsequent messages.
-- Returns `{ content }` — the text of the undone message.
+- Calls `verifyChatOwnership(chatId, userId)` — returns 404 if not owned.
+- Calls `getSummary(chatId)` — if a summary exists, validate that `messageId > summarized_up_to_message_id`. Return 400 (`CANNOT_UNDO_SUMMARIZED`) if the message has been summarized.
+- Calls `getMessage(messageId)` to get the content of the message being undone. Validates that the message's `role` is `'user'` — return 400 if not.
+- Calls `deleteMessagesFrom(chatId, messageId)` to delete the user message and all subsequent messages (including the assistant response that followed).
+- Returns `{ content }` — the text of the undone user message (to restore in the input field).
 
 ### 10.5 AI wrapper additions (`src/lib/ai.ts`)
 - `summarizeChat(summary, messages): string` — sends the previous summary (if any) and messages to the summarization model, returns the new cumulative summary.
+
+> Token counting throughout this phase uses a `chars / 4` approximation — no tokenizer dependency needed. This is rough but sufficient for threshold-based decisions like summarization triggers.
 
 ### 10.6 Initial chat message
 - When a chat has no messages (first load):
@@ -736,6 +749,7 @@ Add all remaining prompts:
   - For the **revision chat**: Generate an AI message introducing the revision chat and what the student can do here. Save this as the first assistant message.
 
 ### 10.7 Chat summarization
+- Token counting uses `Math.ceil(text.length / 4)` as a rough approximation. Apply it to the summary text + all unsummarized message contents.
 - After saving an assistant message, count the tokens in the summary + all unsummarized messages.
 - If the total exceeds `SUMMARIZATION_TOKEN_THRESHOLD`:
   1. Identify which messages to summarize: all unsummarized messages except the last `MIN_UNSUMMARIZED_MESSAGES` (at least 2).
@@ -745,21 +759,52 @@ Add all remaining prompts:
 
 ### 10.8 Chat UI (`src/app/(main)/sections/[id]/chat/[chatId]/page.tsx`)
 
-- **i18n**: Add a `chat` section to the `Translations` interface and both language files with all keys needed for the Chat UI (error messages, retry button, rate limit message, input placeholder, etc.).
-- **Message display**:
-  - User messages: inside a bubble, aligned to the right.
-  - AI messages: no bubble, aligned to the left. Just text with different styling.
-- **Rendering**: Support LaTeX (inline `$...$` and block `$$...$$`), Markdown, and syntax-highlighted code blocks. Use libraries like `react-markdown`, `remark-math`, `rehype-katex`, and a syntax highlighter.
-- **Undo button (↩)**: Appears on hover next to each user message. Clicking it calls `POST /api/chats/:id/undo/:messageId`, removes the message and all subsequent messages from the display, and places the message text back in the input box.
-- **Streaming**: When the AI responds, display the response token-by-token as it arrives. Use the Vercel AI SDK's `useChat` hook.
-- **Input area**:
-  - Single-line text field that grows as the user types, up to a max height, then scrolls.
-  - **Enter** sends the message. **Shift+Enter** inserts a newline.
-  - **Send button** (icon) next to the input.
-  - Disabled while the AI is responding.
-- **Error handling**: If the LLM call fails, show an error message with a "Tentar novamente" (Retry) button.
-- **Rate limit**: If the user exceeds the rate limit, show a message: "Aguarde um momento antes de enviar outra mensagem." (Wait a moment before sending another message.)
-- **Initial load**: Fetch messages from `GET /api/chats/:id/messages`. If no messages exist, the endpoint generates and returns the initial AI message.
+- **i18n**: Add a `chat` section to the `Translations` interface and both language files with all keys needed for the Chat UI (error messages, retry button, rate limit message, input placeholder, undo tooltip, etc.).
+
+#### Data loading and `useChat` integration
+- On mount, fetch `GET /api/chats/:id/messages` to get all existing messages.
+- Initialize `useChat` from `@ai-sdk/react` with:
+  - `api: '/api/chats/${chatId}/messages'` — the POST endpoint.
+  - `initialMessages` — seeded from the GET response (convert DB messages to the format `useChat` expects: `{ id, role, content }`).
+- `useChat` manages message state from this point forward — new messages and streaming are handled by the hook.
+- Undo uses `setMessages()` from `useChat` to remove messages from client state after the API call succeeds.
+
+#### Message rendering
+- When rendering each message from `useChat`, filter `message.parts` to only display parts where `part.type === 'text'`. This hides tool call/result steps — students only see the final text output.
+- **User messages**: Inside a bubble, aligned to the right.
+- **AI messages**: No bubble, aligned to the left, different styling.
+- **Rich content**: Render message text using `react-markdown` with plugins:
+  - `remark-math` — parses `$...$` (inline) and `$$...$$` (block) LaTeX.
+  - `rehype-katex` — renders parsed LaTeX (requires `katex` CSS imported in `globals.css` or the layout).
+  - `react-syntax-highlighter` — code block syntax highlighting via a custom `code` component in `react-markdown`'s `components` prop.
+
+#### Undo
+- An undo button (↩) appears on hover next to each **user** message (not assistant messages).
+- Undo is NOT available for messages that have been summarized (i.e., messages with `id <= summarized_up_to_message_id`). Since the summary boundary is not sent to the client, either: (a) the undo API returns 400 and the client shows an error, or (b) the GET endpoint includes the `summarizedUpToMessageId` so the client can hide undo buttons for old messages. Approach (b) is preferred.
+- Clicking undo:
+  1. Calls `POST /api/chats/:id/undo/:messageId`.
+  2. On success: calls `setMessages()` to remove the undone message and all messages after it from `useChat` state.
+  3. Places the returned `content` text back in the input field via `setInput()` from `useChat`.
+
+#### Stream error handling (auto-undo)
+- Use `useChat`'s `onError` callback.
+- When a stream fails, the server has already deleted the user message from the DB (see 10.4).
+- The client should: remove the failed user message from `useChat` state and restore the message text to the input field.
+- Show a brief error toast (e.g., "Falha ao enviar mensagem. Tente novamente.").
+
+#### Input area
+- A `<textarea>` that starts as a single line and grows as the user types, up to a max height, then scrolls.
+- **Enter** sends the message. **Shift+Enter** inserts a newline.
+- **Send button** (icon) next to the input.
+- Disabled while the AI is responding (`isLoading` from `useChat`).
+
+#### Rate limiting
+- If the POST returns 429, show a message: "Aguarde um momento antes de enviar outra mensagem." / "Wait a moment before sending another message."
+
+#### Initial load
+- Fetch messages from `GET /api/chats/:id/messages`.
+- If the chat has no messages, the GET endpoint generates and returns the initial AI message (see 10.6).
+- Show a loading spinner while the GET request is in flight.
 
 ---
 
