@@ -196,8 +196,9 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="relative flex flex-col min-h-[calc(100vh-12rem)] w-full animate-fade-in-up">
-      {/* Messages */}
+    <>
+      <div className="relative flex flex-col min-h-[calc(100vh-12rem)] w-full animate-fade-in-up">
+        {/* Messages */}
       <div className="flex-1 px-4 py-2 space-y-6 pb-32 max-w-3xl mx-auto w-full">
         {messages.map((message) => {
           const textParts = message.parts?.filter((p) => p.type === 'text') ?? [];
@@ -289,6 +290,7 @@ export default function ChatPage() {
 
         <div ref={messagesEndRef} />
       </div>
+      </div>
 
       {/* Input */}
       <div className="fixed bottom-0 inset-x-0 px-4 flex justify-center pb-6 pt-12 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none z-40">
@@ -316,6 +318,6 @@ export default function ChatPage() {
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
