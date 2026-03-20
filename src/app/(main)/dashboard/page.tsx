@@ -11,6 +11,8 @@ import Modal from '@/components/ui/Modal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import ProgressBar from '@/components/ui/ProgressBar';
 import Spinner from '@/components/ui/Spinner';
+import TrashIcon from '@/components/ui/TrashIcon';
+import { useToast } from '@/components/ui/Toast';
 
 interface Section {
   id: string;
@@ -30,6 +32,7 @@ const statusBadgeVariant: Record<string, 'blue' | 'muted' | 'green'> = {
 
 export default function DashboardPage() {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const router = useRouter();
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -49,17 +52,16 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchSections();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- fetch once on mount; fetchSections is stable within the lifetime of this component
 
   async function fetchSections() {
     try {
       const res = await fetch('/api/sections');
-      if (res.ok) {
-        const data = await res.json();
-        setSections(data.sections);
-      }
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setSections(data.sections);
     } catch {
-      // silently fail — empty list shown
+      showToast(t.errors.UNKNOWN);
     } finally {
       setLoading(false);
     }
@@ -104,12 +106,11 @@ export default function DashboardPage() {
     setDeleting(true);
     try {
       const res = await fetch(`/api/sections/${deleteTarget.id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setSections((prev) => prev.filter((s) => s.id !== deleteTarget.id));
-        setDeleteTarget(null);
-      }
+      if (!res.ok) throw new Error();
+      setSections((prev) => prev.filter((s) => s.id !== deleteTarget.id));
+      setDeleteTarget(null);
     } catch {
-      // keep dialog open on error
+      showToast(t.errors.UNKNOWN);
     } finally {
       setDeleting(false);
     }
@@ -252,19 +253,5 @@ export default function DashboardPage() {
         loading={deleting}
       />
     </>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3 4h10M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1m2 0v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4h10Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

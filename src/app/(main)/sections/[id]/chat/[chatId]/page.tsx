@@ -13,6 +13,7 @@ import 'katex/dist/katex.min.css';
 import { useTranslation } from '@/lib/i18n';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 
 type DbMessage = {
   id: number;
@@ -24,6 +25,7 @@ type DbMessage = {
 
 export default function ChatPage() {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const params = useParams();
   const chatId = typeof params?.chatId === 'string' ? params.chatId : '';
 
@@ -154,10 +156,10 @@ export default function ChatPage() {
       if (!res.ok) {
         const data = await res.json();
         if (data.error === 'CANNOT_UNDO_SUMMARIZED') {
-          alert(t.chat.cannotUndoSummarized);
+          showToast(t.chat.cannotUndoSummarized, 'info');
           return;
         }
-        alert(t.chat.undoError);
+        showToast(t.chat.undoError, 'error');
         return;
       }
       const { content } = await res.json();
@@ -167,9 +169,9 @@ export default function ChatPage() {
       }
       setInputValue(content);
     } catch {
-      alert(t.chat.undoError);
+      showToast(t.chat.undoError, 'error');
     }
-  }, [chatId, messages, setMessages, t]);
+  }, [chatId, messages, setMessages, showToast, t]);
 
   if (initialLoading) {
     return (

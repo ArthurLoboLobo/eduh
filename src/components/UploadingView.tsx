@@ -7,6 +7,8 @@ import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import Spinner from '@/components/ui/Spinner';
+import TrashIcon from '@/components/ui/TrashIcon';
+import { useToast } from '@/components/ui/Toast';
 
 interface UploadingViewProps {
   sectionId: string;
@@ -38,6 +40,7 @@ const UPLOAD_ERROR_MAP: Record<string, string> = {
 
 export default function UploadingView({ sectionId, onStatusChange }: UploadingViewProps) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
 
   const [files, setFiles] = useState<LocalFile[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -336,11 +339,10 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
               const res = await fetch(`/api/sections/${sectionId}/start-planning`, {
                 method: 'POST',
               });
-              if (res.ok) {
-                onStatusChange?.('planning');
-              }
+              if (!res.ok) throw new Error();
+              onStatusChange?.('planning');
             } catch {
-              // fail silently
+              showToast(t.errors.UNKNOWN);
             } finally {
               setStartingPlan(false);
             }
@@ -395,6 +397,7 @@ function FilePreview({
   }
   if (file.fileType.startsWith('image/')) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element -- blobUrl is a runtime Vercel Blob URL; domain unknown at build time
       <img
         src={file.blobUrl}
         alt={file.name}
@@ -428,16 +431,3 @@ function UploadIcon() {
   );
 }
 
-function TrashIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3 4h10M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1m2 0v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4h10Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}

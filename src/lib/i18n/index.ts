@@ -34,6 +34,7 @@ export function useTranslation() {
   const [language, setLang] = useState<Language>('pt-BR');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional hydration sync: start with 'pt-BR' for SSR match, then update to cookie value after mount
     setLang(getLanguageFromCookie());
 
     function handleChange(e: Event) {

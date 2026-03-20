@@ -9,6 +9,7 @@ import Checkbox from '@/components/ui/Checkbox';
 import Badge from '@/components/ui/Badge';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 
 interface TopicWithChatInfo {
   id: string;
@@ -26,6 +27,7 @@ interface StudyingViewProps {
 
 export default function StudyingView({ sectionId }: StudyingViewProps) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const router = useRouter();
 
   const [topics, setTopics] = useState<TopicWithChatInfo[]>([]);
@@ -75,7 +77,7 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
         completed: prev.completed + (data.isCompleted ? 1 : -1),
       }));
     } catch {
-      // fail silently
+      showToast(t.errors.UNKNOWN);
     } finally {
       setTogglingId(null);
     }
@@ -136,11 +138,14 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                 handleToggle(topic.id);
               }}
             >
-              <Checkbox
-                checked={topic.is_completed}
-                disabled={togglingId === topic.id}
-                readOnly
-              />
+              {togglingId === topic.id ? (
+                <Spinner size={14} />
+              ) : (
+                <Checkbox
+                  checked={topic.is_completed}
+                  readOnly
+                />
+              )}
             </div>
           </div>
         </Card>

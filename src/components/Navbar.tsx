@@ -38,7 +38,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-40 h-12 bg-surface border-b border-border flex items-center px-6">
+    <nav className="fixed top-0 inset-x-0 z-40 h-12 bg-surface border-b border-border flex items-center px-4 md:px-6">
       <Link
         href="/dashboard"
         className="text-base font-semibold text-primary-text hover:text-accent-blue"
