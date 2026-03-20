@@ -51,7 +51,7 @@ export default function Breadcrumb() {
   }
 
   return (
-    <div className="fixed top-12 inset-x-0 z-30 h-10 bg-surface border-b border-border flex items-center px-6">
+    <div className="fixed top-14 inset-x-0 z-30 h-12 bg-background/80 backdrop-blur-md border-b border-border-subtle flex items-center px-8">
       <nav className="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
         {/* Dashboard segment */}
         {isOnDashboard ? (
@@ -77,13 +77,13 @@ export default function Breadcrumb() {
               </button>
 
               {open && sections.length > 0 && (
-                <div className="absolute left-0 top-7 min-w-48 max-w-xs bg-surface border border-border rounded-md py-1 shadow-lg">
+                <div className="absolute left-0 top-8 min-w-56 max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
                   {sections.map((s) => (
                     <button
                       key={s.id}
                       onClick={() => handleSectionSelect(s.id)}
-                      className={`w-full text-left px-3 py-2 text-sm truncate cursor-pointer hover:bg-white/5 ${
-                        s.id === sectionId ? 'text-accent-blue' : 'text-primary-text'
+                      className={`w-full text-left px-3 py-2 text-sm truncate cursor-pointer hover:bg-surface-hover rounded-xl transition-colors ${
+                        s.id === sectionId ? 'text-accent-blue bg-accent-surface' : 'text-primary-text'
                       }`}
                     >
                       {s.name}

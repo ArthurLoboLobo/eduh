@@ -194,9 +194,9 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5.5rem)] max-w-3xl mx-auto w-full">
+    <div className="relative flex flex-col h-[calc(100vh-5.5rem)] w-full">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 pb-32 max-w-3xl mx-auto w-full">
         {messages.map((message) => {
           const textParts = message.parts?.filter((p) => p.type === 'text') ?? [];
           const textContent = textParts.map((p) => ('text' in p ? p.text : '')).join('');
@@ -223,8 +223,8 @@ export default function ChatPage() {
                     </svg>
                   </button>
                 )}
-                <div className="bg-surface rounded-lg px-4 py-2 max-w-[80%]">
-                  <p className="text-sm text-primary-text whitespace-pre-wrap">{textContent}</p>
+                <div className="bg-surface rounded-3xl px-5 py-3 max-w-[85%] shadow-sm">
+                  <p className="text-[15px] leading-relaxed text-primary-text whitespace-pre-wrap">{textContent}</p>
                 </div>
               </div>
             );
@@ -232,7 +232,7 @@ export default function ChatPage() {
 
           return (
             <div key={message.id} className="flex justify-start">
-              <div className="max-w-[90%] text-sm text-primary-text prose-chat">
+              <div className="max-w-[95%] text-[15px] leading-relaxed text-primary-text prose-chat">
                 <ReactMarkdown
                   remarkPlugins={[remarkMath]}
                   rehypePlugins={[rehypeKatex]}
@@ -246,14 +246,14 @@ export default function ChatPage() {
                             style={oneDark}
                             language={match[1]}
                             PreTag="div"
-                            customStyle={{ borderRadius: '0.375rem', fontSize: '0.8125rem' }}
+                            customStyle={{ borderRadius: '0.75rem', fontSize: '0.8125rem', margin: '1rem 0' }}
                           >
                             {codeString}
                           </SyntaxHighlighter>
                         );
                       }
                       return (
-                        <code className="bg-white/10 px-1.5 py-0.5 rounded text-[0.8125rem]" {...props}>
+                        <code className="bg-white/10 px-1.5 py-0.5 rounded-md text-[0.8125rem]" {...props}>
                           {children}
                         </code>
                       );
@@ -289,8 +289,8 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border px-4 py-3">
-        <div className="flex items-end gap-2">
+      <div className="absolute bottom-4 inset-x-0 px-4 flex justify-center pb-2 pointer-events-none">
+        <div className="relative w-full max-w-3xl flex items-end bg-[#1E1F20] border border-border-subtle rounded-[32px] p-2 pr-3 shadow-2xl focus-within:ring-1 focus-within:ring-accent-blue/30 focus-within:border-accent-blue/50 transition-all pointer-events-auto">
           <textarea
             ref={textareaRef}
             value={inputValue}
@@ -299,15 +299,15 @@ export default function ChatPage() {
             placeholder={t.chat.inputPlaceholder}
             disabled={isLoading}
             rows={1}
-            className="flex-1 resize-none bg-surface border border-border rounded-lg px-3 py-2 text-sm text-primary-text placeholder:text-muted-text focus:outline-none focus:border-border-hover disabled:opacity-50"
+            className="flex-1 resize-none bg-transparent px-4 mt-2 mb-2 text-[15px] leading-relaxed text-primary-text placeholder:text-muted-text focus:outline-none disabled:opacity-50"
             style={{ maxHeight: '200px' }}
           />
           <button
             onClick={handleSend}
             disabled={isLoading || !inputValue.trim()}
-            className="p-2 rounded-lg bg-accent-blue hover:bg-accent-blue-hover text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="p-2.5 rounded-full bg-accent-blue hover:bg-accent-blue-hover text-background disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mb-0.5 shrink-0 transition-colors"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />
               <polygon points="22 2 15 22 11 13 2 9 22 2" />
             </svg>

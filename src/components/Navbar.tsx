@@ -38,7 +38,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-40 h-12 bg-surface border-b border-border flex items-center px-4 md:px-6">
+    <nav className="fixed top-0 inset-x-0 z-40 h-14 bg-background/80 backdrop-blur-md border-b border-border-subtle flex items-center px-6 md:px-8">
       <Link
         href="/dashboard"
         className="text-base font-semibold text-primary-text hover:text-accent-blue"
@@ -59,20 +59,20 @@ export default function Navbar() {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute right-0 top-10 w-44 bg-surface border border-border rounded-md py-1 shadow-lg">
+          <div className="absolute right-0 top-12 w-48 bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
             {!showLanguages ? (
               <>
                 <button
                   onClick={() => setShowLanguages(true)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-sm text-primary-text hover:bg-white/5 cursor-pointer"
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm text-primary-text hover:bg-surface-hover rounded-xl cursor-pointer transition-colors"
                 >
                   <span>{t.nav.language}</span>
                   <ChevronRightIcon />
                 </button>
-                <div className="my-1 border-t border-border" />
+                <div className="my-1 border-t border-border-subtle mx-2" />
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-3 py-2 text-sm text-danger-red hover:bg-white/5 cursor-pointer"
+                  className="w-full text-left px-3 py-2 text-sm text-danger-red hover:bg-surface-hover rounded-xl cursor-pointer transition-colors"
                 >
                   {t.nav.logout}
                 </button>
@@ -81,18 +81,18 @@ export default function Navbar() {
               <>
                 <button
                   onClick={() => setShowLanguages(false)}
-                  className="w-full flex items-center gap-1.5 px-3 py-2 text-sm text-muted-text hover:text-primary-text hover:bg-white/5 cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-text hover:text-primary-text hover:bg-surface-hover rounded-xl cursor-pointer transition-colors"
                 >
                   <ChevronLeftIcon />
                   <span>{t.nav.language}</span>
                 </button>
-                <div className="my-1 border-t border-border" />
+                <div className="my-1 border-t border-border-subtle mx-2" />
                 {(['pt-BR', 'en'] as Language[]).map((lang) => (
                   <button
                     key={lang}
                     onClick={() => handleLanguageSelect(lang)}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-white/5 ${
-                      language === lang ? 'text-accent-blue' : 'text-primary-text'
+                    className={`w-full flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-surface-hover rounded-xl transition-colors ${
+                      language === lang ? 'text-accent-blue bg-accent-surface' : 'text-primary-text'
                     }`}
                   >
                     <span>{lang === 'pt-BR' ? 'Português' : 'English'}</span>

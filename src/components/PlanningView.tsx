@@ -390,7 +390,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
               value={guidanceText}
               onChange={(e) => setGuidanceText(e.target.value)}
               placeholder={t.planning.regenerateGuidancePlaceholder}
-              className="flex-1 px-3 py-2 rounded-md text-sm bg-background text-primary-text border border-border placeholder:text-muted-text focus:outline-none focus:border-accent-blue"
+              className="flex-1 px-4 py-3 rounded-full text-sm bg-surface text-primary-text border border-border-subtle placeholder:text-muted-text focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/20 transition-all"
               disabled={saving}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && guidanceText.trim()) handleRegenerate();
@@ -484,7 +484,7 @@ function TopicCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group bg-surface border border-border rounded-md p-4 ${topic.isKnown ? 'opacity-50' : ''}`}
+      className={`group bg-surface border border-border-subtle rounded-3xl p-5 md:p-6 transition-all shadow-sm hover:shadow-md ${topic.isKnown ? 'opacity-50' : ''}`}
     >
       {/* Topic header */}
       <div className="flex items-start gap-2">
@@ -500,11 +500,11 @@ function TopicCard({
 
         {/* Title */}
         <div className="flex-1 min-w-0">
-          <InlineEdit
+            <InlineEdit
             value={topic.title}
             onSave={onEditTitle}
             disabled={saving}
-            className="text-sm font-medium text-primary-text"
+            className="text-base font-semibold text-primary-text"
           />
         </div>
 

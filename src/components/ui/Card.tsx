@@ -9,8 +9,9 @@ export default function Card({ children, clickable = false, className = '', ...p
   return (
     <div
       className={`
-        bg-surface border border-border rounded-md p-4
-        ${clickable ? 'cursor-pointer hover:border-border-hover' : ''}
+        bg-surface border border-border-subtle rounded-2xl p-5
+        transition-colors
+        ${clickable ? 'cursor-pointer hover:bg-surface-hover hover:border-border-hover' : ''}
         ${className}
       `}
       {...props}

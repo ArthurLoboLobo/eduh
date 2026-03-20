@@ -18,13 +18,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={id}
           className={`
-            w-full px-3 py-2 rounded-md text-sm
-            bg-background text-primary-text
-            border border-border
+            w-full px-4 py-3 rounded-2xl text-sm
+            bg-surface text-primary-text
+            border border-border-subtle
             placeholder:text-muted-text
-            focus:outline-none focus:border-accent-blue
+            focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/20
+            transition-all
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? 'border-danger-red' : ''}
+            ${error ? 'border-danger-red focus:border-danger-red focus:ring-danger-red/20' : ''}
             ${className}
           `}
           {...props}

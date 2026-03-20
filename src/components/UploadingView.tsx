@@ -244,9 +244,9 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={`
-          flex flex-col items-center justify-center gap-2
-          border-2 border-dashed rounded-md p-8 cursor-pointer
-          ${isDragOver ? 'border-accent-blue' : 'border-border hover:border-border-hover'}
+          flex flex-col items-center justify-center gap-3
+          border-2 border-dashed rounded-3xl p-12 cursor-pointer bg-surface/30 transition-all
+          ${isDragOver ? 'border-accent-blue bg-accent-blue/5' : 'border-border-subtle hover:border-accent-blue/50 hover:bg-surface-hover/50'}
         `}
       >
         <UploadIcon />
@@ -282,7 +282,7 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
           {files.map((file) => (
             <div
               key={file.tempId}
-              className="flex items-center gap-3 bg-surface border border-border rounded-md px-4 py-3"
+              className="flex items-center gap-4 bg-surface border border-border-subtle rounded-2xl px-5 py-4 transition-all hover:shadow-md"
             >
               {/* File name — clickable for preview */}
               <button

@@ -1,27 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #191B1F;
-  --surface: #21242B;
-  --border: #2D3140;
-  --border-hover: #3A3F52;
-  --primary-text: #E4E6EB;
-  --muted-text: #8B90A0;
-  --accent-blue: #2B5CE6;
-  --accent-blue-hover: #3451D1;
-  --success-green: #3D8B5E;
-  --danger-red: #D94444;
+  --background: #131314;
+  --surface: #1E1F20;
+  --surface-hover: #282A2C;
+  --border: transparent; /* No hard borders in gemini style by default, or very subtle */
+  --border-subtle: rgba(255, 255, 255, 0.08); /* Fallback border if needed */
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --primary-text: #E3E3E3;
+  --muted-text: #C4C7C5;
+  --accent-blue: #A2C7FF; /* Gemini uses softer pastel blues */
+  --accent-blue-hover: #B4D1FF;
+  --accent-surface: rgba(162, 199, 255, 0.1);
+  --success-green: #81C995;
+  --danger-red: #F28B82;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
   --color-border-hover: var(--border-hover);
   --color-primary-text: var(--primary-text);
   --color-muted-text: var(--muted-text);
   --color-accent-blue: var(--accent-blue);
   --color-accent-blue-hover: var(--accent-blue-hover);
+  --color-accent-surface: var(--accent-surface);
   --color-success-green: var(--success-green);
   --color-danger-red: var(--danger-red);
   --font-sans: var(--font-geist-sans);
@@ -50,17 +56,17 @@ body {
 .prose-chat ul { list-style-type: disc; }
 .prose-chat ol { list-style-type: decimal; }
 .prose-chat blockquote {
-  border-left: 3px solid var(--border-hover);
+  border-left: 3px solid var(--border-subtle);
   padding-left: 0.75em;
   margin: 0.5em 0;
   color: var(--muted-text);
 }
 .prose-chat strong { font-weight: 600; }
 .prose-chat a { color: var(--accent-blue); text-decoration: underline; }
-.prose-chat hr { border-color: var(--border); margin: 1em 0; }
+.prose-chat hr { border-color: var(--border-subtle); margin: 1em 0; }
 .prose-chat table { border-collapse: collapse; margin: 0.5em 0; }
 .prose-chat th, .prose-chat td {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-subtle);
   padding: 0.375em 0.75em;
   text-align: left;
 }
