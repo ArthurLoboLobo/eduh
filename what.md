@@ -68,7 +68,7 @@ Ditchy is a platform that helps university students prepare for exams using AI. 
     - When the user first enters the chat (or the chat just don't have any message yet), the initial message will be a message from the LLM introducing what will be learnt in this topic and asking the user confirmation to start teaching it.
     - The chat is a standard AI chatbot interface, where the user can send messages and the LLM will respond.
     - The LLM will have access to all the files the student uploaded to the section, and will use them to help the student learn the topic (for example, by using exam's questions as practice questions).
-    - Inside the chat, the user can click an undo icon (↩) next to a message he sent to return the conversation to the point right before sending the message (and the message will be placed back in the text box).
+    - When hovering over a message the user sent, an undo icon (↩) appears next to it. Clicking it returns the conversation to the point right before sending that message (the message content is placed back in the text box). Undo is only available for recent messages — older messages that have been rolled into a conversation summary can no longer be undone.
     - The chat will be latex and markdown-formatted, and the LLM will use both to make their answer more readable.
     - The pedagogical flow of a conversarion should be as follows:
         - First, the LLM will introduce what will be learnt in this topic and ask for confirmation to start teaching it.
