@@ -34,6 +34,8 @@ export default async function AiLogsPage({
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
+  const COST_ESTIMATE_MULTIPLIER = 0.5 / 1_000_000;
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-primary-text mb-6">AI Call Logs</h1>
@@ -55,12 +57,13 @@ export default async function AiLogsPage({
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">Input Tokens</th>
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">Output Tokens</th>
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">Cost Score</th>
+              <th className="text-right p-3 border-b border-border text-muted-text font-medium">Cost Estimate</th>
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">Avg Duration</th>
             </tr>
           </thead>
           <tbody>
             {summary.length === 0 && (
-              <tr><td colSpan={6} className="p-3 text-muted-text text-center">No data</td></tr>
+              <tr><td colSpan={7} className="p-3 text-muted-text text-center">No data</td></tr>
             )}
             {summary.map((row) => (
               <tr key={row.label} className="border-b border-border">
@@ -69,6 +72,7 @@ export default async function AiLogsPage({
                 <td className="p-3 text-right text-primary-text">{row.total_input_tokens.toLocaleString()}</td>
                 <td className="p-3 text-right text-primary-text">{row.total_output_tokens.toLocaleString()}</td>
                 <td className="p-3 text-right text-primary-text">{row.cost_score.toLocaleString()}</td>
+                <td className="p-3 text-right text-primary-text">${(row.cost_score * COST_ESTIMATE_MULTIPLIER).toFixed(6)}</td>
                 <td className="p-3 text-right text-primary-text">{row.avg_duration_ms.toLocaleString()}ms</td>
               </tr>
             ))}
@@ -87,6 +91,8 @@ export default async function AiLogsPage({
               <th className="text-left p-3 border-b border-border text-muted-text font-medium">Model</th>
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">In</th>
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">Out</th>
+              <th className="text-right p-3 border-b border-border text-muted-text font-medium">Cost Score</th>
+              <th className="text-right p-3 border-b border-border text-muted-text font-medium">Cost Estimate</th>
               <th className="text-right p-3 border-b border-border text-muted-text font-medium">Duration</th>
               <th className="text-left p-3 border-b border-border text-muted-text font-medium">Input</th>
               <th className="text-left p-3 border-b border-border text-muted-text font-medium">Output</th>
@@ -94,7 +100,7 @@ export default async function AiLogsPage({
           </thead>
           <tbody>
             {logs.length === 0 && (
-              <tr><td colSpan={8} className="p-3 text-muted-text text-center">No calls found</td></tr>
+              <tr><td colSpan={10} className="p-3 text-muted-text text-center">No calls found</td></tr>
             )}
             {logs.map((log) => (
               <tr key={log.id} className="border-b border-border">
@@ -105,6 +111,15 @@ export default async function AiLogsPage({
                 <td className="p-3 text-muted-text font-mono text-xs">{log.model}</td>
                 <td className="p-3 text-right text-primary-text">{log.input_tokens?.toLocaleString() ?? '-'}</td>
                 <td className="p-3 text-right text-primary-text">{log.output_tokens?.toLocaleString() ?? '-'}</td>
+                {(() => {
+                  const costScore = (log.input_tokens ?? 0) + 6 * (log.output_tokens ?? 0);
+                  return (
+                    <>
+                      <td className="p-3 text-right text-primary-text">{costScore.toLocaleString()}</td>
+                      <td className="p-3 text-right text-primary-text">${(costScore * COST_ESTIMATE_MULTIPLIER).toFixed(6)}</td>
+                    </>
+                  );
+                })()}
                 <td className="p-3 text-right text-primary-text whitespace-nowrap">{log.duration_ms.toLocaleString()}ms</td>
                 <td className="p-3 max-w-xs">
                   <ExpandableText text={log.input_text} />
