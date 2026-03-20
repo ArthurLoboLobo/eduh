@@ -105,6 +105,9 @@ const en: Translations = {
     undoFailed: 'Failed to undo.',
   },
   studying: {
+    title: 'Study Room',
+    progressTitle: 'Course Progress',
+    topicsTitle: 'Topics',
     progressText: 'topics completed',
     interactions: 'interactions',
     noInteractions: 'No interactions',

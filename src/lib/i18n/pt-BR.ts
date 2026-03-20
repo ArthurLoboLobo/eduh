@@ -99,6 +99,9 @@ export interface Translations {
     undoFailed: string;
   };
   studying: {
+    title: string;
+    progressTitle: string;
+    topicsTitle: string;
     progressText: string;
     interactions: string;
     noInteractions: string;
@@ -243,6 +246,9 @@ const ptBR: Translations = {
     undoFailed: 'Falha ao desfazer.',
   },
   studying: {
+    title: 'Sala de Estudos',
+    progressTitle: 'Progresso do Curso',
+    topicsTitle: 'Tópicos',
     progressText: 'tópicos completos',
     interactions: 'interações',
     noInteractions: 'Nenhuma interação',
