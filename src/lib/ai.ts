@@ -1,9 +1,9 @@
 import { generateText, generateObject, embed, embedMany, tool } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod/v4';
-import { TEXT_EXTRACTION_MODEL, PLAN_GENERATION_MODEL, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, TOP_N_CHUNKS } from '@/config/ai';
+import { TEXT_EXTRACTION_MODEL, PLAN_GENERATION_MODEL, SUMMARIZATION_MODEL, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, TOP_N_CHUNKS } from '@/config/ai';
 import { searchChunks } from '@/lib/db/queries/embeddings';
-import { TEXT_EXTRACTION_PROMPT, PLAN_GENERATION_PROMPT, planRegenerationPrompt } from '@/prompts';
+import { TEXT_EXTRACTION_PROMPT, PLAN_GENERATION_PROMPT, planRegenerationPrompt, CHAT_SUMMARIZATION_PROMPT } from '@/prompts';
 
 export type PlanJSON = {
   topics: {
@@ -167,6 +167,24 @@ export async function embedTexts(
     providerOptions: { google: { outputDimensionality: 1536, taskType } },
   });
   return embeddings;
+}
+
+export async function summarizeChat(
+  previousSummary: string | null,
+  messages: { role: string; content: string }[],
+): Promise<string> {
+  const messageText = messages.map((m) => `${m.role}: ${m.content}`).join('\n\n');
+  const userContent = previousSummary
+    ? `<previous_summary>\n${previousSummary}\n</previous_summary>\n\n<new_messages>\n${messageText}\n</new_messages>`
+    : `<messages>\n${messageText}\n</messages>`;
+
+  const { text } = await generateText({
+    model: google(SUMMARIZATION_MODEL),
+    system: CHAT_SUMMARIZATION_PROMPT,
+    messages: [{ role: 'user', content: userContent }],
+  });
+
+  return text;
 }
 
 export function createSearchStudentMaterialsTool(sectionId: string) {

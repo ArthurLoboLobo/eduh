@@ -678,7 +678,12 @@ Add all remaining prompts:
 
 - **Topic chat system prompt**: Includes the full study plan with completion status, the current topic and subtopics, pedagogical instructions (introduce → explain → solve problem → student practice → next subtopic → topic complete), language rules. Topic completion is manual — the AI does NOT mark topics as complete. When the AI judges the student has covered all subtopics and seems confident, it should suggest they mark the topic as complete on the studying page and move on.
 - **Revision chat system prompt**: Similar to topic chat but framed for general revision across all topics. No specific topic/subtopics — the student asks about anything.
-- **Chat summarization prompt**: Instructs the AI to create a concise cumulative summary of the conversation up to a certain point, preserving key context.
+- **Chat summarization prompt**: Instructs the AI to create a concise cumulative summary of the conversation, preserving key context.
+- **Initial user messages** (4 variants) — fake user-role messages used to seed the first AI response in a chat (see 10.6). These are NOT persisted; only the LLM's reply is saved. They exist so the system prompt's "match the language of the last user message" rule naturally produces a response in the correct language. Stored as constants in `src/prompts/index.ts`:
+  - `TOPIC_CHAT_INITIAL_USER_MESSAGE_PT` — Portuguese. Asks the AI to introduce the topic and get started.
+  - `TOPIC_CHAT_INITIAL_USER_MESSAGE_EN` — English equivalent.
+  - `REVISION_CHAT_INITIAL_USER_MESSAGE_PT` — Portuguese. Asks the AI to introduce the revision chat.
+  - `REVISION_CHAT_INITIAL_USER_MESSAGE_EN` — English equivalent.
 
 ### 10.3 Database queries
 
@@ -718,7 +723,7 @@ Add all remaining prompts:
 - Save the user's message to the database via `createMessage(chatId, 'user', content)`.
 - Build the LLM context (server-side only — not sent to the client):
   1. System prompt (topic or revision, from `getChat` data).
-  2. Summary text (from `getSummary(chatId)`), if any — injected as a system/context message.
+  2. Summary text (from `getSummary(chatId)`), if any — injected as a system message.
   3. Unsummarized messages (from `getMessagesAfterSummary(chatId)`).
   4. The new user message (already included in the unsummarized messages after saving).
 - Call `streamText` from the `ai` package with:
@@ -744,9 +749,17 @@ Add all remaining prompts:
 > Token counting throughout this phase uses a `chars / 4` approximation — no tokenizer dependency needed. This is rough but sufficient for threshold-based decisions like summarization triggers.
 
 ### 10.6 Initial chat message
-- When a chat has no messages (first load):
-  - For **topic chats**: Generate an AI message introducing the topic and its subtopics, and asking the student for confirmation to start. Save this as the first assistant message.
-  - For the **revision chat**: Generate an AI message introducing the revision chat and what the student can do here. Save this as the first assistant message.
+- When a chat has no messages (first load in `GET /api/chats/:id/messages`):
+  1. Read the user's language from the `ditchy_language` cookie (default: `pt-BR`).
+  2. Select the appropriate initial user message prompt based on chat type and language:
+     - Topic chat + pt-BR → `TOPIC_CHAT_INITIAL_USER_MESSAGE_PT`
+     - Topic chat + en → `TOPIC_CHAT_INITIAL_USER_MESSAGE_EN`
+     - Revision chat + pt-BR → `REVISION_CHAT_INITIAL_USER_MESSAGE_PT`
+     - Revision chat + en → `REVISION_CHAT_INITIAL_USER_MESSAGE_EN`
+  3. Call the LLM with the system prompt (topic or revision) and the selected initial user message as a `user`-role message.
+  4. Save **only** the LLM's response as the first assistant message via `createMessage(chatId, 'assistant', response)`. The fake user message is NOT persisted.
+  5. Return the saved assistant message in the response.
+- This approach leverages the system prompt's language rule ("always match the language of the last user message") — the fake user message sets the language naturally without any special language-handling logic in the generation code.
 
 ### 10.7 Chat summarization
 - Token counting uses `Math.ceil(text.length / 4)` as a rough approximation. Apply it to the summary text + all unsummarized message contents.
@@ -891,3 +904,8 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 - **Optimistic uploading UI**: Switch the uploading page from pessimistic to optimistic updates — show files as added immediately in the UI before the server confirms, and handle errors by reverting.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
 - **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
+- **LLM API call observability**: Add token usage tracking and logging for every LLM API call. Two approaches under consideration: (1) Vercel AI SDK `wrapLanguageModel` middleware — centralized interception of all model calls, with `experimental_telemetry` metadata to identify the caller; (2) thin wrapper functions in `src/lib/ai.ts` that accept a label, call the SDK, and log the label, model, token usage (promptTokens/completionTokens), latency, and optionally the full request/response body. Goal: identify which steps consume the most tokens and where cheaper/weaker models could be used.
+- **Improve the made-up user message for "sent" state**: Make the synthetic first user message more natural so the LLM response feels organic — ideally the AI starts by briefly summarizing what the student will learn in the session before diving in.
+- **Fix chat page scroll**: Remove the scrollbar from the chat page as a whole — scrolling should only happen inside the chat message list, not at the page level.
+- **Add chat segment to breadcrumb**: The breadcrumb already renders on the chat page (via the shared layout) and shows "Dashboard › Section", but it doesn't include a "Chat" segment. Extend the `Breadcrumb` component to detect the `/sections/[id]/chat/[chatId]` route and append a third segment (e.g., the topic name or a generic "Chat" label).
+- **Add confirmation to undo messages**: Show a confirmation dialog before undoing a message in the chat, to prevent accidental deletion.

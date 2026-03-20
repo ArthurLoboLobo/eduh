@@ -106,6 +106,16 @@ export interface Translations {
     errorLoading: string;
     retry: string;
   };
+  chat: {
+    loading: string;
+    errorLoading: string;
+    retry: string;
+    inputPlaceholder: string;
+    rateLimited: string;
+    streamError: string;
+    undoError: string;
+    cannotUndoSummarized: string;
+  };
   errors: {
     EMAIL_INVALID: string;
     EMAIL_MISSING: string;
@@ -234,6 +244,16 @@ const ptBR: Translations = {
     loading: 'Carregando tópicos...',
     errorLoading: 'Erro ao carregar tópicos.',
     retry: 'Tentar novamente',
+  },
+  chat: {
+    loading: 'Carregando conversa...',
+    errorLoading: 'Erro ao carregar conversa.',
+    retry: 'Tentar novamente',
+    inputPlaceholder: 'Digite sua mensagem...',
+    rateLimited: 'Aguarde um momento antes de enviar outra mensagem.',
+    streamError: 'Falha ao enviar mensagem. Tente novamente.',
+    undoError: 'Não foi possível desfazer.',
+    cannotUndoSummarized: 'Mensagem muito antiga para desfazer.',
   },
   errors: {
     EMAIL_INVALID: 'E-mail inválido.',

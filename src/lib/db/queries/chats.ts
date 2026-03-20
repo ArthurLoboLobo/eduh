@@ -36,3 +36,36 @@ export async function getRevisionChat(sectionId: string): Promise<Chat | null> {
   `;
   return (rows[0] as Chat) ?? null;
 }
+
+export async function verifyChatOwnership(chatId: string, userId: string): Promise<boolean> {
+  const rows = await sql`
+    SELECT 1 FROM chats c
+    JOIN sections s ON s.id = c.section_id
+    WHERE c.id = ${chatId} AND s.user_id = ${userId}
+    LIMIT 1
+  `;
+  return rows.length > 0;
+}
+
+export type ChatWithDetails = {
+  id: string;
+  section_id: string;
+  topic_id: string | null;
+  type: string;
+  section_name: string;
+  topic_title: string | null;
+};
+
+export async function getChat(chatId: string): Promise<ChatWithDetails | null> {
+  const rows = await sql`
+    SELECT c.id, c.section_id, c.topic_id, c.type,
+           s.name AS section_name,
+           t.title AS topic_title
+    FROM chats c
+    JOIN sections s ON s.id = c.section_id
+    LEFT JOIN topics t ON t.id = c.topic_id
+    WHERE c.id = ${chatId}
+    LIMIT 1
+  `;
+  return (rows[0] as ChatWithDetails) ?? null;
+}

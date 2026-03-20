@@ -113,6 +113,16 @@ const en: Translations = {
     errorLoading: 'Failed to load topics.',
     retry: 'Try again',
   },
+  chat: {
+    loading: 'Loading conversation...',
+    errorLoading: 'Failed to load conversation.',
+    retry: 'Try again',
+    inputPlaceholder: 'Type your message...',
+    rateLimited: 'Wait a moment before sending another message.',
+    streamError: 'Failed to send message. Try again.',
+    undoError: 'Could not undo.',
+    cannotUndoSummarized: 'Message too old to undo.',
+  },
   errors: {
     EMAIL_INVALID: 'Invalid email.',
     EMAIL_MISSING: 'Please enter your email.',
