@@ -386,6 +386,18 @@ function FilePreview({
   file: LocalFile;
   noPreviewLabel: string;
 }) {
+  const [textFetch, setTextFetch] = useState<{ url: string; content: string | null; error: boolean } | null>(null);
+
+  useEffect(() => {
+    if (file.fileType !== 'text/plain') return;
+    let cancelled = false;
+    fetch(file.blobUrl)
+      .then((res) => res.text())
+      .then((content) => { if (!cancelled) setTextFetch({ url: file.blobUrl, content, error: false }); })
+      .catch(() => { if (!cancelled) setTextFetch({ url: file.blobUrl, content: null, error: true }); });
+    return () => { cancelled = true; };
+  }, [file.blobUrl, file.fileType]);
+
   if (file.fileType === 'application/pdf') {
     return (
       <iframe
@@ -403,6 +415,16 @@ function FilePreview({
         alt={file.name}
         className="max-w-full max-h-[70vh] mx-auto rounded-md"
       />
+    );
+  }
+  if (file.fileType === 'text/plain') {
+    const current = textFetch?.url === file.blobUrl ? textFetch : null;
+    if (current === null) return <div className="flex justify-center py-8"><Spinner size={24} /></div>;
+    if (current.error || current.content === null) return <p className="text-sm text-muted-text text-center py-8">{noPreviewLabel}</p>;
+    return (
+      <pre className="text-sm text-primary-text whitespace-pre-wrap break-words overflow-y-auto max-h-[70vh] font-mono p-4 bg-background rounded-md">
+        {current.content}
+      </pre>
     );
   }
   return (

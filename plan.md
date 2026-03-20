@@ -894,14 +894,10 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 
 ## Future TODOs
 
-- **File preview improvements**: Currently, non-PDF/non-image files (TXT) show a "no preview available" message in the preview modal. In the future, implement proper rendering for these file types (e.g., display plain text content directly).
 - **Send current plan in regenerate request**: Include the current plan JSON in the `POST /api/sections/:id/plan/regenerate` payload and pass it to the regeneration prompt, so the AI can see what the user already has and make targeted adjustments instead of generating from scratch.
 - **UI redesign**: Redesign the components to improve visual quality and aesthetics across the app.
-  - Increase the base font size — current text is too small.
-  - Improve text contrast — the current white (`#E4E6EB`) doesn't stand out enough against the dark background.
   - Make the navbar match the content width instead of spanning the full viewport width.
-  - Use icons instead of text labels for action buttons where possible (e.g., an undo icon instead of writing "Desfazer").
-- **Optimistic uploading UI**: Switch the uploading page from pessimistic to optimistic updates — show files as added immediately in the UI before the server confirms, and handle errors by reverting.
+- **Optimistic uploading UI**: Switch the planning page from pessimistic to optimistic updates — show files as added immediately in the UI before the server confirms, and handle errors by reverting.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
 - **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
 - **LLM API call observability**: Add token usage tracking and logging for every LLM API call. Two approaches under consideration: (1) Vercel AI SDK `wrapLanguageModel` middleware — centralized interception of all model calls, with `experimental_telemetry` metadata to identify the caller; (2) thin wrapper functions in `src/lib/ai.ts` that accept a label, call the SDK, and log the label, model, token usage (promptTokens/completionTokens), latency, and optionally the full request/response body. Goal: identify which steps consume the most tokens and where cheaper/weaker models could be used.

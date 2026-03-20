@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Ditchy is an AI-powered exam preparation platform for university students. Users upload study materials (past exams, slides, notes), the AI generates a structured study plan, and then provides interactive AI tutoring through topic-specific and revision chats.
 
-Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (technical architecture), `plan.md` (10-phase implementation plan).
+Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (technical architecture), `plan.md` (12-phase implementation plan).
 
 ### Implementation Status
 
-Phases 1–7 are complete. Next up is Phase 8 (Studying & Chat).
+All phases are complete.
 
 | Phase | Status |
 |-------|--------|
@@ -21,9 +21,11 @@ Phases 1–7 are complete. Next up is Phase 8 (Studying & Chat).
 | 5. Dashboard & Sections | Done |
 | 6. File Upload & Processing | Done |
 | 7. Study Plan Generation | Done |
-| 8. Studying & Chat | Not started |
-| 9. i18n Review | Not started |
-| 10. Polish & Deploy | Not started |
+| 8. Embeddings (RAG Pipeline) | Done |
+| 9. Studying Section Page | Done |
+| 10. Chat | Done |
+| 11. i18n Review | Not started |
+| 12. Polish & Deploy | Not started |
 
 ## Build & Run
 
@@ -80,8 +82,9 @@ db/
 
 - **Route groups**: `(auth)` has no navbar, `(main)` has navbar + breadcrumb. No `src/app/page.tsx` — the root `/` is served by `(auth)/page.tsx`. The auth page has a standalone language switcher (top-right) since there is no navbar.
 - **Self-chaining background jobs**: Plan generation uses self-invoking serverless functions to stay within Vercel's 60s timeout. File processing is triggered by the client (one call per file) and does not self-chain.
-- **RAG pipeline** (not yet implemented): Extracted text → chunked (~512 tokens, ~100 overlap) → embedded with `gemini-embedding-2-preview` (taskType: `RETRIEVAL_DOCUMENT`) → stored in pgvector → retrieved via similarity search (top 4 chunks, query embedded with taskType: `RETRIEVAL_QUERY`).
-- **Lazy chat creation** (not yet implemented): Chat records created on first open, not upfront.
+- **RAG pipeline**: Extracted text → chunked (~512 tokens, ~100 overlap) → embedded with `gemini-embedding-2-preview` (taskType: `RETRIEVAL_DOCUMENT`) → stored in pgvector → retrieved via similarity search (top 4 chunks, query embedded with taskType: `RETRIEVAL_QUERY`). The LLM accesses this via the `searchStudentMaterials` tool.
+- **Initial AI message**: On first chat load, the GET messages endpoint generates an introductory AI message using a fake (unpersisted) user message to seed the response in the correct language.
+- **Chat summarization**: After each assistant message, token count (chars/4 approximation) is checked against `SUMMARIZATION_TOKEN_THRESHOLD`. When exceeded, older messages are summarized and stored in `chat_summaries`, keeping only the last `MIN_UNSUMMARIZED_MESSAGES` in full.
 - **Ownership verification**: Each entity has a dedicated `verify*Ownership(entityId, userId)` query. API routes call it explicitly before proceeding — queries themselves don't embed ownership checks.
 - **Plan draft stack**: Plan edits create new `plan_drafts` rows. Undo deletes the newest draft, revealing the previous one. Drafts are cleaned up when the user starts studying.
 
@@ -91,13 +94,15 @@ db/
 |------|-------|--------------|
 | Text extraction | `gemini-3-flash-preview` | Yes |
 | Plan generation | `gemini-3-flash-preview` | Yes |
-| Teaching chat | `gemini-3-flash-preview` | No |
-| Summarization | `gemini-3-flash-preview` | No |
-| Embeddings | `gemini-embedding-2-preview` | No |
+| Teaching chat | `gemini-3-flash-preview` | Yes |
+| Summarization | `gemini-3-flash-preview` | Yes |
+| Embeddings | `gemini-embedding-2-preview` | Yes |
 
 ### Database
 
-12 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. See `tech.md` for full schema. 6 migrations exist in `db/migrations/`.
+11 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. 6 migrations exist in `db/migrations/`.
+
+Tables: `users`, `otp_codes`, `sections`, `files`, `plan_drafts`, `topics`, `subtopics`, `chats`, `messages`, `chat_summaries`, `embeddings`.
 
 ### Existing API Routes
 
@@ -114,26 +119,66 @@ POST /api/sections/:id/start-planning   # Transition uploading → planning
 GET|PUT /api/sections/:id/plan          # Get / update plan draft
 POST /api/sections/:id/plan/undo        # Undo last plan edit
 POST /api/sections/:id/plan/regenerate  # AI-regenerate plan with guidance
-POST /api/sections/:id/start-studying   # Transition planning → studying
+POST /api/sections/:id/start-studying   # Transition planning → studying (creates topics, embeddings, chats)
+GET /api/sections/:id/topics            # List topics with chat info and progress
 
 POST /api/files                   # Upload file
 DELETE /api/files/:id             # Delete file
 POST /api/files/:id/process       # Extract text from file via AI
+
+PATCH /api/topics/:id             # Toggle topic completion
+
+GET /api/chats/:id/messages       # Load messages (generates initial AI message on first load)
+POST /api/chats/:id/messages      # Send message (streaming via useChat / AI SDK data stream)
+POST /api/chats/:id/undo/:messageId  # Undo a user message and all subsequent messages
 ```
 
 ### Existing Components
 
-- **UI** (`src/components/ui/`): Button, Input, Modal, Card, Badge, Checkbox, ConfirmDialog, ProgressBar, Spinner
-- **Layout**: Navbar, Breadcrumb
-- **Views**: UploadingView (file upload + processing), PlanningView (plan editor with drag-and-drop via `@dnd-kit`)
+- **UI** (`src/components/ui/`): Button, Input, Modal, Card, Badge, Checkbox, ConfirmDialog, ProgressBar, Spinner, Toast (with `useToast` hook), TrashIcon
+- **Layout**: Navbar (with language switcher + logout dropdown), Breadcrumb (with section/topic dropdowns)
+- **Views**: UploadingView, PlanningView (drag-and-drop via `@dnd-kit`), StudyingView
 
 ### Database Query Files
 
 - `users.ts` — user/OTP queries
-- `sections.ts` — section CRUD, ownership verification, status updates
-- `files.ts` — file CRUD, ownership verification, text extraction storage
+- `sections.ts` — section CRUD, ownership verification, status updates, progress counts
+- `files.ts` — file CRUD, ownership verification, text extraction storage, size tracking
 - `plans.ts` — plan draft management (create, get current, undo, delete all)
-- `topics.ts` — create topics from plan, list topics
+- `topics.ts` — create topics from plan, list topics, toggle completion, list with chat info
+- `chats.ts` — bulk create chats for section, get revision chat, get chat with full details, ownership verification
+- `messages.ts` — message CRUD, rate limit tracking (`getMessageCountLastMinute`), delete from message ID onward
+- `embeddings.ts` — bulk insert embeddings, cosine similarity search (`searchChunks`)
+- `summaries.ts` — get/upsert chat summaries
+
+### AI Functions (`src/lib/ai.ts`)
+
+- `extractTextFromFile(fileBuffer, mimeType)` — multimodal Gemini call for text extraction
+- `generatePlan(allText)` — generate `PlanJSON` from extracted text
+- `regeneratePlan(allText, guidance)` — regenerate plan with user guidance
+- `validatePlanJSON(data)` — type guard for `PlanJSON`
+- `chunkText(text, chunkSize?, overlap?)` — split text into overlapping chunks
+- `embedText(text, taskType)` — single embedding via `gemini-embedding-2-preview`
+- `embedTexts(texts, taskType)` — batch embeddings
+- `createSearchStudentMaterialsTool(sectionId)` — Vercel AI SDK tool for RAG retrieval
+- `summarizeChat(previousSummary, messages)` — produce cumulative chat summary
+
+**Type**: `PlanJSON = { topics: { title: string; subtopics: string[]; isKnown?: boolean }[] }`
+
+### Prompts (`src/prompts/index.ts`)
+
+- `TEXT_EXTRACTION_PROMPT` — extract text to Markdown, LaTeX for math, describe images
+- `PLAN_GENERATION_PROMPT` — generate structured `PlanJSON` from study materials
+- `planRegenerationPrompt(guidance)` — regenerate plan incorporating user guidance
+- `topicChatSystemPrompt(params)` — topic chat system prompt (pedagogical flow + language rules)
+- `revisionChatSystemPrompt(params)` — revision chat system prompt
+- `CHAT_SUMMARIZATION_PROMPT` — summarize conversation cumulatively
+- `TOPIC_CHAT_INITIAL_USER_MESSAGE_PT/EN` — seeded fake user message to trigger initial AI greeting
+- `REVISION_CHAT_INITIAL_USER_MESSAGE_PT/EN` — same for revision chat
+
+### i18n
+
+Translation keys are organized into sections: `auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`. The `useTranslation()` hook reads the `ditchy_language` cookie (default: `pt-BR`) and returns `{ t, language, setLanguage }` with SSR-safe hydration.
 
 ## Tailwind v4
 
