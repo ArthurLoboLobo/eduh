@@ -14,6 +14,7 @@ import { useTranslation } from '@/lib/i18n';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import RefreshIcon from '@/components/ui/RefreshIcon';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
 
 type DbMessage = {
@@ -36,6 +37,8 @@ export default function ChatPage() {
   const [rateLimitMsg, setRateLimitMsg] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
+  const [undoTargetId, setUndoTargetId] = useState<string | null>(null);
+  const [isUndoing, setIsUndoing] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -151,28 +154,35 @@ export default function ChatPage() {
   }, [handleSend]);
 
   // Undo
-  const handleUndo = useCallback(async (messageId: string) => {
+  const handleUndo = useCallback(async () => {
+    if (!undoTargetId) return;
+    setIsUndoing(true);
     try {
-      const res = await fetch(`/api/chats/${chatId}/undo/${messageId}`, { method: 'POST' });
+      const res = await fetch(`/api/chats/${chatId}/undo/${undoTargetId}`, { method: 'POST' });
       if (!res.ok) {
         const data = await res.json();
         if (data.error === 'CANNOT_UNDO_SUMMARIZED') {
           showToast(t.chat.cannotUndoSummarized, 'info');
-          return;
+        } else {
+          showToast(t.chat.undoError, 'error');
         }
-        showToast(t.chat.undoError, 'error');
+        setUndoTargetId(null);
         return;
       }
       const { content } = await res.json();
-      const msgIndex = messages.findIndex((m) => m.id === messageId);
+      const msgIndex = messages.findIndex((m) => m.id === undoTargetId);
       if (msgIndex >= 0) {
         setMessages(messages.slice(0, msgIndex));
       }
       setInputValue(content);
+      setUndoTargetId(null);
     } catch {
       showToast(t.chat.undoError, 'error');
+      setUndoTargetId(null);
+    } finally {
+      setIsUndoing(false);
     }
-  }, [chatId, messages, setMessages, showToast, t]);
+  }, [chatId, messages, setMessages, showToast, t, undoTargetId]);
 
   if (initialLoading) {
     return (
@@ -216,7 +226,7 @@ export default function ChatPage() {
               >
                 {hoveredMessageId === message.id && Number(message.id) > summarizedUpToMessageId && !isLoading && (
                   <button
-                    onClick={() => handleUndo(message.id)}
+                    onClick={() => setUndoTargetId(message.id)}
                     className="self-center mr-2 p-1 rounded text-muted-text hover:text-primary-text hover:bg-white/5 cursor-pointer"
                     title="Undo"
                   >
@@ -318,6 +328,17 @@ export default function ChatPage() {
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!undoTargetId}
+        onClose={() => setUndoTargetId(null)}
+        onConfirm={handleUndo}
+        title={t.chat.undoConfirmTitle}
+        message={t.chat.undoConfirmMessage}
+        confirmLabel={t.chat.undoConfirmButton}
+        cancelLabel={t.chat.undoCancelButton}
+        loading={isUndoing}
+      />
     </>
   );
 }

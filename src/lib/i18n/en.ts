@@ -123,6 +123,10 @@ const en: Translations = {
     streamError: 'Failed to send message. Try again.',
     undoError: 'Could not undo.',
     cannotUndoSummarized: 'Message too old to undo.',
+    undoConfirmTitle: 'Undo message?',
+    undoConfirmMessage: 'This will remove this message and all subsequent messages. This action cannot be undone.',
+    undoConfirmButton: 'Undo',
+    undoCancelButton: 'Cancel',
   },
   errors: {
     EMAIL_INVALID: 'Invalid email.',

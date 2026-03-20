@@ -117,6 +117,10 @@ export interface Translations {
     streamError: string;
     undoError: string;
     cannotUndoSummarized: string;
+    undoConfirmTitle: string;
+    undoConfirmMessage: string;
+    undoConfirmButton: string;
+    undoCancelButton: string;
   };
   errors: {
     EMAIL_INVALID: string;
@@ -257,6 +261,10 @@ const ptBR: Translations = {
     streamError: 'Falha ao enviar mensagem. Tente novamente.',
     undoError: 'Não foi possível desfazer.',
     cannotUndoSummarized: 'Mensagem muito antiga para desfazer.',
+    undoConfirmTitle: 'Desfazer mensagem?',
+    undoConfirmMessage: 'Isso removerá esta mensagem e todas as mensagens seguintes. Essa ação não pode ser desfeita.',
+    undoConfirmButton: 'Desfazer',
+    undoCancelButton: 'Cancelar',
   },
   errors: {
     EMAIL_INVALID: 'E-mail inválido.',
