@@ -6,7 +6,6 @@ import { useTranslation } from '@/lib/i18n';
 import Card from '@/components/ui/Card';
 import ProgressBar from '@/components/ui/ProgressBar';
 import Checkbox from '@/components/ui/Checkbox';
-import Badge from '@/components/ui/Badge';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import RefreshIcon from '@/components/ui/RefreshIcon';
