@@ -41,7 +41,7 @@ export default function Navbar() {
     <nav className="fixed top-0 inset-x-0 z-40 h-14 bg-background/80 backdrop-blur-md border-b border-border-subtle flex items-center px-6 md:px-8">
       <Link
         href="/dashboard"
-        className="text-base font-semibold text-primary-text hover:text-accent-blue"
+        className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary-text to-accent-blue bg-clip-text text-transparent hover:opacity-80 transition-opacity"
       >
         Ditchy
       </Link>

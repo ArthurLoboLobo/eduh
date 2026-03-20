@@ -16,12 +16,12 @@ export default function Checkbox({ label, className = '', id, ...props }: Checkb
         type="checkbox"
         id={id}
         className="
-          w-4 h-4 rounded
-          border border-border bg-background
-          checked:bg-accent-blue checked:border-accent-blue
-          focus:outline-none focus:ring-1 focus:ring-accent-blue
-          cursor-pointer
-          accent-accent-blue
+          appearance-none w-4 h-4 rounded
+          border border-border-subtle bg-surface transition-all duration-200 ease-out
+          checked:bg-accent-blue checked:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 focus:border-accent-blue/50
+          focus:outline-none cursor-pointer active:scale-90
+          flex items-center justify-center
+          before:content-[''] before:w-full before:h-full before:scale-0 before:bg-[url('data:image/svg+xml;utf8,%3Csvg%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M3%208L6%2011L13%204%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] before:transition-transform before:duration-200 checked:before:scale-100
         "
         {...props}
       />

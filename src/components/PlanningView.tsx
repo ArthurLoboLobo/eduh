@@ -315,7 +315,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
   const topicIds = plan!.topics.map((_, i) => `topic-${i}`);
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       {/* Top bar */}
       <div className="flex items-center justify-end gap-3 mb-4 min-h-[36px]">
         {inlineError && (

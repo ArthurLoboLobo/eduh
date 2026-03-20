@@ -233,7 +233,7 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
   }
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       {/* Upload drop zone */}
       <div
         role="button"
@@ -245,8 +245,8 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
         onDragLeave={handleDragLeave}
         className={`
           flex flex-col items-center justify-center gap-3
-          border-2 border-dashed rounded-3xl p-12 cursor-pointer bg-surface/30 transition-all
-          ${isDragOver ? 'border-accent-blue bg-accent-blue/5' : 'border-border-subtle hover:border-accent-blue/50 hover:bg-surface-hover/50'}
+          border-2 border-dashed rounded-3xl p-12 cursor-pointer bg-surface/30 backdrop-blur-sm shadow-inner transition-all duration-300
+          ${isDragOver ? 'border-accent-blue bg-accent-blue/10 scale-[1.02]' : 'border-border-subtle hover:border-accent-blue/50 hover:bg-surface-hover/50 hover:shadow-md'}
         `}
       >
         <UploadIcon />

@@ -27,14 +27,14 @@ export default function Modal({ open, onClose, title, children, className = '' }
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-[#0F0F11]/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#0F0F11]/80 backdrop-blur-sm animate-backdrop"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         className={`
           relative z-10 w-full max-w-md
-          bg-surface border border-border-subtle rounded-3xl p-6 shadow-2xl
+          bg-surface border border-border-subtle rounded-3xl p-6 shadow-2xl animate-modal-pop
           ${className}
         `}
       >

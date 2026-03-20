@@ -106,7 +106,7 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
   const progressPercent = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in-up">
       {/* Progress area */}
       <div className="space-y-2">
         <p className="text-sm text-muted-text">

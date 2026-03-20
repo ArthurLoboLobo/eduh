@@ -194,7 +194,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="relative flex flex-col h-[calc(100vh-5.5rem)] w-full">
+    <div className="relative flex flex-col h-[calc(100vh-5.5rem)] w-full animate-fade-in-up">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 pb-32 max-w-3xl mx-auto w-full">
         {messages.map((message) => {
@@ -290,7 +290,7 @@ export default function ChatPage() {
 
       {/* Input */}
       <div className="absolute bottom-4 inset-x-0 px-4 flex justify-center pb-2 pointer-events-none">
-        <div className="relative w-full max-w-3xl flex items-end bg-[#1E1F20] border border-border-subtle rounded-[32px] p-2 pr-3 shadow-2xl focus-within:ring-1 focus-within:ring-accent-blue/30 focus-within:border-accent-blue/50 transition-all pointer-events-auto">
+        <div className="relative w-full max-w-3xl flex items-end bg-surface/80 backdrop-blur-xl border border-border-subtle rounded-[32px] p-2 pr-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] focus-within:ring-1 focus-within:ring-accent-blue/40 focus-within:border-accent-blue/60 transition-all pointer-events-auto">
           <textarea
             ref={textareaRef}
             value={inputValue}

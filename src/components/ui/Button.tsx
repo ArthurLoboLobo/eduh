@@ -30,8 +30,8 @@ export default function Button({
       className={`
         inline-flex items-center justify-center gap-2
         px-5 py-2.5 rounded-full text-sm font-medium
-        cursor-pointer
-        disabled:opacity-50 disabled:cursor-not-allowed
+        cursor-pointer transition-all duration-200 ease-out active:scale-95
+        disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
         ${variantClasses[variant]}
         ${className}
       `}
