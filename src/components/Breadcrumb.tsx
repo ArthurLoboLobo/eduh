@@ -10,18 +10,28 @@ interface Section {
   name: string;
 }
 
+interface ChatEntry {
+  id: string;
+  name: string;
+}
+
 export default function Breadcrumb() {
   const { t } = useTranslation();
   const pathname = usePathname();
   const params = useParams();
   const router = useRouter();
 
-  const [open, setOpen] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [sections, setSections] = useState<Section[]>([]);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [chats, setChats] = useState<ChatEntry[]>([]);
+  const sectionDropdownRef = useRef<HTMLDivElement>(null);
+  const chatDropdownRef = useRef<HTMLDivElement>(null);
 
   const sectionId = typeof params?.id === 'string' ? params.id : null;
+  const chatId = typeof params?.chatId === 'string' ? params.chatId : null;
   const currentSection = sectionId ? sections.find((s) => s.id === sectionId) : null;
+  const currentChat = chatId ? chats.find((c) => c.id === chatId) : null;
 
   useEffect(() => {
     fetch('/api/sections')
@@ -32,13 +42,42 @@ export default function Breadcrumb() {
       .catch(() => {});
   }, [pathname]);
 
+  useEffect(() => {
+    if (!sectionId || !chatId) {
+      setChats([]);
+      return;
+    }
+    fetch(`/api/sections/${sectionId}/topics`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const list: ChatEntry[] = [];
+        if (data.topics) {
+          for (const topic of data.topics) {
+            if (topic.chat_id) {
+              list.push({ id: topic.chat_id, name: topic.title });
+            }
+          }
+        }
+        if (data.revisionChatId) {
+          list.push({ id: data.revisionChatId, name: t.studying.revision });
+        }
+        setChats(list);
+      })
+      .catch(() => {});
+  }, [sectionId, chatId, t.studying.revision]);
+
   const isOnDashboard = pathname === '/dashboard';
   const isOnSection = !!sectionId;
+  const isOnChat = !!chatId;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
+      if (sectionDropdownRef.current && !sectionDropdownRef.current.contains(e.target as Node)) {
+        setSectionOpen(false);
+      }
+      if (chatDropdownRef.current && !chatDropdownRef.current.contains(e.target as Node)) {
+        setChatOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -46,8 +85,13 @@ export default function Breadcrumb() {
   }, []);
 
   function handleSectionSelect(id: string) {
-    setOpen(false);
+    setSectionOpen(false);
     router.push(`/sections/${id}`);
+  }
+
+  function handleChatSelect(id: string) {
+    setChatOpen(false);
+    router.push(`/sections/${sectionId}/chat/${id}`);
   }
 
   return (
@@ -66,17 +110,22 @@ export default function Breadcrumb() {
         {isOnSection && (
           <>
             <span className="text-muted-text select-none">›</span>
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative" ref={sectionDropdownRef}>
               <button
-                onClick={() => setOpen((v) => !v)}
-                className="flex items-center gap-1 text-primary-text hover:text-accent-blue cursor-pointer"
-                aria-expanded={open}
+                onClick={() => {
+                  setSectionOpen((v) => !v);
+                  setChatOpen(false);
+                }}
+                className={`flex items-center gap-1 hover:text-accent-blue cursor-pointer ${
+                  isOnChat ? 'text-muted-text' : 'text-primary-text'
+                }`}
+                aria-expanded={sectionOpen}
               >
                 <span>{currentSection?.name ?? sectionId}</span>
                 <ChevronDownIcon />
               </button>
 
-              {open && sections.length > 0 && (
+              {sectionOpen && sections.length > 0 && (
                 <div className="absolute left-0 top-8 min-w-56 max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
                   {sections.map((s) => (
                     <button
@@ -87,6 +136,42 @@ export default function Breadcrumb() {
                       }`}
                     >
                       {s.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Chat segment */}
+        {isOnChat && (
+          <>
+            <span className="text-muted-text select-none">›</span>
+            <div className="relative" ref={chatDropdownRef}>
+              <button
+                onClick={() => {
+                  setChatOpen((v) => !v);
+                  setSectionOpen(false);
+                }}
+                className="flex items-center gap-1 text-primary-text hover:text-accent-blue cursor-pointer"
+                aria-expanded={chatOpen}
+              >
+                <span>{currentChat?.name ?? chatId}</span>
+                <ChevronDownIcon />
+              </button>
+
+              {chatOpen && chats.length > 0 && (
+                <div className="absolute left-0 top-8 min-w-56 max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
+                  {chats.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => handleChatSelect(c.id)}
+                      className={`w-full text-left px-3 py-2 text-sm truncate cursor-pointer hover:bg-surface-hover rounded-xl transition-colors ${
+                        c.id === chatId ? 'text-accent-blue bg-accent-surface' : 'text-primary-text'
+                      }`}
+                    >
+                      {c.name}
                     </button>
                   ))}
                 </div>

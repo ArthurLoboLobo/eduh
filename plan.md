@@ -895,10 +895,7 @@ The i18n infrastructure (`src/i18n/`, `useTranslation()` hook, language cookie) 
 ## Future TODOs
 
 - **Send current plan in regenerate request**: Include the current plan JSON in the `POST /api/sections/:id/plan/regenerate` payload and pass it to the regeneration prompt, so the AI can see what the user already has and make targeted adjustments instead of generating from scratch.
-- **UI redesign**: Redesign the components to improve visual quality and aesthetics across the app.
-  - Make the navbar match the content width instead of spanning the full viewport width.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
 - **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
 - **LLM API call observability**: Add token usage tracking and logging for every LLM API call. Two approaches under consideration: (1) Vercel AI SDK `wrapLanguageModel` middleware — centralized interception of all model calls, with `experimental_telemetry` metadata to identify the caller; (2) thin wrapper functions in `src/lib/ai.ts` that accept a label, call the SDK, and log the label, model, token usage (promptTokens/completionTokens), latency, and optionally the full request/response body. Goal: identify which steps consume the most tokens and where cheaper/weaker models could be used.
 - **Improve the made-up user message for "sent" state**: Make the synthetic first user message more natural so the LLM response feels organic — ideally the AI starts by briefly summarizing what the student will learn in the session before diving in.
-- **Fix chat page scroll**: Remove the scrollbar from the chat page as a whole — scrolling should only happen inside the chat message list, not at the page level.
