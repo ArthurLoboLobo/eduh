@@ -196,9 +196,9 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="relative flex flex-col h-[calc(100vh-5.5rem)] w-full animate-fade-in-up">
+    <div className="relative flex flex-col min-h-[calc(100vh-12rem)] w-full animate-fade-in-up">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 pb-32 max-w-3xl mx-auto w-full">
+      <div className="flex-1 px-4 py-2 space-y-6 pb-32 max-w-3xl mx-auto w-full">
         {messages.map((message) => {
           const textParts = message.parts?.filter((p) => p.type === 'text') ?? [];
           const textContent = textParts.map((p) => ('text' in p ? p.text : '')).join('');
@@ -291,7 +291,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="absolute bottom-4 inset-x-0 px-4 flex justify-center pb-2 pointer-events-none">
+      <div className="fixed bottom-0 inset-x-0 px-4 flex justify-center pb-6 pt-12 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none z-40">
         <div className="relative w-full max-w-3xl flex items-end bg-surface/80 backdrop-blur-xl border border-border-subtle rounded-[32px] p-2 pr-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] focus-within:ring-1 focus-within:ring-accent-blue/40 focus-within:border-accent-blue/60 transition-all pointer-events-auto">
           <textarea
             ref={textareaRef}
