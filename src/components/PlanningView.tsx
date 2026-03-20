@@ -21,6 +21,8 @@ import type { PlanJSON } from '@/lib/ai';
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/Checkbox';
 import Spinner from '@/components/ui/Spinner';
+import UndoIcon from '@/components/ui/UndoIcon';
+import RefreshIcon from '@/components/ui/RefreshIcon';
 
 interface PlanningViewProps {
   sectionId: string;
@@ -305,7 +307,10 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
           {errorSource === 'load' ? t.planning.errorInterrupted : t.planning.errorMessage}
         </p>
         {errorSource === 'regenerate' && (
-          <Button onClick={handleRegenerate}>{t.planning.retry}</Button>
+          <Button onClick={handleRegenerate}>
+            <RefreshIcon size={16} />
+            {t.planning.retry}
+          </Button>
         )}
       </div>
     );
@@ -326,8 +331,11 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
           variant="ghost"
           disabled={!canUndo || saving}
           onClick={handleUndo}
+          title={t.planning.undo}
+          aria-label={t.planning.undo}
+          className="px-3"
         >
-          {t.planning.undo}
+          <UndoIcon size={18} />
         </Button>
       </div>
 

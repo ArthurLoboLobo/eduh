@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   open: boolean;
@@ -11,6 +12,10 @@ interface ModalProps {
 }
 
 export default function Modal({ open, onClose, title, children, className = '' }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -18,11 +23,11 @@ export default function Modal({ open, onClose, title, children, className = '' }
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex overflow-y-auto p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -33,7 +38,7 @@ export default function Modal({ open, onClose, title, children, className = '' }
       />
       <div
         className={`
-          relative z-10 w-full max-w-md
+          relative z-10 w-full max-w-md m-auto
           bg-surface border border-border-subtle rounded-3xl p-6 shadow-2xl animate-modal-pop
           ${className}
         `}
@@ -52,6 +57,7 @@ export default function Modal({ open, onClose, title, children, className = '' }
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

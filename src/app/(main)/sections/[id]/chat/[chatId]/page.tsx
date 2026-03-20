@@ -13,6 +13,7 @@ import 'katex/dist/katex.min.css';
 import { useTranslation } from '@/lib/i18n';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
+import RefreshIcon from '@/components/ui/RefreshIcon';
 import { useToast } from '@/components/ui/Toast';
 
 type DbMessage = {
@@ -187,6 +188,7 @@ export default function ChatPage() {
       <div className="flex flex-col items-center justify-center h-[calc(100vh-5.5rem)]">
         <p className="text-sm text-muted-text mb-3">{t.chat.errorLoading}</p>
         <Button variant="ghost" onClick={() => window.location.reload()}>
+          <RefreshIcon size={16} />
           {t.chat.retry}
         </Button>
       </div>

@@ -9,6 +9,7 @@ import Checkbox from '@/components/ui/Checkbox';
 import Badge from '@/components/ui/Badge';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
+import RefreshIcon from '@/components/ui/RefreshIcon';
 import { useToast } from '@/components/ui/Toast';
 
 interface TopicWithChatInfo {
@@ -97,6 +98,7 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <p className="text-sm text-muted-text">{t.studying.errorLoading}</p>
         <Button variant="ghost" onClick={fetchTopics}>
+          <RefreshIcon size={16} />
           {t.studying.retry}
         </Button>
       </div>

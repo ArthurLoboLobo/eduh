@@ -8,6 +8,7 @@ import Modal from '@/components/ui/Modal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import Spinner from '@/components/ui/Spinner';
 import TrashIcon from '@/components/ui/TrashIcon';
+import RefreshIcon from '@/components/ui/RefreshIcon';
 import { useToast } from '@/components/ui/Toast';
 
 interface UploadingViewProps {
@@ -305,10 +306,12 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
               {/* Retry button — only for server-side extraction errors */}
               {file.status === 'error' && file.id && !file.localError && (
                 <button
-                  onClick={() => handleRetry(file.id)}
-                  className="text-xs text-accent-blue hover:underline cursor-pointer shrink-0"
+                  onClick={() => handleRetry(file.id!)}
+                  className="text-muted-text hover:text-accent-blue cursor-pointer shrink-0 p-0.5 transition-colors"
+                  title={t.uploading.retry}
+                  aria-label={t.uploading.retry}
                 >
-                  {t.uploading.retry}
+                  <RefreshIcon size={16} />
                 </button>
               )}
 
