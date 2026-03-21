@@ -273,7 +273,7 @@ export default function ChatPage() {
                     },
                   }}
                 >
-                  {textContent}
+                  {textContent.replace(/\$\$([\s\S]*?)\$\$/g, (_, content) => `\n$$\n${content.trim()}\n$$\n`)}
                 </ReactMarkdown>
               </div>
             </div>
