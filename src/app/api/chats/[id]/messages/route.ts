@@ -31,7 +31,6 @@ function buildSystemPrompt(
 
   if (chat.type === 'topic' && chat.topic_title) {
     return topicChatSystemPrompt({
-      allTopics: topicData,
       currentTopicTitle: chat.topic_title,
       subtopics: currentSubtopics ?? [],
     });
