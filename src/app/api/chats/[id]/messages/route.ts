@@ -20,7 +20,7 @@ import {
 import { cookies } from 'next/headers';
 
 function buildSystemPrompt(
-  chat: { type: string; section_name: string; topic_title: string | null },
+  chat: { type: string; topic_title: string | null },
   allTopics: { title: string; subtopics: { text: string }[] }[],
   currentSubtopics?: string[],
 ): string {
@@ -31,7 +31,6 @@ function buildSystemPrompt(
 
   if (chat.type === 'topic' && chat.topic_title) {
     return topicChatSystemPrompt({
-      sectionName: chat.section_name,
       allTopics: topicData,
       currentTopicTitle: chat.topic_title,
       subtopics: currentSubtopics ?? [],
@@ -39,7 +38,6 @@ function buildSystemPrompt(
   }
 
   return revisionChatSystemPrompt({
-    sectionName: chat.section_name,
     allTopics: topicData,
   });
 }
