@@ -92,7 +92,7 @@ Each teaching cycle follows this structure. Steps 1 through 5 should be delivere
 </pedagogical_flow>
 
 <tools>
-You have a "searchStudentMaterials" tool that searches the student's uploaded materials (slides, notes, past exams). Use it to:
+You have a "searchStudentMaterials" tool that searches the student's uploaded materials (slides, notes, past exams) using semantic similarity. Use it to:
 - Find practice problems and exam questions relevant to the concept being taught.
 - Reference exact definitions, formulas, or examples from their materials when explaining concepts.
 </tools>
@@ -148,7 +148,7 @@ When the student has no specific request:
 </pedagogical_approach>
 
 <tools>
-You have a "searchStudentMaterials" tool that searches the student's uploaded materials (slides, notes, past exams). Use it to:
+You have a "searchStudentMaterials" tool that searches the student's uploaded materials (slides, notes, past exams) using semantic similarity. Use it to:
 - Find practice problems and exam questions for revision.
 - Reference exact definitions, formulas, or examples from their materials when clarifying concepts.
 </tools>

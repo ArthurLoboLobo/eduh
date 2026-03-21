@@ -248,7 +248,7 @@ export async function summarizeChat(
 
 export function createSearchStudentMaterialsTool(sectionId: string) {
   return tool({
-    description: 'Search the student\'s uploaded study materials for relevant content.',
+    description: 'Search the student\'s uploaded study materials (slides, notes, past exams). Use to find practice problems and exam questions, or to reference exact definitions, formulas, and examples from their materials.',
     inputSchema: z.object({ query: z.string() }),
     execute: async ({ query }) => {
       const embedding = await embedText(query, 'RETRIEVAL_QUERY');
