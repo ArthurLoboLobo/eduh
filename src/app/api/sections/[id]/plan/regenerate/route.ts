@@ -3,7 +3,7 @@ import { getUserIdFromRequest } from '@/lib/auth';
 import { verifySectionOwnership, getSection } from '@/lib/db/queries/sections';
 import { getCurrentPlanDraft, createPlanDraft } from '@/lib/db/queries/plans';
 import { getExtractedTexts } from '@/lib/db/queries/files';
-import { regeneratePlan, validatePlanJSON } from '@/lib/ai';
+import { regeneratePlan, validatePlanJSON, type PlanJSON } from '@/lib/ai';
 
 export async function POST(
   request: NextRequest,
@@ -41,7 +41,7 @@ export async function POST(
       const texts = await getExtractedTexts(id);
       const allText = texts.join('\n\n');
 
-      const plan = await regeneratePlan(allText, guidance);
+      const plan = await regeneratePlan(allText, guidance, draft.plan_json as PlanJSON);
 
       if (!validatePlanJSON(plan)) {
         return NextResponse.json({ error: 'REGENERATION_FAILED' }, { status: 500 });

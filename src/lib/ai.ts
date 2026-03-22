@@ -68,8 +68,11 @@ export async function generatePlan(allText: string): Promise<PlanJSON> {
 export async function regeneratePlan(
   allText: string,
   guidance: string,
+  currentPlan: PlanJSON,
 ): Promise<PlanJSON> {
   const start = Date.now();
+  const currentPlanJson = JSON.stringify(currentPlan, null, 2);
+  const prompt = planRegenerationPrompt(guidance, currentPlanJson);
   const { object, usage } = await generateObject({
     model: google(PLAN_GENERATION_MODEL),
     schema: planSchema,
@@ -77,7 +80,7 @@ export async function regeneratePlan(
       {
         role: 'user',
         content: [
-          { type: 'text', text: planRegenerationPrompt(guidance) },
+          { type: 'text', text: prompt },
           { type: 'text', text: allText },
         ],
       },
@@ -88,7 +91,7 @@ export async function regeneratePlan(
     model: PLAN_GENERATION_MODEL,
     inputTokens: usage?.inputTokens ?? null,
     outputTokens: usage?.outputTokens ?? null,
-    inputText: planRegenerationPrompt(guidance) + '\n' + allText,
+    inputText: prompt + '\n' + allText,
     outputText: JSON.stringify(object),
     durationMs: Date.now() - start,
   });

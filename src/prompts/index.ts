@@ -209,18 +209,23 @@ export const REVISION_CHAT_INITIAL_USER_MESSAGE_EN = `This is a system message t
 3. Ask which topic the student would like to revise.
 4. Also ask if the student would prefer to just solve exercises/problems.`;
 
-export function planRegenerationPrompt(guidance: string): string {
+export function planRegenerationPrompt(guidance: string, currentPlanJson: string): string {
   return `<instructions>
-You are a study plan creator. Given extracted text from a student's study materials and their specific guidance, produce an updated structured study plan as JSON.
+You are a study plan creator. You are given the student's current study plan, their study materials, and their specific guidance for how to change the plan. Modify the current plan according to the user's guidance, making targeted adjustments rather than generating from scratch.
 </instructions>
+
+<current_plan>
+${currentPlanJson}
+</current_plan>
 
 <user_guidance>
 ${guidance}
 </user_guidance>
 
 <rules>
-- Take the user's guidance into account when producing the plan. Their guidance may ask you to focus on certain areas, remove topics, reorder, split, merge, or adjust the plan in any way.
-- Analyze the provided text and identify the key topics a student needs to study.
+- Start from the current plan and apply the user's guidance as targeted modifications. Preserve parts of the plan that the user did not ask to change.
+- The user's guidance may ask you to focus on certain areas, remove topics, reorder, split, merge, add, or adjust the plan in any way.
+- You may also use the study materials to inform your changes — for example, if the user asks to add more detail or new topics.
 - Each topic should be a self-contained subject that makes sense to learn on its own, distinct from the other topics. Think of topics as independent units of study.
 - Order topics in the recommended study sequence: foundational concepts first, then progressively more advanced topics, unless the user's guidance specifies a different order.
 - Each topic must have a clear, descriptive title and at least one subtopic.
