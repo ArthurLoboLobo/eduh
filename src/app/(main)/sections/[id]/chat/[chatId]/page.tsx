@@ -43,6 +43,8 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const initialMessagesRef = useRef<UIMessage[]>([]);
+  const userScrolledUpRef = useRef(false);
+  const prevMessageCountRef = useRef(0);
 
   const {
     messages,
@@ -121,10 +123,32 @@ export default function ChatPage() {
     return () => { cancelled = true; };
   }, [chatId, setMessages]);
 
-  // Auto-scroll
+  // Auto-scroll: scroll to bottom on new messages, but stop if user scrolls up
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const isNewMessage = messages.length > prevMessageCountRef.current;
+    prevMessageCountRef.current = messages.length;
+
+    if (isNewMessage) {
+      userScrolledUpRef.current = false;
+    }
+
+    if (!userScrolledUpRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
+
+  // Detect user scrolling up during streaming
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollBottom = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+      if (scrollBottom > 100) {
+        userScrolledUpRef.current = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Auto-resize textarea
   const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -142,6 +166,7 @@ export default function ChatPage() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
+    userScrolledUpRef.current = false;
     sendMessage({ text: trimmed });
   }, [inputValue, isLoading, sendMessage]);
 
