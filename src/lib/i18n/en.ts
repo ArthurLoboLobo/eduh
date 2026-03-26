@@ -6,7 +6,7 @@ const en: Translations = {
     hero: 'Turn your study materials into a personalized, AI-guided study plan.',
     learnMore: 'Learn how it works',
     steps: [
-      { title: 'Upload Your Materials', description: "Ditchy is not your average tutor. Upload your past exams, lecture slides, and notes. It learns exactly what you need to know." },
+      { title: 'Upload Your Materials', description: "Eduh is not your average tutor. Upload your past exams, lecture slides, and notes. It learns exactly what you need to know." },
       { title: 'Get a Smart Study Plan', description: 'Our AI automatically analyzes your documents and structures a custom study plan broken down into digestible topics and subtopics. Edit, reorder, and refine the plan before you begin.' },
       { title: 'Master Topics with AI', description: 'Dive into dedicated AI chats for each topic. Solve dynamically generated problems, track your progress, and chat with an LLM that explicitly leverages the exact material you uploaded.' },
     ],

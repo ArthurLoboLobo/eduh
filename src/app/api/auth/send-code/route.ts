@@ -9,11 +9,11 @@ type Language = 'pt-BR' | 'en';
 
 const EMAIL_CONTENT: Record<Language, { subject: string; body: (code: string) => string }> = {
   'pt-BR': {
-    subject: 'Seu código de acesso ao Ditchy',
+    subject: 'Seu código de acesso ao Eduh',
     body: (code) => `Seu código de acesso é: ${code}\n\nEle expira em 10 minutos.`,
   },
   en: {
-    subject: 'Your Ditchy access code',
+    subject: 'Your Eduh access code',
     body: (code) => `Your access code is: ${code}\n\nIt expires in 10 minutes.`,
   },
 };

@@ -4,7 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ditchy",
+  title: "Eduh",
   description: "AI-powered exam preparation platform",
 };
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Ditchy is an AI-powered exam preparation platform for university students. Users upload study materials (past exams, slides, notes), the AI generates a structured study plan, and then provides interactive AI tutoring through topic-specific and revision chats.
+Eduh is an AI-powered exam preparation platform for university students. Users upload study materials (past exams, slides, notes), the AI generates a structured study plan, and then provides interactive AI tutoring through topic-specific and revision chats.
 
 Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (technical architecture), `plan.md` (12-phase implementation plan).
 
@@ -178,7 +178,7 @@ POST /api/chats/:id/undo/:messageId  # Undo a user message and all subsequent me
 
 ### i18n
 
-Translation keys are organized into sections: `auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`. The `useTranslation()` hook reads the `ditchy_language` cookie (default: `pt-BR`) and returns `{ t, language, setLanguage }` with SSR-safe hydration.
+Translation keys are organized into sections: `auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`. The `useTranslation()` hook reads the `eduh_language` cookie (default: `pt-BR`) and returns `{ t, language, setLanguage }` with SSR-safe hydration.
 
 ## Tailwind v4
 

@@ -7,7 +7,7 @@ import en from './en';
 
 export type Language = 'pt-BR' | 'en';
 
-const COOKIE_NAME = 'ditchy_language';
+const COOKIE_NAME = 'eduh_language';
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 const translations: Record<Language, Translations> = {
@@ -26,7 +26,7 @@ export function setLanguageCookie(language: Language): void {
   document.cookie = `${COOKIE_NAME}=${language}; path=/; max-age=${ONE_YEAR_SECONDS}; SameSite=Lax`;
 }
 
-const LANGUAGE_EVENT = 'ditchy:language-change';
+const LANGUAGE_EVENT = 'eduh:language-change';
 
 export function useTranslation() {
   // Always start with 'pt-BR' so SSR and client initial render match.

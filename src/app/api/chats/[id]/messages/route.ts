@@ -62,7 +62,7 @@ export async function GET(
     if (messages.length === 0) {
       // First load — generate initial AI greeting
       const cookieStore = await cookies();
-      const lang = cookieStore.get('ditchy_language')?.value ?? 'pt-BR';
+      const lang = cookieStore.get('eduh_language')?.value ?? 'pt-BR';
 
       const chat = await getChat(chatId);
       if (!chat) {

@@ -1,4 +1,4 @@
-# Ditchy — Implementation Reference
+# Eduh — Implementation Reference
 
 This document describes how each feature is implemented. If you have any doubt about how something works, refer to this file.
 
@@ -12,7 +12,7 @@ Email + OTP (one-time code sent via Resend). No passwords.
 1. User enters email on the auth page (`/`).
 2. `POST /api/auth/send-code` — validates email, finds or creates user, generates a random 6-digit code, stores it in `otp_codes` (10-minute expiry), sends it via Resend. Rate limited: max 1 code per 60 seconds (returns 429 with `retryAfterSeconds`).
 3. User enters the code. `POST /api/auth/verify-code` — validates code (not expired, < 3 attempts, correct match). On success: deletes all OTP codes for the user, signs a JWT, sets an HTTP-only cookie.
-4. JWT is signed with `jose` (HS256), 30-day expiry. Cookie name: `ditchy_token` (httpOnly, secure, sameSite=lax).
+4. JWT is signed with `jose` (HS256), 30-day expiry. Cookie name: `eduh_token` (httpOnly, secure, sameSite=lax).
 5. `POST /api/auth/logout` — deletes the cookie.
 
 ### Proxy (`src/proxy.ts`)
@@ -22,7 +22,7 @@ Runs on every request:
 - Unauthenticated API calls to non-auth endpoints → 401.
 
 ### Language Preference
-Stored in a cookie (`ditchy_language`), not in the database. Default: `pt-BR`. Updated via the navbar language switcher.
+Stored in a cookie (`eduh_language`), not in the database. Default: `pt-BR`. Updated via the navbar language switcher.
 
 ---
 
@@ -145,7 +145,7 @@ Each edit creates a new `plan_drafts` row. The current plan is always the newest
 
 ### Initial AI Message
 When `GET /api/chats/:id/messages` finds an empty chat:
-1. Reads user language from `ditchy_language` cookie.
+1. Reads user language from `eduh_language` cookie.
 2. Selects the appropriate fake user message template (topic/revision × pt-BR/en).
 3. Calls the LLM with the system prompt + fake user message (not persisted).
 4. Saves only the AI response as the first assistant message.
@@ -197,10 +197,10 @@ After saving each assistant message:
 ## Internationalization
 
 ### Setup (`src/lib/i18n/`)
-- `useTranslation()` hook reads `ditchy_language` cookie (default: `pt-BR`).
+- `useTranslation()` hook reads `eduh_language` cookie (default: `pt-BR`).
 - Returns `{ t, language, setLanguage }`.
 - SSR-safe: starts with `pt-BR`, syncs to cookie after hydration.
-- Custom event `ditchy:language-change` for cross-component sync.
+- Custom event `eduh:language-change` for cross-component sync.
 - Translation files: `pt-BR.ts` and `en.ts` with keys organized by section (`auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`).
 
 ### LLM Language Rules (priority order)

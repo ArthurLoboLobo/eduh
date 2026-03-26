@@ -43,7 +43,7 @@ export default function Navbar() {
         href="/dashboard"
         className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary-text to-accent-blue bg-clip-text text-transparent hover:opacity-80 transition-opacity"
       >
-        Ditchy
+        Eduh
       </Link>
 
       <div className="ml-auto relative" ref={dropdownRef}>

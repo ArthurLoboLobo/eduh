@@ -172,7 +172,7 @@ export default function AuthPage() {
         {/* Left panel — info */}
         <div className="mb-12 max-w-xl text-center lg:mb-0 lg:text-left flex flex-col justify-center">
           <h1 className="text-5xl lg:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary-text via-accent-blue to-primary-text bg-clip-text text-transparent pb-2">
-            Ditchy
+            Eduh
           </h1>
           <p className="mt-4 text-xl lg:text-2xl font-medium text-accent-blue">{t.auth.tagline}</p>
           <p className="mt-6 text-lg text-muted-text leading-relaxed">

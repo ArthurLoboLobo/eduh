@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db/connection';
 
-const COOKIE_NAME = 'ditchy_token';
+const COOKIE_NAME = 'eduh_token';
 const THIRTY_DAYS_SECONDS = 60 * 60 * 24 * 30;
 
 function getSecret(): Uint8Array {

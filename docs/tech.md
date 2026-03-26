@@ -1,4 +1,4 @@
-# Ditchy — Technical Overview
+# Eduh — Technical Overview
 
 ## Tech Stack
 
@@ -74,7 +74,7 @@ db/
 `(auth)` has no navbar — serves the login page at `/`. `(main)` has navbar + breadcrumb for all authenticated pages. No `src/app/page.tsx` — root `/` is served by `(auth)/page.tsx`.
 
 ### Auth Proxy
-`src/proxy.ts` runs on every request, verifies JWT, and handles redirects/401s. Auth cookie is `ditchy_token` (httpOnly, secure, sameSite=lax, 30-day expiry).
+`src/proxy.ts` runs on every request, verifies JWT, and handles redirects/401s. Auth cookie is `eduh_token` (httpOnly, secure, sameSite=lax, 30-day expiry).
 
 ### Client-Side Data Fetching
 Plain `fetch` for all API calls. No SWR, React Query, or other data-fetching libraries. Polling uses `setInterval` with `fetch`.
@@ -119,8 +119,8 @@ Every LLM/embedding API call is logged to `ai_call_logs` with token usage, laten
 ## Internationalization
 
 - Supported: **Brazilian Portuguese** (pt-BR, default) and **English**.
-- `useTranslation()` hook reads `ditchy_language` cookie, returns `{ t, language, setLanguage }`.
-- SSR-safe with hydration sync. Cross-component sync via custom `ditchy:language-change` event.
+- `useTranslation()` hook reads `eduh_language` cookie, returns `{ t, language, setLanguage }`.
+- SSR-safe with hydration sync. Cross-component sync via custom `eduh:language-change` event.
 - Translation keys organized by section: `auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`.
 
 ## Limits

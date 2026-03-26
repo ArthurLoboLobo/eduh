@@ -1,6 +1,6 @@
-# What is Ditchy?
+# What is Eduh?
 
-Ditchy is a platform that helps university students prepare for exams using AI. The goal is to prepare for a specific exam — not a subject as a whole. Users upload study materials, the AI generates a structured study plan, and then provides interactive tutoring through topic-specific chats.
+Eduh is a platform that helps university students prepare for exams using AI. The goal is to prepare for a specific exam — not a subject as a whole. Users upload study materials, the AI generates a structured study plan, and then provides interactive tutoring through topic-specific chats.
 
 ## User Flow
 
@@ -108,5 +108,5 @@ When the user clicks a topic from the Studying page, they enter an AI chat speci
 
 ### Navigation
 
-- **Navbar**: Fixed at the top. Logo "Ditchy" on the left (gradient text). Avatar button on the right that opens a dropdown with language switcher and logout.
+- **Navbar**: Fixed at the top. Logo "Eduh" on the left (gradient text). Avatar button on the right that opens a dropdown with language switcher and logout.
 - **Breadcrumb**: Below the navbar. Shows: Dashboard > Section Name > Topic Name. Section and topic names have dropdowns for quick navigation to other sections/topics.

@@ -149,7 +149,7 @@ const ptBR: Translations = {
     hero: 'Transforme seus materiais em um plano de estudos personalizado e guiado por IA.',
     learnMore: 'Entenda como funciona',
     steps: [
-      { title: 'Envie Seus Materiais', description: 'O Ditchy vai além de um tutor genérico. Envie provas anteriores, slides e anotações, e ele aprenderá exatamente o que você precisa saber.' },
+      { title: 'Envie Seus Materiais', description: 'O Eduh vai além de um tutor genérico. Envie provas anteriores, slides e anotações, e ele aprenderá exatamente o que você precisa saber.' },
       { title: 'Receba um Plano de Estudos Inteligente', description: 'Nossa IA analisa automaticamente seus documentos e estrutura um plano de estudos personalizado, dividido em tópicos e subtópicos fáceis de digerir. Edite, reordene e refine o plano antes de começar.' },
       { title: 'Domine Tópicos com IA', description: 'Mergulhe em chats de IA dedicados para cada tópico. Resolva problemas gerados dinamicamente, acompanhe seu progresso e converse com um LLM que usa explicitamente o material exato que você enviou.' },
     ],

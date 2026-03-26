@@ -10,7 +10,7 @@ export default async function AiLogsPage({
   searchParams: Promise<{ from?: string; to?: string; page?: string }>;
 }) {
   const cookieStore = await cookies();
-  const token = cookieStore.get('ditchy_token')?.value;
+  const token = cookieStore.get('eduh_token')?.value;
   if (!token) notFound();
 
   const result = await verifyToken(token);

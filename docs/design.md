@@ -1,4 +1,4 @@
-# Ditchy — Design System
+# Eduh — Design System
 
 ## Design Philosophy
 
@@ -100,7 +100,7 @@ Subtle micro-animations are used throughout:
 
 ### Navbar
 Fixed top, `h-14`, `bg-background/80` with `backdrop-blur-md`, `border-b border-border-subtle`.
-- Left: "Ditchy" logo with gradient text (primary-text → accent-blue).
+- Left: "Eduh" logo with gradient text (primary-text → accent-blue).
 - Right: Avatar button (circle, `bg-white/10`) → dropdown menu (`bg-surface`, `rounded-2xl`).
 
 ### Breadcrumb
