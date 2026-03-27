@@ -6,7 +6,12 @@
 - **Landing page improvements**: Add images/screenshots to the landing page and improve the copy to better explain how the app works and its value proposition.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
 - **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
-
+- **Fix Enter on mobile**: Fix the Enter key on mobile devices so that it inserts a newline instead of sending.
+Fix the view of the last message when the message box expands
+Include in the system prompt: "Do not use emojis"
+Let the user write messages while the AI is generating a response
+Make it possible to refresh the page without interfearing with the response
+Add 
 ---
 
 ## Production Readiness Gaps
