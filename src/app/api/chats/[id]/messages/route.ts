@@ -33,6 +33,7 @@ function buildSystemPrompt(
     return topicChatSystemPrompt({
       currentTopicTitle: chat.topic_title,
       subtopics: currentSubtopics ?? [],
+      allTopics: topicData,
     });
   }
 

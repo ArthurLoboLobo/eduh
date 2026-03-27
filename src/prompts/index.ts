@@ -53,13 +53,23 @@ Return a JSON object matching this exact schema:
 interface TopicChatPromptParams {
   currentTopicTitle: string;
   subtopics: string[];
+  allTopics: { title: string; subtopics: string[] }[];
 }
 
-export function topicChatSystemPrompt({ currentTopicTitle, subtopics }: TopicChatPromptParams): string {
+export function topicChatSystemPrompt({ currentTopicTitle, subtopics, allTopics }: TopicChatPromptParams): string {
+  const topicList = allTopics
+    .map((t, i) => `  ${i + 1}. ${t.title}\n${t.subtopics.map((s) => `     - ${s}`).join('\n')}`)
+    .join('\n');
+
   return `<instructions>
 You are an academic tutor. Your goal is to help the student learn "${currentTopicTitle}". Teach, explain, and guide.
 If the student goes off-topic, briefly answer or acknowledge what they said, then gently steer back to the current topic.
 </instructions>
+
+<study_plan>
+The student is following this study plan:
+${topicList}
+</study_plan>
 
 <current_topic>
 You are teaching: ${currentTopicTitle}
