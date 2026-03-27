@@ -27,7 +27,7 @@ You are a study plan creator. Given extracted text from a student's study materi
 - Each topic should be a self-contained subject that makes sense to learn on its own, distinct from the other topics. Think of topics as independent units of study.
 - Order topics in the recommended study sequence: foundational concepts first, then progressively more advanced topics.
 - Each topic must have a clear, descriptive title and at least one subtopic.
-- Subtopics describe what the topic covers in more detail — they are not separate things to learn, but rather a breakdown that clarifies the scope and content of the topic.
+- Subtopics describe in detail what the topic covers — they should give the student a clear picture of what they will learn, including the key concepts, techniques, or ideas within the topic. They are a descriptive breakdown of the topic's content.
 - Aim for a reasonable number of topics (typically 4-12) depending on the breadth of the material.
 </rules>
 
