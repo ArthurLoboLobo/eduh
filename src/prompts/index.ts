@@ -32,8 +32,7 @@ You are a study plan creator. Given extracted text from a student's study materi
 </rules>
 
 <language_rules>
-- Topic and subtopic names must be written in the same language as the study materials.
-- Do NOT translate topic or subtopic names.
+- Topic and subtopic names must be written in english.
 </language_rules>
 
 <output_format>
