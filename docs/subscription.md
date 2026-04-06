@@ -4,7 +4,7 @@
 
 - **Free tier**: available to all users, with daily usage limits.
 - **Pro tier**: R$20/month (~US$4), higher daily usage limits.
-- The difference is only the usage limits. Models are the same for both tiers.
+- Both tiers start on the best model and switch to a degraded model after a usage threshold. Pro users get a higher best-model threshold and can use the degraded model with no daily limit. Free users have a second threshold after which they're blocked entirely.
 
 ## Payment
 
@@ -99,18 +99,24 @@ Returns `{ plan, planExpiresAt, balance, email }`. Used by:
 
 ### Chat usage metadata
 
-The `GET /api/chats/:id/messages` response (page load) and the `POST /api/chats/:id/messages` response (sending a message) both include **`usagePercent`** (integer, can exceed 100). The frontend combines this with the plan info it already has to determine behavior:
-- `usagePercent` crosses 75 or 90 → show warning toast.
-- `usagePercent >= 100` and free → message bounces back to input box (see "When Limits Are Reached"), show cutoff toast.
-- `usagePercent >= 100` and pro → show one-time degradation toast.
+The `GET /api/chats/:id/messages` response (page load) and the `POST /api/chats/:id/messages` response (sending a message) both include **`phase`** and **`usagePercent`**:
+- **`phase`**: `'best' | 'degraded' | 'blocked'` for free users, `'best' | 'degraded'` for pro users. Indicates which model the user is currently on (or if they're blocked).
+- **`usagePercent`**: integer relative to the current phase's threshold. For pro users in `'degraded'` phase, this is irrelevant (no cap).
+
+The frontend combines this with the plan info to determine behavior:
+- `usagePercent` crosses 75 or 90 → show warning toast (applies in both `'best'` and `'degraded'` phases for free, and `'best'` phase for pro).
+- `phase` changes from `'best'` to `'degraded'` → show degradation toast (with upgrade link for free users).
+- Free user, `phase === 'blocked'` → message bounces back to input box (see "When Limits Are Reached"), show cutoff toast.
 
 ## Usage Limits
 
 - The only thing that counts towards the daily limit is **chat with AI** (not plan generation or text extraction). The others are just rate limited.
 - Usage is measured in weighted tokens: `(input_tokens + output_tokens * 6)`. The 6x ratio reflects the approximate cost difference between input and output tokens.
-- Limits are calibrated in terms of "topics" (one topic = one typical chat session):
-  - **Free**: ~2.5 topics/day.
-  - **Pro** (best model): ~10 topics/day.
+- There is a **single cumulative token counter** per user per day. No separate counters per phase.
+- **Free users** have two thresholds on that single counter:
+  1. **Best-model threshold** (~2.5 topics): user starts on the best model. After crossing this threshold, they switch to the degraded model mid-conversation.
+  2. **Hard-cutoff threshold** (~5 topics): after crossing this, the user is fully blocked until the next day.
+- **Pro users** have one threshold (~10 topics) after which they switch to the degraded model. There is no hard cutoff — pro users can use the degraded model indefinitely.
 - The actual token limit numbers will be derived from measuring real usage per topic.
 - Usage resets every day at **3 AM UTC** (midnight BRT).
 - Limits are enforced at the API layer.
@@ -123,9 +129,10 @@ This is a new behavior that applies to all chat errors, not just usage limits.
 
 ## When Limits Are Reached
 
-- **Free users**: hard cutoff. The API rejects the message, it bounces back to the input box, and a toast shows: "You've reached your daily usage limit. Come back tomorrow or subscribe to the Pro tier!" with a link to the subscription page.
-- **Pro users**: graceful degradation. Switch to a weaker model for the rest of the day. Show a one-time toast explaining that a lighter model will be used because they reached their daily limit.
-- The best and weaker models will be configured in the `src/config/ai.ts` config file.
+- **Free users — best-model threshold**: graceful degradation. The API switches to the degraded model mid-conversation. A toast explains that a lighter model will be used and offers an upgrade link.
+- **Free users — hard-cutoff threshold**: hard cutoff. The API rejects the message, it bounces back to the input box, and a toast shows: "You've reached your daily usage limit. Come back tomorrow or subscribe to the Pro tier!" with a link to the subscription page.
+- **Pro users — best-model threshold**: graceful degradation. Switch to the degraded model for the rest of the day. Show a one-time toast explaining that a lighter model will be used. No hard cutoff — the degraded model can be used indefinitely.
+- The best and degraded models are configured in `src/config/ai.ts`.
 
 ## Usage Warnings
 
@@ -133,7 +140,11 @@ This is a new behavior that applies to all chat errors, not just usage limits.
 - Instead, show **toast notifications** at fixed thresholds:
   - **75%**: "You've used 75% of your daily usage limit."
   - **90%**: "You've used 90% of your daily usage limit."
-- For Pro users, also say that after the limit they will start to use a weaker model for the chat.
+- These warnings apply **per phase**:
+  - **Free "best" phase**: warnings at 75%/90% of the best-model threshold. Mention that after the limit, a lighter model will be used.
+  - **Free "degraded" phase**: warnings at 75%/90% of the hard-cutoff threshold. Mention that after the limit, usage will be blocked.
+  - **Pro "best" phase**: warnings at 75%/90% of the pro threshold. Mention that after the limit, a lighter model will be used.
+  - **Pro "degraded" phase**: no warnings (no limit to warn about).
 
 ## Promotions
 
@@ -185,5 +196,5 @@ Clicking a card opens a **promotion detail modal** with:
 
 ## Configuration
 
-- AI-related config in `src/config/ai.ts`: model IDs (best/weaker), daily token limits (free/pro), warning thresholds.
+- AI-related config in `src/config/ai.ts`: model IDs (best/degraded), daily token limits (free best-model threshold, free hard-cutoff threshold, pro best-model threshold), warning thresholds.
 - Subscription-related config in `src/config/subscription.ts`: subscription price, promotion definitions, university email suffixes.
