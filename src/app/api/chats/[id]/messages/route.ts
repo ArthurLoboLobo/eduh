@@ -269,6 +269,15 @@ export async function POST(
           console.error('Summarization error:', err);
         }
       },
+      async onError() {
+        if (savedUserMessage) {
+          try {
+            await deleteMessagesFrom(chatId, savedUserMessage.id);
+          } catch {
+            // ignore cleanup error
+          }
+        }
+      },
     });
 
     return result.toUIMessageStreamResponse();

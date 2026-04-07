@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import ReactMarkdown from 'react-markdown';
@@ -16,6 +17,9 @@ import Button from '@/components/ui/Button';
 import RefreshIcon from '@/components/ui/RefreshIcon';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
+import { useUser } from '@/hooks/useUser';
+import { getWarningState, getWarningSeverity } from '@/lib/usage-warnings';
+import { USAGE_WARNING_THRESHOLDS } from '@/config/ai';
 
 type DbMessage = {
   id: number;
@@ -34,32 +38,60 @@ export default function ChatPage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [summarizedUpToMessageId, setSummarizedUpToMessageId] = useState(0);
-  const [rateLimitMsg, setRateLimitMsg] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
   const [undoTargetId, setUndoTargetId] = useState<string | null>(null);
   const [isUndoing, setIsUndoing] = useState(false);
 
+  const { user: currentUser } = useUser();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const initialMessagesRef = useRef<UIMessage[]>([]);
   const userScrolledUpRef = useRef(false);
   const prevMessageCountRef = useRef(0);
+  const warningStateRef = useRef<string | null>(null);
+  const lastFetchDataRef = useRef<{ phase: 'best' | 'degraded' | 'blocked'; usagePercent: number } | null>(null);
+  const initialWarningShownRef = useRef(false);
+  const userPlanRef = useRef<'free' | 'pro' | null>(null);
 
   const {
     messages,
     setMessages,
     sendMessage,
     status,
-    error: chatError,
   } = useChat({
     id: chatId,
     transport: new DefaultChatTransport({ api: `/api/chats/${chatId}/messages` }),
     messages: initialMessagesRef.current,
     onError(error) {
-      if (error.message?.includes('429') || error.message?.includes('RATE_LIMITED')) {
-        setRateLimitMsg(t.chat.rateLimited);
-        setTimeout(() => setRateLimitMsg(''), 5000);
+      // Bounce back: remove optimistic user message, restore to input
+      let bouncedText = '';
+      setMessages(prev => {
+        const lastUserMsg = [...prev].reverse().find(m => m.role === 'user');
+        bouncedText = lastUserMsg?.parts?.find(p => p.type === 'text')?.text ?? '';
+        return lastUserMsg ? prev.filter(m => m.id !== lastUserMsg.id) : prev;
+      });
+      setInputValue(bouncedText);
+
+      // Auto-resize textarea (same pattern as undo handler)
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+        }
+      }, 0);
+
+      // Error-specific toast
+      const errStr = error.message ?? '';
+      if (errStr.includes('USAGE_LIMIT_REACHED')) {
+        showToast(
+          <span>{t.subscription.usageLimitFree}{' '}<Link href="/subscription" className="underline hover:text-primary-text">{t.subscription.subscribeToPro}</Link></span>,
+          'error',
+        );
+      } else if (errStr.includes('RATE_LIMITED')) {
+        showToast(t.chat.rateLimited, 'error');
+      } else {
+        showToast(t.chat.streamError, 'error');
       }
     },
     async onFinish() {
@@ -77,6 +109,15 @@ export default function ChatPage() {
               parts: [{ type: 'text' as const, text: m.content }],
             })),
           );
+
+          // Usage warning check
+          if (userPlanRef.current) {
+            const newState = getWarningState(data.usagePercent, userPlanRef.current, data.phase);
+            if (getWarningSeverity(newState) > getWarningSeverity(warningStateRef.current)) {
+              showWarningToast(newState, userPlanRef.current);
+            }
+            warningStateRef.current = newState;
+          }
         }
       } catch {
         // silent — IDs just won't be synced
@@ -85,6 +126,39 @@ export default function ChatPage() {
   });
 
   const isLoading = status === 'submitted' || status === 'streaming';
+
+  // Keep userPlanRef in sync (avoids stale closure in onFinish)
+  useEffect(() => {
+    if (currentUser) {
+      userPlanRef.current = currentUser.plan;
+    }
+  }, [currentUser]);
+
+  function showWarningToast(state: string | null, plan: 'free' | 'pro') {
+    if (!state) return;
+
+    if (state === 'degraded') {
+      showToast(plan === 'free' ? t.subscription.freeDegraded : t.subscription.proDegraded, 'warning');
+      return;
+    }
+
+    const [phase, thresholdStr] = state.split(':');
+    const threshold = Number(thresholdStr);
+    const sorted = [...USAGE_WARNING_THRESHOLDS].sort((a, b) => a - b);
+    const isHighest = threshold === sorted[sorted.length - 1];
+
+    let template: string;
+    if (plan === 'pro') {
+      template = t.subscription.usageWarningPro;
+    } else if (phase === 'best') {
+      template = t.subscription.usageWarningFreeBest;
+    } else if (isHighest) {
+      template = t.subscription.usageWarningFreeDegradedFinal;
+    } else {
+      template = t.subscription.usageWarningFreeDegraded;
+    }
+    showToast(template.replace('{percent}', String(threshold)), 'warning');
+  }
 
   // Initial fetch
   useEffect(() => {
@@ -109,6 +183,7 @@ export default function ChatPage() {
         if (!cancelled) {
           initialMessagesRef.current = uiMessages;
           setMessages(uiMessages);
+          lastFetchDataRef.current = { phase: data.phase, usagePercent: data.usagePercent };
           setInitialLoading(false);
         }
       } catch {
@@ -122,6 +197,21 @@ export default function ChatPage() {
     load();
     return () => { cancelled = true; };
   }, [chatId, setMessages]);
+
+  // Show warning toast on initial load (once both user data and messages are ready)
+  useEffect(() => {
+    if (initialLoading || !currentUser || initialWarningShownRef.current) return;
+    if (lastFetchDataRef.current) {
+      const { phase, usagePercent } = lastFetchDataRef.current;
+      const state = getWarningState(usagePercent, currentUser.plan, phase);
+      warningStateRef.current = state;
+      if (state !== null) {
+        showWarningToast(state, currentUser.plan);
+      }
+      initialWarningShownRef.current = true;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLoading, currentUser]);
 
   // Auto-scroll: scroll to bottom on new messages, but stop if user scrolls up
   useEffect(() => {
@@ -344,18 +434,6 @@ export default function ChatPage() {
         {isLoading && messages[messages.length - 1]?.role === 'user' && (
           <div className="flex justify-start">
             <Spinner size={18} />
-          </div>
-        )}
-
-        {rateLimitMsg && (
-          <div className="text-center">
-            <p className="text-xs text-muted-text">{rateLimitMsg}</p>
-          </div>
-        )}
-
-        {chatError && !rateLimitMsg && (
-          <div className="text-center">
-            <p className="text-xs text-danger-red">{t.chat.streamError}</p>
           </div>
         )}
 

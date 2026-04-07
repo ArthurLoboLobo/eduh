@@ -27,6 +27,7 @@ const en: Translations = {
     logout: 'Logout',
     dashboard: 'Dashboard',
     profileMenu: 'Profile menu',
+    subscription: 'Subscription',
   },
   dashboard: {
     searchPlaceholder: 'Search sections...',
@@ -146,6 +147,16 @@ const en: Translations = {
     OTP_INVALID: 'Incorrect code. Try again.',
     EMAIL_SEND_FAILED: 'Failed to send email. Please try again.',
     UNKNOWN: 'An error occurred. Please try again.',
+  },
+  subscription: {
+    usageLimitFree: 'You have reached your daily usage limit.',
+    subscribeToPro: 'Subscribe to Pro',
+    freeDegraded: 'You have reached the best model limit. Responses will continue with reduced quality.',
+    proDegraded: 'You have reached your daily best model limit. Responses will continue with a lighter model.',
+    usageWarningPro: 'You have used {percent}% of your daily best model limit.',
+    usageWarningFreeBest: 'You have used {percent}% of your daily best model limit.',
+    usageWarningFreeDegraded: 'You have used {percent}% of your remaining daily limit.',
+    usageWarningFreeDegradedFinal: 'You have used {percent}% of your remaining daily limit. After this, access will be blocked until tomorrow.',
   },
 } as const;
 

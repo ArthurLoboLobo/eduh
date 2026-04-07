@@ -2,16 +2,16 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-type ToastVariant = 'error' | 'success' | 'info';
+type ToastVariant = 'error' | 'success' | 'info' | 'warning';
 
 interface Toast {
   id: string;
-  message: string;
+  message: ReactNode;
   variant: ToastVariant;
 }
 
 interface ToastContextValue {
-  showToast: (message: string, variant?: ToastVariant) => void;
+  showToast: (message: ReactNode, variant?: ToastVariant) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -19,7 +19,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = useCallback((message: string, variant: ToastVariant = 'error') => {
+  const showToast = useCallback((message: ReactNode, variant: ToastVariant = 'error') => {
     const id = Math.random().toString(36).slice(2);
     setToasts((prev) => [...prev, { id, message, variant }]);
     setTimeout(() => {
@@ -35,6 +35,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     error: 'bg-danger-red/10 border border-danger-red/30 text-danger-red',
     success: 'bg-success-green/10 border border-success-green/30 text-success-green',
     info: 'bg-white/5 border border-border text-muted-text',
+    warning: 'bg-warning-amber/10 border border-warning-amber/30 text-warning-amber',
   };
 
   return (

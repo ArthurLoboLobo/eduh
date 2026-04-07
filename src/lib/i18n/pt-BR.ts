@@ -21,6 +21,7 @@ export interface Translations {
     logout: string;
     dashboard: string;
     profileMenu: string;
+    subscription: string;
   };
   dashboard: {
     searchPlaceholder: string;
@@ -141,6 +142,16 @@ export interface Translations {
     EMAIL_SEND_FAILED: string;
     UNKNOWN: string;
   };
+  subscription: {
+    usageLimitFree: string;
+    subscribeToPro: string;
+    freeDegraded: string;
+    proDegraded: string;
+    usageWarningPro: string;
+    usageWarningFreeBest: string;
+    usageWarningFreeDegraded: string;
+    usageWarningFreeDegradedFinal: string;
+  };
 }
 
 const ptBR: Translations = {
@@ -170,6 +181,7 @@ const ptBR: Translations = {
     logout: 'Sair',
     dashboard: 'Painel',
     profileMenu: 'Menu do perfil',
+    subscription: 'Assinatura',
   },
   dashboard: {
     searchPlaceholder: 'Buscar seções...',
@@ -289,6 +301,16 @@ const ptBR: Translations = {
     OTP_INVALID: 'Código incorreto. Tente novamente.',
     EMAIL_SEND_FAILED: 'Falha ao enviar o e-mail. Tente novamente.',
     UNKNOWN: 'Ocorreu um erro. Tente novamente.',
+  },
+  subscription: {
+    usageLimitFree: 'Você atingiu seu limite diário de uso.',
+    subscribeToPro: 'Assinar Pro',
+    freeDegraded: 'Você atingiu o limite do modelo principal. Respostas continuarão com qualidade reduzida.',
+    proDegraded: 'Você atingiu o limite diário do modelo principal. Respostas continuarão com um modelo mais leve.',
+    usageWarningPro: 'Você já usou {percent}% do seu limite diário do modelo principal.',
+    usageWarningFreeBest: 'Você já usou {percent}% do limite diário do modelo principal.',
+    usageWarningFreeDegraded: 'Você já usou {percent}% do limite diário restante.',
+    usageWarningFreeDegradedFinal: 'Você já usou {percent}% do limite diário restante. Após isso, o acesso será bloqueado até amanhã.',
   },
 };
 
