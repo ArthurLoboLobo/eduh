@@ -7,8 +7,10 @@ import { getMessages, getMessagesAfterSummary, createMessage, deleteMessagesFrom
 import { getSummary, upsertSummary } from '@/lib/db/queries/summaries';
 import { listTopics } from '@/lib/db/queries/topics';
 import { createSearchStudentMaterialsTool, summarizeChat } from '@/lib/ai';
-import { TEACHING_CHAT_MODEL, RATE_LIMIT_MESSAGES_PER_MINUTE, SUMMARIZATION_TOKEN_THRESHOLD, MIN_UNSUMMARIZED_MESSAGES } from '@/config/ai';
+import { TEACHING_CHAT_MODEL, DEGRADED_CHAT_MODEL, RATE_LIMIT_MESSAGES_PER_MINUTE, SUMMARIZATION_TOKEN_THRESHOLD, MIN_UNSUMMARIZED_MESSAGES, TOKEN_WEIGHT_OUTPUT_MULTIPLIER } from '@/config/ai';
 import { insertAiCallLog } from '@/lib/db/queries/aiLogs';
+import { upsertDailyUsage, getDailyUsage, getUsagePhase } from '@/lib/db/queries/usage';
+import { getUserById } from '@/lib/db/queries/users';
 import {
   topicChatSystemPrompt,
   revisionChatSystemPrompt,
@@ -104,13 +106,27 @@ export async function GET(
       });
 
       const saved = await createMessage(chatId, 'assistant', text);
-      return NextResponse.json({ messages: [saved], summarizedUpToMessageId: 0 });
+
+      // Usage phase (initial greeting does NOT count towards usage)
+      const user = await getUserById(userId);
+      const dailyUsage = await getDailyUsage(userId);
+      const { phase, usagePercent } = getUsagePhase(dailyUsage, user.plan);
+
+      return NextResponse.json({ messages: [saved], summarizedUpToMessageId: 0, phase, usagePercent });
     }
 
     const summary = await getSummary(chatId);
+
+    // Usage phase
+    const user = await getUserById(userId);
+    const dailyUsage = await getDailyUsage(userId);
+    const { phase, usagePercent } = getUsagePhase(dailyUsage, user.plan);
+
     return NextResponse.json({
       messages,
       summarizedUpToMessageId: summary?.summarized_up_to_message_id ?? 0,
+      phase,
+      usagePercent,
     });
   } catch (err) {
     console.error('GET /api/chats/:id/messages error:', err);
@@ -141,6 +157,15 @@ export async function POST(
     if (recentCount >= RATE_LIMIT_MESSAGES_PER_MINUTE) {
       return NextResponse.json({ error: 'RATE_LIMITED' }, { status: 429 });
     }
+
+    // Usage limit enforcement
+    const user = await getUserById(userId);
+    const currentUsage = await getDailyUsage(userId);
+    const { phase } = getUsagePhase(currentUsage, user.plan);
+    if (phase === 'blocked') {
+      return NextResponse.json({ error: 'USAGE_LIMIT_REACHED' }, { status: 429 });
+    }
+    const modelToUse = phase === 'degraded' ? DEGRADED_CHAT_MODEL : TEACHING_CHAT_MODEL;
 
     // Extract user message from useChat request body (UIMessage format with parts)
     const body = await request.json();
@@ -192,7 +217,7 @@ export async function POST(
 
     const streamStart = Date.now();
     const result = streamText({
-      model: google(TEACHING_CHAT_MODEL),
+      model: google(modelToUse),
       system: systemPrompt,
       messages: llmMessages,
       tools: { searchStudentMaterials: createSearchStudentMaterialsTool(chat.section_id) },
@@ -200,7 +225,7 @@ export async function POST(
       async onFinish({ text, usage: streamUsage }) {
         insertAiCallLog({
           label: 'chat-stream',
-          model: TEACHING_CHAT_MODEL,
+          model: modelToUse,
           inputTokens: streamUsage?.inputTokens ?? null,
           outputTokens: streamUsage?.outputTokens ?? null,
           inputText: systemPrompt + '\n' + JSON.stringify(llmMessages),
@@ -209,6 +234,11 @@ export async function POST(
           sectionId: chat.section_id,
           durationMs: Date.now() - streamStart,
         });
+        // Track usage
+        const inputTokens = streamUsage?.inputTokens ?? 0;
+        const outputTokens = streamUsage?.outputTokens ?? 0;
+        const weightedTokens = inputTokens + outputTokens * TOKEN_WEIGHT_OUTPUT_MULTIPLIER;
+        upsertDailyUsage(userId, weightedTokens);
         // Save assistant message
         await createMessage(chatId, 'assistant', text);
 
