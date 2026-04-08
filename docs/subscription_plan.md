@@ -771,8 +771,10 @@ export async function createPixQrCode(params: {
 }
 
 export async function checkPixQrCode(id: string): Promise<{
-  status: string;       // "PENDING" | "PAID" | "EXPIRED"
+  status: string;       // "PENDING" | "PAID" | "EXPIRED" | "CANCELLED" | "REFUNDED"
   expiresAt: string;
+  id: string;
+  amount: number;
 }> {
   return abacateRequest('GET', `/v1/pixQrCode/check?id=${id}`);
 }
@@ -820,7 +822,7 @@ Flow:
    - Use `sql.transaction([...])` (same Neon HTTP-mode transaction pattern as `createChatsForSection`): debit balance (`UPDATE users SET balance = balance - $creditsToDebit WHERE id = $userId`) + activate pro (`UPDATE users SET plan = 'pro', plan_expires_at = now() + INTERVAL '30 days' WHERE id = $userId`).
    - Return `{ status: 'activated' }`.
 6. If `pixAmount > 0`:
-   - Call `createPixQrCode({ amount: pixAmount, expiresIn: PIX_EXPIRATION_SECONDS, description: 'Eduh Pro', metadata: { userId, creditsToDebit } })`.
+   - Call `createPixQrCode({ amount: pixAmount, expiresIn: PIX_EXPIRATION_SECONDS, description: 'Eduh Pro', metadata: { userId, creditsToDebit } })`. The metadata comes back in the webhook at `data.pixQrCode.metadata` (confirmed via testing). The primary lookup is via `data.pixQrCode.id` (the `pix_char_xxx` stored as `abacatepay_id` in our DB).
    - `createPayment(userId, qrResponse.id, pixAmount, creditsToDebit, qrResponse)` — stores the full AbacatePay response in the `metadata` JSONB column. The partial unique index ensures this fails if a pending payment somehow still exists (race condition safety net).
    - Return `{ status: 'pending', brCode: qrResponse.brCode, brCodeBase64: qrResponse.brCodeBase64, expiresAt: qrResponse.expiresAt, paymentId: payment.id }`.
 7. If the AbacatePay API call fails → `return json({ error: 'PAYMENT_CREATION_FAILED' }, 502)`.
@@ -877,45 +879,59 @@ The frontend polls this every 3 seconds via `setInterval` while the QR code moda
 if (!userId && pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/') && !pathname.startsWith('/api/webhooks/')) {
 ```
 
-**Reading raw body for HMAC**: Next.js App Router parses the body automatically. For HMAC verification we need the raw bytes. Read it as text first, then parse:
+**Webhook security — URL query string secret**: The AbacatePay v1 webhook docs describe a URL-based secret as the primary verification method. Register the webhook URL with a secret in the query string:
 
-```typescript
-const rawBody = await request.text();
-// Verify HMAC before parsing
-const payload = JSON.parse(rawBody);
+```
+https://<your-vercel-domain>/api/webhooks/abacatepay?webhookSecret=SEU_SECRET
 ```
 
-**HMAC verification**: Assumed format (confirm from AbacatePay docs or dev mode testing during implementation): HMAC-SHA256 of the raw request body string, hex-encoded, compared to the `X-Webhook-Signature` header value.
+In the handler, verify the secret before processing:
 
 ```typescript
-import { createHmac } from 'crypto';
-const expected = createHmac('sha256', process.env.ABACATEPAY_WEBHOOK_SECRET!)
-  .update(rawBody)
-  .digest('hex');
-const signature = request.headers.get('X-Webhook-Signature');
-if (signature !== expected) return json({ error: 'INVALID_SIGNATURE' }, 401);
+const url = new URL(request.url);
+const secret = url.searchParams.get('webhookSecret');
+if (secret !== process.env.ABACATEPAY_WEBHOOK_SECRET) {
+  return NextResponse.json({ error: 'INVALID_SECRET' }, { status: 401 });
+}
+const payload = await request.json();
 ```
 
-**Webhook payload**: AbacatePay docs don't document the exact webhook body format. The first task when implementing this step is to call `simulatePixPayment` in dev mode and log the webhook body to determine the exact structure. Assumed structure for the plan (adjust field paths after testing):
+This is simpler than HMAC and is the documented approach. The HMAC header signature is described as optional ("when available") in the AbacatePay docs — skip it for now and add later if AbacatePay enables it for our account.
+
+**Webhook payload** (confirmed via dev mode testing on 2026-04-08):
 
 ```json
 {
-  "event": "pix.paid",
+  "id": "log_hzYP4haJXuhMt0sQrc0Rwy5T",
+  "event": "billing.paid",
   "data": {
-    "id": "pix_char_123456",
-    "amount": 1000,
-    "status": "PAID"
-  }
+    "pixQrCode": {
+      "id": "pix_char_xxx",
+      "amount": 100,
+      "kind": "PIX",
+      "status": "PAID",
+      "metadata": {
+        "userId": "user-uuid",
+        "creditsToDebit": 0
+      }
+    },
+    "payment": {
+      "amount": 100,
+      "fee": 80,
+      "method": "PIX"
+    }
+  },
+  "devMode": true
 }
 ```
 
-We need the AbacatePay payment `id` (the `pix_char_xxx` string) from the payload to look up the payment in our DB. If the payload uses different field names, update the extraction code accordingly.
+Key fields: `event` is `billing.paid` (not `pix.paid`). The PIX QR Code ID is at `data.pixQrCode.id`. Our `metadata` comes back at `data.pixQrCode.metadata`. The top-level `id` is a webhook log ID, not the payment ID.
 
 **Handler flow**:
 
-1. Read raw body, verify HMAC → 401 if invalid.
-2. Parse JSON. If `event !== 'pix.paid'` → return 200 (ignore other events).
-3. Extract `abacatepayId = payload.data.id`.
+1. Verify `webhookSecret` query param → 401 if invalid.
+2. Parse JSON body. If `event !== 'billing.paid'` → return 200 (ignore other events).
+3. Extract `abacatepayId = payload.data.pixQrCode.id`.
 4. `getPaymentByAbacatepayId(abacatepayId)`.
 5. **Not found** → return 200 + log warning (return 200 to prevent AbacatePay retries for payments we don't know about).
 6. **Already `paid`** (idempotency) → return 200.
@@ -929,7 +945,7 @@ We need the AbacatePay payment `id` (the `pix_char_xxx` string) from the payload
 
 **Test** (`tests/integration/webhook-flow.test.ts` — needs DB):
 
-These tests call the query functions directly to simulate the webhook handler's logic (no HTTP calls, no real HMAC — the handler logic is what matters).
+These tests call the query functions directly to simulate the webhook handler's logic (no HTTP calls, no real webhook secret check — the handler logic is what matters).
 
 **Happy path (pending payment)**:
 - Create a user with 0 balance. Create a pending payment with `credits_to_debit = 0`. Simulate the webhook logic: `getPaymentByAbacatepayId` → found, status is `'pending'` → run the transaction (debit credits, activate pro, mark paid). Verify: user is `plan: 'pro'`, `plan_expires_at` set, payment `status = 'paid'`, balance still 0.
@@ -946,8 +962,10 @@ These tests call the query functions directly to simulate the webhook handler's 
 **Unknown payment ID**:
 - Run the webhook logic with a non-existent `abacatepayId`. Verify: no error thrown, no DB changes (handler returns early).
 
-**HMAC verification** (`tests/unit/webhook-hmac.test.ts` — no DB):
-- Given a known `rawBody` string and `ABACATEPAY_WEBHOOK_SECRET`, compute the expected HMAC-SHA256 hex digest. Verify the verification function returns true for the correct signature and false for a tampered one.
+**Webhook secret verification** (`tests/unit/webhook-secret.test.ts` — no DB):
+- Given a request URL with `?webhookSecret=correct_secret` and `ABACATEPAY_WEBHOOK_SECRET=correct_secret`, verify the check passes.
+- Given a request URL with `?webhookSecret=wrong_secret`, verify the check fails.
+- Given a request URL with no `webhookSecret` param, verify the check fails.
 
 ---
 
@@ -1061,7 +1079,7 @@ By this point, the following test files should pass with `npm test`:
 - `tests/unit/usage.test.ts` — `getUsageDate`, `calculateUsagePercent` (Step 7)
 - `tests/db/usage.test.ts` — `upsertDailyUsage`, `getDailyUsage` (Step 7)
 - `tests/unit/abacatepay.test.ts` — AbacatePay client with mocked fetch (Step 15)
-- `tests/unit/webhook-hmac.test.ts` — HMAC verification (Step 18)
+- `tests/unit/webhook-secret.test.ts` — webhook secret verification (Step 18)
 - `tests/integration/subscribe-flow.test.ts` — full subscribe logic (Step 16)
 - `tests/integration/webhook-flow.test.ts` — full webhook logic (Step 18)
 - `tests/integration/usage-limit-flow.test.ts` — usage enforcement logic (Step 10)
@@ -1269,7 +1287,7 @@ By this point, additionally passing:
 | Variable | Purpose |
 |---|---|
 | `ABACATEPAY_API_KEY` | AbacatePay Bearer token (from AbacatePay dashboard) |
-| `ABACATEPAY_WEBHOOK_SECRET` | HMAC-SHA256 secret for webhook signature verification (configured in AbacatePay dashboard) |
+| `ABACATEPAY_WEBHOOK_SECRET` | Secret appended to webhook URL query string for verification (you generate this — any long random string) |
 
 ### Update `.env.example`
 
@@ -1278,9 +1296,9 @@ Add both variables with descriptions and placeholder values.
 ### Webhook URL registration
 
 In the AbacatePay dashboard:
-1. Register webhook URL: `https://<your-vercel-domain>/api/webhooks/abacatepay`
-2. Select the `pix.paid` event.
-3. Copy the webhook signing secret to `ABACATEPAY_WEBHOOK_SECRET`.
+1. Generate a random secret (e.g., `openssl rand -hex 32`) and set it as `ABACATEPAY_WEBHOOK_SECRET` in Vercel.
+2. Register webhook URL with the secret in the query string: `https://<your-vercel-domain>/api/webhooks/abacatepay?webhookSecret=<your-secret>`
+3. Select the `billing.paid` event (confirmed via dev mode testing on 2026-04-08).
 
 ### Vercel environment variables
 
@@ -1307,7 +1325,7 @@ Add `ABACATEPAY_API_KEY` and `ABACATEPAY_WEBHOOK_SECRET` to Vercel project setti
 | 15 | AbacatePay client library + unit tests | Step 4 |
 | 16 | Subscribe endpoint + integration test | Steps 5-6, 15 |
 | 17 | Payment status polling endpoint | Step 6 |
-| 18 | Webhook handler + integration test + HMAC unit test | Steps 6, 5 |
+| 18 | Webhook handler + integration test + secret verification test | Steps 6, 5 |
 | 19-21 | Payment modal (3 steps) | Steps 16-17 |
 | 22 | i18n for subscription | Steps 11-21 |
 | 23 | E2E testing — subscription (checkpoint: all tests pass) | All above |
