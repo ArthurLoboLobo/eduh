@@ -60,6 +60,17 @@ export async function invalidateUserPayments(userId: string): Promise<void> {
   `;
 }
 
+export async function getLatestPaymentByUserId(userId: string): Promise<Payment | null> {
+  const rows = await sql`
+    SELECT ${sql.unsafe(PAYMENT_COLUMNS)}
+    FROM payments
+    WHERE user_id = ${userId}
+    ORDER BY created_at DESC
+    LIMIT 1
+  `;
+  return (rows[0] as Payment) ?? null;
+}
+
 export async function markPaymentPaid(paymentId: string): Promise<void> {
   await sql`
     UPDATE payments SET status = 'paid', updated_at = now()
