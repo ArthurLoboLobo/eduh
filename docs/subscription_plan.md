@@ -879,13 +879,13 @@ The frontend polls this every 3 seconds via `setInterval` while the QR code moda
 if (!userId && pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/') && !pathname.startsWith('/api/webhooks/')) {
 ```
 
-**Webhook security — URL query string secret**: The AbacatePay v1 webhook docs describe a URL-based secret as the primary verification method. Register the webhook URL with a secret in the query string:
+**Webhook security — dashboard Secret field + URL query string**: The AbacatePay dashboard "Criar webhook" form has a dedicated **Secret** field separate from the URL. Enter the clean endpoint URL and put the secret in the Secret field. AbacatePay then **automatically appends** `?webhookSecret=<secret>` to the URL on every POST — confirmed via webhook.site testing (2026-04-08). It also sends it as the `x-webhook-secret` header.
 
-```
-https://<your-vercel-domain>/api/webhooks/abacatepay?webhookSecret=SEU_SECRET
-```
+Register:
+- **URL**: `https://<your-vercel-domain>/api/webhooks/abacatepay`
+- **Secret**: your generated secret (stored as `ABACATEPAY_WEBHOOK_SECRET` in Vercel)
 
-In the handler, verify the secret before processing:
+In the handler, verify the query string secret before processing:
 
 ```typescript
 const url = new URL(request.url);
@@ -896,7 +896,7 @@ if (secret !== process.env.ABACATEPAY_WEBHOOK_SECRET) {
 const payload = await request.json();
 ```
 
-This is simpler than HMAC and is the documented approach. The HMAC header signature is described as optional ("when available") in the AbacatePay docs — skip it for now and add later if AbacatePay enables it for our account.
+Note: AbacatePay also sends `x-webhook-signature` (HMAC) and `x-webhook-secret` headers — skip HMAC verification for now and add later if needed.
 
 **Webhook payload** (confirmed via dev mode testing on 2026-04-08):
 
@@ -1089,6 +1089,15 @@ Run `npm test` and confirm all pass against the test Neon DB.
 ### Manual full-flow tests (frontend + backend together)
 
 These require running the dev server and interacting with the UI. They verify the frontend wiring, the visual UX, and the real AbacatePay integration.
+
+> **Local testing setup**: AbacatePay cannot reach `localhost`, so the webhook can't complete the flow if you register a localhost URL. The recommended approach:
+> 1. Create a separate test Neon DB (never use production data for manual testing).
+> 2. Deploy your branch to a **Vercel Preview** — it gets a stable URL like `ditchy-git-feat-subscription.vercel.app`. Set the test DB as `DATABASE_URL` on that preview environment in Vercel.
+> 3. Register the preview URL as the webhook in AbacatePay (`https://<preview-url>/api/webhooks/abacatepay`).
+> 4. Point your local `.env` to the **same test Neon DB**.
+> 5. Run the app on `localhost:3000` and use it normally. AbacatePay will POST to the preview URL, which updates the shared test DB, and your local app will pick up the change via polling.
+>
+> You only need to redeploy the preview when you change the webhook handler itself. All other local changes (UI, other routes) work immediately without redeploying.
 
 1. **Free user subscribes with Pix (no credits)**:
    - Visit /subscription → see free plan → click subscribe → modal opens → see full price → click pay → QR code appears → simulate payment → success → navbar updates → /subscription shows pro.
@@ -1287,7 +1296,7 @@ By this point, additionally passing:
 | Variable | Purpose |
 |---|---|
 | `ABACATEPAY_API_KEY` | AbacatePay Bearer token (from AbacatePay dashboard) |
-| `ABACATEPAY_WEBHOOK_SECRET` | Secret appended to webhook URL query string for verification (you generate this — any long random string) |
+| `ABACATEPAY_WEBHOOK_SECRET` | Secret entered in the AbacatePay dashboard "Secret" field — AbacatePay automatically appends it as `?webhookSecret=<secret>` to the URL on every POST (you generate this — any long random string) |
 
 ### Update `.env.example`
 
@@ -1295,10 +1304,11 @@ Add both variables with descriptions and placeholder values.
 
 ### Webhook URL registration
 
-In the AbacatePay dashboard:
+In the AbacatePay dashboard ("Criar webhook"):
 1. Generate a random secret (e.g., `openssl rand -hex 32`) and set it as `ABACATEPAY_WEBHOOK_SECRET` in Vercel.
-2. Register webhook URL with the secret in the query string: `https://<your-vercel-domain>/api/webhooks/abacatepay?webhookSecret=<your-secret>`
-3. Select the `billing.paid` event (confirmed via dev mode testing on 2026-04-08).
+2. **URL** field: `https://<your-vercel-domain>/api/webhooks/abacatepay` (no query params — AbacatePay appends the secret automatically).
+3. **Secret** field: paste the same secret value.
+4. Select the `billing.paid` event (confirmed via dev mode testing on 2026-04-08).
 
 ### Vercel environment variables
 
