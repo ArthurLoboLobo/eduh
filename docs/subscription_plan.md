@@ -1106,7 +1106,7 @@ These require running the dev server and interacting with the UI. They verify th
 CREATE TABLE promo_university_email (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-  claimed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 
