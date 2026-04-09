@@ -162,6 +162,18 @@ export interface Translations {
     proUntil: string;
     yourBalance: string;
     promotions: string;
+    confirmationTitle: string;
+    useBalance: string;
+    confirmSubscription: string;
+    payWithPix: string;
+    pixInstructions: string;
+    payWithinMinutes: string;
+    copyCode: string;
+    copied: string;
+    youAreNowPro: string;
+    close: string;
+    paymentExpired: string;
+    paymentFailed: string;
   };
 }
 
@@ -333,6 +345,18 @@ const ptBR: Translations = {
     proUntil: 'Você é Pro até {date}',
     yourBalance: 'Seu saldo: {amount}',
     promotions: 'Promoções',
+    confirmationTitle: 'Confirmar assinatura',
+    useBalance: 'Usar meu saldo',
+    confirmSubscription: 'Confirmar assinatura',
+    payWithPix: 'Pagar R${amount} com Pix',
+    pixInstructions: 'Escaneie o QR Code ou copie o código Pix para pagar',
+    payWithinMinutes: 'Pague em {time}',
+    copyCode: 'Copiar código',
+    copied: 'Copiado!',
+    youAreNowPro: 'Agora você é Pro!',
+    close: 'Fechar',
+    paymentExpired: 'Pagamento expirado',
+    paymentFailed: 'Falha no pagamento. Tente novamente.',
   },
 };
 

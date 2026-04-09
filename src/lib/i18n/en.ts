@@ -168,6 +168,18 @@ const en: Translations = {
     proUntil: 'You are Pro until {date}',
     yourBalance: 'Your balance: {amount}',
     promotions: 'Promotions',
+    confirmationTitle: 'Confirm subscription',
+    useBalance: 'Use my balance',
+    confirmSubscription: 'Confirm subscription',
+    payWithPix: 'Pay R${amount} with Pix',
+    pixInstructions: 'Scan the QR Code or copy the Pix code to pay',
+    payWithinMinutes: 'Pay within {time}',
+    copyCode: 'Copy code',
+    copied: 'Copied!',
+    youAreNowPro: "You're now Pro!",
+    close: 'Close',
+    paymentExpired: 'Payment expired',
+    paymentFailed: 'Payment failed. Please try again.',
   },
 } as const;
 

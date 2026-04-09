@@ -1,16 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { useUser } from '@/hooks/useUser';
 import Spinner from '@/components/ui/Spinner';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import PaymentModal from '@/components/PaymentModal';
 import { SUBSCRIPTION_PRICE_CENTS } from '@/config/subscription';
 
 export default function SubscriptionPage() {
   const { t, language } = useTranslation();
-  const { user, loading } = useUser();
+  const { user, loading, refetch } = useUser();
+  const [paymentOpen, setPaymentOpen] = useState(false);
 
   if (loading) {
     return (
@@ -66,7 +69,7 @@ export default function SubscriptionPage() {
           <p className="text-sm text-muted-text mt-2">{t.subscription.unlimitedUsage}</p>
           {isFree && (
             <div className="mt-4">
-              <Button>{t.subscription.subscribe}</Button>
+              <Button onClick={() => setPaymentOpen(true)}>{t.subscription.subscribe}</Button>
             </div>
           )}
         </Card>
@@ -84,6 +87,13 @@ export default function SubscriptionPage() {
           <p className="text-sm text-muted-text text-center py-4">—</p>
         </Card>
       </div>
+
+      <PaymentModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        balance={user.balance}
+        onSuccess={refetch}
+      />
     </div>
   );
 }
