@@ -19,12 +19,14 @@ export type OtpCode = {
 };
 
 export async function findUserByEmail(email: string): Promise<User | null> {
-  const rows = await sql`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
+  const normalized = email.toLowerCase();
+  const rows = await sql`SELECT * FROM users WHERE email = ${normalized} LIMIT 1`;
   return (rows[0] as User) ?? null;
 }
 
 export async function createUser(email: string): Promise<User> {
-  const rows = await sql`INSERT INTO users (email) VALUES (${email}) RETURNING *`;
+  const normalized = email.toLowerCase();
+  const rows = await sql`INSERT INTO users (email) VALUES (${normalized}) RETURNING *`;
   return rows[0] as User;
 }
 

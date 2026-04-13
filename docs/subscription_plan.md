@@ -245,7 +245,6 @@ export const SUBSCRIPTION_DURATION_DAYS = 30;
 export const PIX_EXPIRATION_SECONDS = 600; // 10 minutes
 
 export const UNIVERSITY_EMAIL_SUFFIXES = [
-  '@unicamp.br',
   '@dac.unicamp.br',
   '@usp.br',
   // add more as needed
@@ -1123,6 +1122,8 @@ Run migration up/down manually against the test DB. Automated tests:
 - Insert a claim for user A with `promotion_id = 'university-email'`, then another with `promotion_id = 'launch-bonus'` — verify both succeed (same user, different promotions).
 - Insert a claim for user A and another for user B with the same `promotion_id` — verify both succeed (different users, same promotion).
 
+**Test isolation**: Add `promotion_claims` to the `TRUNCATE` list in `cleanDatabase()` in `tests/helpers.ts` (place it alongside `daily_usage, payments` — the other subscription-era tables). Without this, claim rows leak between tests and the unique-constraint assertions in Step 24 become order-dependent. `cleanDatabase()` is the only place in `tests/` that enumerates tables (verified via grep for `TRUNCATE` / table lists) — no other fixtures need updating.
+
 ---
 
 ## Step 24: Database Queries — Promotions
@@ -1144,7 +1145,7 @@ const PROMOTION_IDS = ['university-email'] as const;
 
 Functions:
 
-- `getUserPromotion(userId, promotionId)` — returns `UserPromotion | null`. This is where **all** per-promotion logic lives: a `switch (promotionId)` (or equivalent) with one branch per known id. Each branch fetches whatever it needs (the user row, the matching `promotion_claims` row, etc.) and returns `{ id, creditAmount, eligible, claimed }`. The default case returns `null` so unknown ids become 404s at the route layer. The `university-email` branch fetches the user, checks `UNIVERSITY_EMAIL_SUFFIXES.some((suffix) => user.email.toLowerCase().endsWith(suffix))` for `eligible`, looks up `promotion_claims` for `claimed`, and hardcodes `creditAmount: UNIVERSITY_PROMO_CREDIT_CENTS`. The `.toLowerCase()` is there because `endsWith` is case-sensitive — before implementing, verify whether `src/lib/db/queries/users.ts` already lowercases emails on insert. If it does, the `.toLowerCase()` here is belt-and-suspenders; if it doesn't, it's load-bearing.
+- `getUserPromotion(userId, promotionId)` — returns `UserPromotion | null`. This is where **all** per-promotion logic lives: a `switch (promotionId)` (or equivalent) with one branch per known id. Each branch fetches whatever it needs (the user row, the matching `promotion_claims` row, etc.) and returns `{ id, creditAmount, eligible, claimed }`. The default case returns `null` so unknown ids become 404s at the route layer. The `university-email` branch fetches the user, checks `UNIVERSITY_EMAIL_SUFFIXES.some((suffix) => user.email.toLowerCase().endsWith(suffix))` for `eligible`, looks up `promotion_claims` for `claimed`, and hardcodes `creditAmount: UNIVERSITY_PROMO_CREDIT_CENTS`. Emails are already normalized to lowercase at the auth boundary (`src/app/api/auth/send-code/route.ts`, `verify-code/route.ts`) and again in `findUserByEmail` / `createUser`, so the `.toLowerCase()` here is defensive — keep it anyway since `endsWith` is case-sensitive and the cost is zero.
 - `getUserPromotions(userId)` — loops over `PROMOTION_IDS` and calls `getUserPromotion(userId, id)` for each, filtering out any `null` results (there shouldn't be any in normal operation, since every id in `PROMOTION_IDS` should have a branch, but the filter keeps the return type clean). Returns `UserPromotion[]`. This function contains **no** per-promotion logic — adding a new promotion means adding its id to `PROMOTION_IDS` and its branch to `getUserPromotion`, nothing else.
 - `claimPromo(userId, promotionId, creditAmount)` — `Promise<void>`. Atomically inserts into `promotion_claims` and increments `users.balance` via `sql.transaction([...])` from `@/lib/db/connection` (same pattern as `src/app/api/webhooks/abacatepay/route.ts:43`). On a duplicate claim the Postgres unique-violation surfaces as a thrown `NeonDbError` with `code === '23505'`; re-throw unchanged so the API route can map it.
 
@@ -1161,7 +1162,7 @@ Functions:
 - Returns `null` for an unknown `promotionId` like `'does-not-exist'`.
 
 `claimPromo`:
-- Create a user with 0 balance. Call `claimPromo(userId, 'university-email', 2000)`. Verify: returned balance is 2000. Query the user row — confirm `balance = 2000`. Query `promotion_claims` — confirm a row exists for `(userId, 'university-email')`.
+- Create a user with 0 balance. Call `claimPromo(userId, 'university-email', 2000)` (returns `void`). Query the user row — confirm `balance = 2000`. Query `promotion_claims` — confirm a row exists for `(userId, 'university-email')`.
 - Call `claimPromo(userId, 'university-email', 2000)` again — verify it throws (unique constraint). Query the user row — confirm `balance` is still 2000 (not double-credited, transaction rolled back).
 - Call `claimPromo(userId, 'launch-bonus', 500)` for the same user — verify it succeeds and balance becomes 2500 (different `promotion_id`, no conflict). Note: this exercises the table only — `'launch-bonus'` doesn't need to exist as a known promotion in the read functions for this test.
 
@@ -1216,7 +1217,7 @@ On mount, the subscription page fires `GET /api/promotions` via a plain `useEffe
 
 Alongside the existing `const { user, loading, refetch } = useUser()` call. The promotions fetch is independent from the user fetch, so both loading states are tracked separately; the promotions section renders its own small spinner while `promotions === null`, without blocking the rest of the page.
 
-After a successful claim, the page refreshes both sources of truth: it re-fires the `GET /api/promotions` request (to flip the claimed card) and calls `refetch()` from `useUser` (to update the navbar balance chip and the on-page balance display). These are the only two pieces of state affected, so a full page reload is not needed.
+After a successful claim, the page refreshes both sources of truth: it re-fires the `GET /api/promotions` request (to flip the claimed card) and calls `refetch()` from `useUser` (to update the on-page balance display). These are the only two pieces of state affected, so a full page reload is not needed.
 
 ### Rendering the cards
 
@@ -1252,7 +1253,7 @@ Rendered content depends on the promotion's flags:
   5. On 400 `NOT_ELIGIBLE`: set `error` to the `notEligible` key, fire `onClaimed()` so the card re-renders with the correct state.
   6. On 404 `NOT_FOUND` / 5xx / network error: set `error` to `t.promotions.claimError`; do not refetch.
   7. In all cases: set `claiming = false` at the end.
-  - While `claiming === true`, the button shows a small spinner and is disabled; clicking the backdrop or close button is blocked to avoid interrupting the request.
+  - While `claiming === true`, the button shows a small spinner and is disabled. The modal can still be closed normally.
 - **Not eligible** — show title, description, credit amount, and a muted `t.promotions.notEligible` line. No button. Close button works normally.
 - **Already claimed** — show title, description, credit amount, and a muted `t.promotions.alreadyClaimed` line with a "Claimed" badge next to the title. No button.
 

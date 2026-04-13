@@ -168,7 +168,7 @@ Clicking a card opens a **promotion detail modal** with:
 
 ### How promotions work (backend)
 
-- Each promotion is fully independent — its own logic, its own DB table for tracking claims. Since promotions are rare and each one is different, this is simpler than a generic system.
+- Claims are tracked in a single generic `promotion_claims` table with `(user_id, promotion_id)` as a unique pair. Each promotion has its own `promotion_id` string and its own eligibility logic in code, but they all share this table.
 - The claim endpoint checks eligibility **server-side** before crediting — never trust the client.
 - Claiming credits the user's balance atomically with storing the claim.
 
@@ -180,7 +180,7 @@ Clicking a card opens a **promotion detail modal** with:
 - **Eligibility check**: the user's email ends with one of the hardcoded suffixes (e.g. `@unicamp.br`, `@usp.br`, `@dac.unicamp.br`, etc.) and they didn't claimed it yet. The list of accepted suffixes is hardcoded in the config.
 - **Claim flow**: user clicks "Claim" → backend verifies email suffix → credits balance → stores claim.
 - Since the user's email is already known (they logged in with it), the modal just shows whether they qualify or not. No additional input needed.
-- **DB table**: `promo_university_email` — stores user_id (unique) and claimed_at timestamp.
+- **Storage**: a row in the shared `promotion_claims` table with `promotion_id = 'university-email'`.
 
 ## Webhook Handling
 
