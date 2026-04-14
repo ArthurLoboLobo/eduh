@@ -161,7 +161,6 @@ export interface Translations {
     subscribe: string;
     proUntil: string;
     yourBalance: string;
-    promotions: string;
     confirmationTitle: string;
     useBalance: string;
     confirmSubscription: string;
@@ -174,6 +173,21 @@ export interface Translations {
     close: string;
     paymentExpired: string;
     paymentFailed: string;
+  };
+  promotions: {
+    title: string;
+    universityEmailTitle: string;
+    universityEmailDescription: string;
+    unknownTitle: string;
+    unknownDescription: string;
+    creditAmount: string;
+    claimed: string;
+    claim: string;
+    notEligible: string;
+    alreadyClaimed: string;
+    claimSuccess: string;
+    claimError: string;
+    loadError: string;
   };
 }
 
@@ -344,7 +358,6 @@ const ptBR: Translations = {
     subscribe: 'Assinar',
     proUntil: 'Você é Pro até {date}',
     yourBalance: 'Seu saldo: {amount}',
-    promotions: 'Promoções',
     confirmationTitle: 'Confirmar assinatura',
     useBalance: 'Usar meu saldo',
     confirmSubscription: 'Confirmar assinatura',
@@ -357,6 +370,21 @@ const ptBR: Translations = {
     close: 'Fechar',
     paymentExpired: 'Pagamento expirado',
     paymentFailed: 'Falha no pagamento. Tente novamente.',
+  },
+  promotions: {
+    title: 'Promoções',
+    universityEmailTitle: 'Estuda na Unicamp ou USP? Ganhe 1 mês grátis!',
+    universityEmailDescription: 'Se o email da sua conta pertence à Unicamp ou USP, resgate R$20 em créditos — o suficiente para um mês inteiro de Pro.',
+    unknownTitle: 'Promoção',
+    unknownDescription: 'Detalhes indisponíveis.',
+    creditAmount: '{amount} em créditos',
+    claimed: 'Resgatado',
+    claim: 'Resgatar',
+    notEligible: 'Seu email não é de uma universidade qualificada.',
+    alreadyClaimed: 'Você já resgatou esta promoção.',
+    claimSuccess: 'Créditos adicionados ao seu saldo!',
+    claimError: 'Não foi possível resgatar a promoção. Tente novamente.',
+    loadError: 'Não foi possível carregar as promoções.',
   },
 };
 
