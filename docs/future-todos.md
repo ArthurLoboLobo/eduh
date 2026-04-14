@@ -21,6 +21,10 @@
 - **Cron-based expiration handling**: Currently, plan expiration is checked on every API request. Add a cron job to proactively handle expirations (needed for auto-renewal and email notifications).
 - **Email notifications for subscription events**: Notify users when their Pro subscription expires, when auto-renewal succeeds or fails due to insufficient balance.
 - **More promotions**: Add new hardcoded promotions beyond the initial "university email" promotion (e.g. "Refer X friends → gain Y credits").
+- **Email Alias Loophole**: Normalize emails by stripping "plus" aliases (e.g., `user+test@gmail.com` -> `user@gmail.com`). Currently, aliases create separate accounts, which allows users to bypass limits and claim promotions multiple times.
+- **Countdown fix**: The countdown isn't working correctly. Every time I go out of the page it stops counting.
+
+
 
 
 ---

@@ -24,7 +24,7 @@ Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (
 | 10. Chat | Done |
 | 11. Subscription (AbacatePay PIX) | Done |
 | 12. i18n Review | Not started |
-| 13. Polish & Deploy | Not started |
+| 13. Polish & Deploy | In progress — Broader polish pending |
 
 ## Build & Run
 
@@ -95,6 +95,7 @@ db/
 - **Plan draft stack**: Plan edits create new `plan_drafts` rows. Undo deletes the newest draft, revealing the previous one. Drafts are cleaned up when the user starts studying.
 - **Usage tiers**: Each chat message call reads `daily_usage`, determines the usage phase (`best`/`degraded`/`blocked`), selects the appropriate model, then writes back the weighted token count. Free users hit `degraded` at 100k tokens/day and `blocked` at 200k; pro users degrade at 400k but are never hard-blocked.
 - **Subscription flow**: `POST /api/subscription/subscribe` creates a PIX QR code via AbacatePay and inserts a `pending` payment row. The `POST /api/webhooks/abacatepay` endpoint receives the `billing.paid` event, activates the pro plan, and marks the payment `paid`. The client polls `GET /api/subscription/payment-status` while displaying the QR code.
+- **Promotions**: per-promotion eligibility and claim state live in code (`PROMOTION_IDS` + `getUserPromotion` switch) — there is no `promotions` table, only a `promotion_claims` join table with a `UNIQUE (user_id, promotion_id)` constraint. `claimPromo` runs the insert + balance update in a single transaction; a double-claim trips the unique index and is surfaced as `ALREADY_CLAIMED` by the API route. Frontend maps promotion `id` → translation keys via `camelCase(id)`, so titles/descriptions never come from the API.
 
 ### AI Models
 
@@ -111,9 +112,9 @@ The active model for a chat call is determined by the user's usage phase (`best`
 
 ### Database
 
-15 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. 8 migrations in `db/migrations/`.
+15 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. 9 migrations in `db/migrations/`.
 
-Tables: `users`, `otp_codes`, `sections`, `files`, `plan_drafts`, `topics`, `subtopics`, `chats`, `messages`, `chat_summaries`, `embeddings`, `payments`, `daily_usage`, `ai_call_logs`.
+Tables: `users`, `otp_codes`, `sections`, `files`, `plan_drafts`, `topics`, `subtopics`, `chats`, `messages`, `chat_summaries`, `embeddings`, `payments`, `daily_usage`, `ai_call_logs`, `promotion_claims`.
 
 Key fields added by subscription migration: `users.plan` (`free`|`pro`), `users.plan_expires_at`, `users.balance` (credits in cents). `getUserById` auto-expires stale pro subscriptions in-place on every read.
 
@@ -150,6 +151,9 @@ GET /api/user                         # Get current user (plan, balance, etc.)
 POST /api/subscription/subscribe      # Create PIX QR code or activate via credits
 GET  /api/subscription/payment-status # Poll latest payment status
 
+GET  /api/promotions                  # List promotions with eligibility/claimed status
+POST /api/promotions/:id/claim        # Claim a promotion (credits balance)
+
 POST /api/webhooks/abacatepay         # AbacatePay webhook (billing.paid event)
 
 GET /api/admin/ai-logs               # AI call log summary + list (admin only)
@@ -160,7 +164,7 @@ GET /api/admin/ai-logs               # AI call log summary + list (admin only)
 - **UI** (`src/components/ui/`): Button, Input, Modal, Card, Badge, Checkbox, ConfirmDialog, ProgressBar, Spinner, Toast (with `useToast` hook), TrashIcon, ExpandableText
 - **Layout**: Navbar (with language switcher + logout dropdown), Breadcrumb (with section/topic dropdowns)
 - **Views**: UploadingView, PlanningView (drag-and-drop via `@dnd-kit`), StudyingView
-- **Subscription**: PaymentModal (PIX QR code display + polling for payment confirmation)
+- **Subscription**: PaymentModal (PIX QR code display + polling for payment confirmation), PromotionDetailModal (claim flow with eligible/ineligible/already-claimed states)
 
 ### Database Query Files
 
@@ -174,6 +178,7 @@ GET /api/admin/ai-logs               # AI call log summary + list (admin only)
 - `embeddings.ts` — bulk insert embeddings, cosine similarity search (`searchChunks`)
 - `summaries.ts` — get/upsert chat summaries
 - `payments.ts` — payment CRUD; statuses: `pending` → `paid` / `invalidated`
+- `promotions.ts` — `getUserPromotion`, `getUserPromotions`, `claimPromo` (eligibility + atomic claim via transaction, guarded by `UNIQUE (user_id, promotion_id)`)
 - `usage.ts` — `upsertDailyUsage`, `getDailyUsage`, `getUsagePhase` (free vs. pro thresholds)
 - `aiLogs.ts` — `insertAiCallLog` (fire-and-forget), summary/list queries for admin view
 
@@ -204,7 +209,7 @@ GET /api/admin/ai-logs               # AI call log summary + list (admin only)
 
 ### i18n
 
-Translation keys are organized into sections: `auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`. The `useTranslation()` hook reads the `eduh_language` cookie (default: `pt-BR`) and returns `{ t, language, setLanguage }` with SSR-safe hydration.
+Translation keys are organized into sections: `auth`, `nav`, `dashboard`, `section`, `uploading`, `planning`, `studying`, `chat`, `errors`, `subscription`, `promotions`. The `useTranslation()` hook reads the `eduh_language` cookie (default: `pt-BR`) and returns `{ t, language, setLanguage }` with SSR-safe hydration. Per-promotion copy is keyed by `camelCase(id)` (e.g. `universityEmailTitle`) with `unknownTitle`/`unknownDescription` fallback — no id→key map, the transform is the map.
 
 ## Tailwind v4
 
