@@ -10,8 +10,6 @@ Spec documents: `what.md` (features/user flow), `design.md` (UI/UX), `tech.md` (
 
 ### Implementation Status
 
-All phases are complete.
-
 | Phase | Status |
 |-------|--------|
 | 1. Project Setup | Done |
@@ -24,8 +22,9 @@ All phases are complete.
 | 8. Embeddings (RAG Pipeline) | Done |
 | 9. Studying Section Page | Done |
 | 10. Chat | Done |
-| 11. i18n Review | Not started |
-| 12. Polish & Deploy | Not started |
+| 11. Subscription (AbacatePay PIX) | Done |
+| 12. i18n Review | Not started |
+| 13. Polish & Deploy | Not started |
 
 ## Build & Run
 
@@ -45,6 +44,7 @@ npm run lint         # ESLint
 - **File storage**: Vercel Blob (signed URLs for direct upload)
 - **Auth**: JWT in HTTP-only cookies (`jose`), OTP via Resend
 - **AI**: Google Gemini via Vercel AI SDK (`ai` + `@ai-sdk/google`)
+- **Payments**: AbacatePay (PIX QR codes for Brazilian market)
 - **Hosting**: Vercel
 
 ## Architecture
@@ -60,9 +60,13 @@ src/
       dashboard/
       sections/[id]/
       sections/[id]/chat/[chatId]/
+      subscription/          # Subscription management page
+      admin/ai-logs/         # Admin: AI call log viewer
     api/                     # REST API routes
   components/
     ui/                      # Generic reusable components
+  hooks/
+    useUser.ts               # Fetches /api/user, exposes { user, loading, refetch }
   lib/
     db/
       connection.ts          # Neon Postgres connection (exports sql function)
@@ -70,12 +74,15 @@ src/
     i18n/                    # Translation strings (pt-BR.ts, en.ts) + useTranslation hook
     auth.ts                  # JWT utilities
     ai.ts                    # LLM wrappers
+    abacatepay.ts            # AbacatePay API client (createPixQrCode, checkPixQrCode, simulatePixPayment)
+    usage-warnings.ts        # getWarningState / getWarningSeverity for usage UI
   config/
-    ai.ts                    # Model IDs and tunable AI parameters
+    ai.ts                    # Model IDs, token limits, usage thresholds
+    subscription.ts          # Price, duration, PIX expiry, university email suffixes
   prompts/
     index.ts                 # All prompt templates
 db/
-  migrations/                # node-pg-migrate SQL files
+  migrations/                # node-pg-migrate SQL files (8 migrations)
 ```
 
 ### Key Patterns
@@ -86,22 +93,29 @@ db/
 - **Chat summarization**: After each assistant message, token count (chars/4 approximation) is checked against `SUMMARIZATION_TOKEN_THRESHOLD`. When exceeded, older messages are summarized and stored in `chat_summaries`, keeping only the last `MIN_UNSUMMARIZED_MESSAGES` in full.
 - **Ownership verification**: Each entity has a dedicated `verify*Ownership(entityId, userId)` query. API routes call it explicitly before proceeding — queries themselves don't embed ownership checks.
 - **Plan draft stack**: Plan edits create new `plan_drafts` rows. Undo deletes the newest draft, revealing the previous one. Drafts are cleaned up when the user starts studying.
+- **Usage tiers**: Each chat message call reads `daily_usage`, determines the usage phase (`best`/`degraded`/`blocked`), selects the appropriate model, then writes back the weighted token count. Free users hit `degraded` at 100k tokens/day and `blocked` at 200k; pro users degrade at 400k but are never hard-blocked.
+- **Subscription flow**: `POST /api/subscription/subscribe` creates a PIX QR code via AbacatePay and inserts a `pending` payment row. The `POST /api/webhooks/abacatepay` endpoint receives the `billing.paid` event, activates the pro plan, and marks the payment `paid`. The client polls `GET /api/subscription/payment-status` while displaying the QR code.
 
 ### AI Models
 
-| Task | Model | Implemented? |
-|------|-------|--------------|
-| Text extraction | `gemini-3-flash-preview` | Yes |
-| Plan generation | `gemini-3-flash-preview` | Yes |
-| Teaching chat | `gemini-3-flash-preview` | Yes |
-| Summarization | `gemini-3-flash-preview` | Yes |
-| Embeddings | `gemini-embedding-2-preview` | Yes |
+| Task | Model |
+|------|-------|
+| Text extraction | `gemini-3.1-flash-lite-preview` |
+| Plan generation | `gemini-3-flash-preview` |
+| Teaching chat (best) | `gemini-3.1-pro-preview` |
+| Teaching chat (degraded) | `gemini-3-flash-preview` |
+| Summarization | `gemini-3.1-pro-preview` |
+| Embeddings | `gemini-embedding-2-preview` |
+
+The active model for a chat call is determined by the user's usage phase (`best` → pro model, `degraded` → flash model, `blocked` → rejected). Output tokens are weighted 6× input tokens when tracking daily usage.
 
 ### Database
 
-11 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. 6 migrations exist in `db/migrations/`.
+15 tables with UUID primary keys, CASCADE deletes, timestamps. Messages use SERIAL IDs for ordering. 8 migrations in `db/migrations/`.
 
-Tables: `users`, `otp_codes`, `sections`, `files`, `plan_drafts`, `topics`, `subtopics`, `chats`, `messages`, `chat_summaries`, `embeddings`.
+Tables: `users`, `otp_codes`, `sections`, `files`, `plan_drafts`, `topics`, `subtopics`, `chats`, `messages`, `chat_summaries`, `embeddings`, `payments`, `daily_usage`, `ai_call_logs`.
+
+Key fields added by subscription migration: `users.plan` (`free`|`pro`), `users.plan_expires_at`, `users.balance` (credits in cents). `getUserById` auto-expires stale pro subscriptions in-place on every read.
 
 ### Existing API Routes
 
@@ -130,17 +144,27 @@ PATCH /api/topics/:id             # Toggle topic completion
 GET /api/chats/:id/messages       # Load messages (generates initial AI message on first load)
 POST /api/chats/:id/messages      # Send message (streaming via useChat / AI SDK data stream)
 POST /api/chats/:id/undo/:messageId  # Undo a user message and all subsequent messages
+
+GET /api/user                         # Get current user (plan, balance, etc.)
+
+POST /api/subscription/subscribe      # Create PIX QR code or activate via credits
+GET  /api/subscription/payment-status # Poll latest payment status
+
+POST /api/webhooks/abacatepay         # AbacatePay webhook (billing.paid event)
+
+GET /api/admin/ai-logs               # AI call log summary + list (admin only)
 ```
 
 ### Existing Components
 
-- **UI** (`src/components/ui/`): Button, Input, Modal, Card, Badge, Checkbox, ConfirmDialog, ProgressBar, Spinner, Toast (with `useToast` hook), TrashIcon
+- **UI** (`src/components/ui/`): Button, Input, Modal, Card, Badge, Checkbox, ConfirmDialog, ProgressBar, Spinner, Toast (with `useToast` hook), TrashIcon, ExpandableText
 - **Layout**: Navbar (with language switcher + logout dropdown), Breadcrumb (with section/topic dropdowns)
 - **Views**: UploadingView, PlanningView (drag-and-drop via `@dnd-kit`), StudyingView
+- **Subscription**: PaymentModal (PIX QR code display + polling for payment confirmation)
 
 ### Database Query Files
 
-- `users.ts` — user/OTP queries
+- `users.ts` — user/OTP queries; `getUserById` lazily expires stale pro subscriptions
 - `sections.ts` — section CRUD, ownership verification, status updates, progress counts
 - `files.ts` — file CRUD, ownership verification, text extraction storage, size tracking
 - `plans.ts` — plan draft management (create, get current, undo, delete all)
@@ -149,6 +173,9 @@ POST /api/chats/:id/undo/:messageId  # Undo a user message and all subsequent me
 - `messages.ts` — message CRUD, rate limit tracking (`getMessageCountLastMinute`), delete from message ID onward
 - `embeddings.ts` — bulk insert embeddings, cosine similarity search (`searchChunks`)
 - `summaries.ts` — get/upsert chat summaries
+- `payments.ts` — payment CRUD; statuses: `pending` → `paid` / `invalidated`
+- `usage.ts` — `upsertDailyUsage`, `getDailyUsage`, `getUsagePhase` (free vs. pro thresholds)
+- `aiLogs.ts` — `insertAiCallLog` (fire-and-forget), summary/list queries for admin view
 
 ### AI Functions (`src/lib/ai.ts`)
 
@@ -203,5 +230,7 @@ Custom colors are defined as CSS variables in `src/app/globals.css` and exposed 
 | `RESEND_FROM_EMAIL` | Sender address (free tier: `onboarding@resend.dev`) | No |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini API (default for `@ai-sdk/google`) | No |
 | `JWT_SECRET` | JWT signing secret | No |
+| `ABACATEPAY_API_KEY` | AbacatePay API key for PIX payments | No |
+| `ABACATEPAY_WEBHOOK_SECRET` | Secret query param for webhook verification | No |
 
 See `.env.example` for setup instructions.

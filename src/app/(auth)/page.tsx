@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, FormEvent } from 'react';
+import Image from 'next/image';
 import { useTranslation } from '@/lib/i18n';
 import type { Translations } from '@/lib/i18n/pt-BR';
 
@@ -289,10 +290,11 @@ export default function AuthPage() {
                 {/* Back */}
                 <div className="absolute inset-0 w-full h-full bg-surface rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden">
                   {/* Image Placeholder */}
-                  <img 
-                    src="/images/step1.png" 
-                    alt="Step 1 Preview" 
-                    className="w-full h-full object-cover"
+                  <Image
+                    src="/images/step1.png"
+                    alt="Step 1 Preview"
+                    fill
+                    className="object-cover"
                   />
                 </div>
 
@@ -326,10 +328,11 @@ export default function AuthPage() {
                 {/* Back */}
                 <div className="absolute inset-0 w-full h-full bg-surface rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden">
                   {/* Image Placeholder */}
-                  <img 
-                    src="/images/step2.png" 
-                    alt="Step 2 Preview" 
-                    className="w-full h-full object-cover"
+                  <Image
+                    src="/images/step2.png"
+                    alt="Step 2 Preview"
+                    fill
+                    className="object-cover"
                   />
                 </div>
 
@@ -363,10 +366,11 @@ export default function AuthPage() {
                 {/* Back */}
                 <div className="absolute inset-0 w-full h-full bg-surface rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden">
                   {/* Image Placeholder */}
-                  <img 
-                    src="/images/step3.png" 
-                    alt="Step 3 Preview" 
-                    className="w-full h-full object-cover"
+                  <Image
+                    src="/images/step3.png"
+                    alt="Step 3 Preview"
+                    fill
+                    className="object-cover"
                   />
                 </div>
 

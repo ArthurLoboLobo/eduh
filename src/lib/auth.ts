@@ -60,5 +60,5 @@ export async function isAdmin(userId: string): Promise<boolean> {
   if (!adminEmail) return false;
   const rows = await sql`SELECT email FROM users WHERE id = ${userId} LIMIT 1`;
   if (!rows[0]) return false;
-  return (rows[0] as { email: string }).email === adminEmail;
+  return (rows[0] as { email: string }).email === adminEmail.toLowerCase();
 }

@@ -4,9 +4,11 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n';
 import type { Language } from '@/lib/i18n';
+import { useUser } from '@/hooks/useUser';
 
 export default function Navbar() {
   const { t, language, setLanguage } = useTranslation();
+  const { user, loading } = useUser();
   const [open, setOpen] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -46,7 +48,16 @@ export default function Navbar() {
         Eduh
       </Link>
 
-      <div className="ml-auto relative" ref={dropdownRef}>
+      <div className="ml-auto flex items-center">
+        {!loading && user?.plan === 'free' && (
+          <Link
+            href="/subscription"
+            className="mr-3 px-3 py-1 text-xs font-medium rounded-full bg-accent-blue/15 text-accent-blue hover:bg-accent-blue/25 transition-colors"
+          >
+            {t.subscription.subscribeToPro}
+          </Link>
+        )}
+        <div className="relative" ref={dropdownRef}>
         {/* Avatar button */}
         <button
           onClick={() => { setOpen((v) => !v); setShowLanguages(false); }}
@@ -69,6 +80,14 @@ export default function Navbar() {
                   <span>{t.nav.language}</span>
                   <ChevronRightIcon />
                 </button>
+                <div className="my-1 border-t border-border-subtle mx-2" />
+                <Link
+                  href="/subscription"
+                  onClick={handleClose}
+                  className="block w-full px-3 py-2 text-sm text-primary-text hover:bg-surface-hover rounded-xl transition-colors"
+                >
+                  {t.nav.subscription}
+                </Link>
                 <div className="my-1 border-t border-border-subtle mx-2" />
                 <button
                   onClick={handleLogout}
@@ -103,6 +122,7 @@ export default function Navbar() {
             )}
           </div>
         )}
+      </div>
       </div>
     </nav>
   );

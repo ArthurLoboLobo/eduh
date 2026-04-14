@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
   const userId = await getUserIdFromRequest(request);
 
   // Unauthenticated API calls (except auth routes) → 401
-  if (!userId && pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/')) {
+  if (!userId && pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/') && !pathname.startsWith('/api/webhooks/')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
