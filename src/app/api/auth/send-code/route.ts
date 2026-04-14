@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json().catch(() => null);
-    const email = body?.email?.trim();
+    const email = body?.email?.trim().toLowerCase();
     const language: Language = body?.language === 'en' ? 'en' : 'pt-BR';
 
     if (!email || !EMAIL_REGEX.test(email)) {

@@ -21,6 +21,7 @@ export interface Translations {
     logout: string;
     dashboard: string;
     profileMenu: string;
+    subscription: string;
   };
   dashboard: {
     searchPlaceholder: string;
@@ -141,6 +142,53 @@ export interface Translations {
     EMAIL_SEND_FAILED: string;
     UNKNOWN: string;
   };
+  subscription: {
+    usageLimitFree: string;
+    subscribeToPro: string;
+    freeDegraded: string;
+    proDegraded: string;
+    usageWarningPro: string;
+    usageWarningFreeBest: string;
+    usageWarningFreeDegraded: string;
+    usageWarningFreeDegradedFinal: string;
+    title: string;
+    freePlan: string;
+    proPlan: string;
+    currentPlan: string;
+    limitedUsage: string;
+    unlimitedUsage: string;
+    perMonth: string;
+    subscribe: string;
+    proUntil: string;
+    yourBalance: string;
+    confirmationTitle: string;
+    useBalance: string;
+    confirmSubscription: string;
+    payWithPix: string;
+    pixInstructions: string;
+    payWithinMinutes: string;
+    copyCode: string;
+    copied: string;
+    youAreNowPro: string;
+    close: string;
+    paymentExpired: string;
+    paymentFailed: string;
+  };
+  promotions: {
+    title: string;
+    universityEmailTitle: string;
+    universityEmailDescription: string;
+    unknownTitle: string;
+    unknownDescription: string;
+    creditAmount: string;
+    claimed: string;
+    claim: string;
+    notEligible: string;
+    alreadyClaimed: string;
+    claimSuccess: string;
+    claimError: string;
+    loadError: string;
+  };
 }
 
 const ptBR: Translations = {
@@ -170,6 +218,7 @@ const ptBR: Translations = {
     logout: 'Sair',
     dashboard: 'Painel',
     profileMenu: 'Menu do perfil',
+    subscription: 'Assinatura',
   },
   dashboard: {
     searchPlaceholder: 'Buscar seções...',
@@ -289,6 +338,53 @@ const ptBR: Translations = {
     OTP_INVALID: 'Código incorreto. Tente novamente.',
     EMAIL_SEND_FAILED: 'Falha ao enviar o e-mail. Tente novamente.',
     UNKNOWN: 'Ocorreu um erro. Tente novamente.',
+  },
+  subscription: {
+    usageLimitFree: 'Você atingiu seu limite diário de uso.',
+    subscribeToPro: 'Assinar Pro',
+    freeDegraded: 'Você atingiu o limite do modelo principal. Respostas continuarão com qualidade reduzida.',
+    proDegraded: 'Você atingiu o limite diário do modelo principal. Respostas continuarão com um modelo mais leve.',
+    usageWarningPro: 'Você já usou {percent}% do seu limite diário do modelo principal.',
+    usageWarningFreeBest: 'Você já usou {percent}% do limite diário do modelo principal.',
+    usageWarningFreeDegraded: 'Você já usou {percent}% do limite diário restante.',
+    usageWarningFreeDegradedFinal: 'Você já usou {percent}% do limite diário restante. Após isso, o acesso será bloqueado até amanhã.',
+    title: 'Assinatura',
+    freePlan: 'Grátis',
+    proPlan: 'Pro',
+    currentPlan: 'Plano atual',
+    limitedUsage: 'Uso diário limitado',
+    unlimitedUsage: 'Uso ilimitado',
+    perMonth: 'por mês',
+    subscribe: 'Assinar',
+    proUntil: 'Você é Pro até {date}',
+    yourBalance: 'Seu saldo: {amount}',
+    confirmationTitle: 'Confirmar assinatura',
+    useBalance: 'Usar meu saldo',
+    confirmSubscription: 'Confirmar assinatura',
+    payWithPix: 'Pagar R${amount} com Pix',
+    pixInstructions: 'Escaneie o QR Code ou copie o código Pix para pagar',
+    payWithinMinutes: 'Pague em {time}',
+    copyCode: 'Copiar código',
+    copied: 'Copiado!',
+    youAreNowPro: 'Agora você é Pro!',
+    close: 'Fechar',
+    paymentExpired: 'Pagamento expirado',
+    paymentFailed: 'Falha no pagamento. Tente novamente.',
+  },
+  promotions: {
+    title: 'Promoções',
+    universityEmailTitle: 'Estuda na Unicamp ou USP? Ganhe 1 mês grátis!',
+    universityEmailDescription: 'Se o email da sua conta pertence à Unicamp ou USP, resgate R$20 em créditos — o suficiente para um mês inteiro de Pro.',
+    unknownTitle: 'Promoção',
+    unknownDescription: 'Detalhes indisponíveis.',
+    creditAmount: '{amount} em créditos',
+    claimed: 'Resgatado',
+    claim: 'Resgatar',
+    notEligible: 'Seu email não é de uma universidade qualificada.',
+    alreadyClaimed: 'Você já resgatou esta promoção.',
+    claimSuccess: 'Créditos adicionados ao seu saldo!',
+    claimError: 'Não foi possível resgatar a promoção. Tente novamente.',
+    loadError: 'Não foi possível carregar as promoções.',
   },
 };
 

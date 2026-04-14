@@ -43,10 +43,7 @@ export default function Breadcrumb() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!sectionId || !chatId) {
-      setChats([]);
-      return;
-    }
+    if (!sectionId || !chatId) return;
     fetch(`/api/sections/${sectionId}/topics`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -68,6 +65,7 @@ export default function Breadcrumb() {
   }, [sectionId, chatId, t.studying.revision]);
 
   const isOnDashboard = pathname === '/dashboard';
+  const isOnSubscription = pathname === '/subscription';
   const isOnSection = !!sectionId;
   const isOnChat = !!chatId;
 
@@ -104,6 +102,14 @@ export default function Breadcrumb() {
           <Link href="/dashboard" className="text-muted-text hover:text-primary-text">
             {t.nav.dashboard}
           </Link>
+        )}
+
+        {/* Subscription segment */}
+        {isOnSubscription && (
+          <>
+            <span className="text-muted-text select-none">›</span>
+            <span className="text-primary-text">{t.subscription.title}</span>
+          </>
         )}
 
         {/* Section segment */}

@@ -12,7 +12,7 @@ const MAX_ATTEMPTS = 3;
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => null);
-    const email = body?.email?.trim();
+    const email = body?.email?.trim().toLowerCase();
     const code = body?.code?.trim();
 
     if (!email) return NextResponse.json({ error: 'EMAIL_MISSING' }, { status: 400 });

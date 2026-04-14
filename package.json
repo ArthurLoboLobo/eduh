@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "migrate": "node --env-file=.env.local node_modules/.bin/node-pg-migrate --database-url-var DATABASE_URL_UNPOOLED --migrations-dir db/migrations up",
-    "migrate:create": "node --env-file=.env.local node_modules/.bin/node-pg-migrate --migrations-dir db/migrations create"
+    "migrate:test": "node --env-file=.env.test node_modules/.bin/node-pg-migrate --database-url-var DATABASE_URL_UNPOOLED --migrations-dir db/migrations up",
+    "migrate:create": "node --env-file=.env.local node_modules/.bin/node-pg-migrate --migrations-dir db/migrations create",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.43",
@@ -37,9 +40,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.2"
   }
 }
