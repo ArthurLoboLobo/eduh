@@ -1229,7 +1229,7 @@ A new section is added **below** the existing balance display (so the flow reads
 - If `promotionsError`: a muted one-liner from `t.promotions.loadError`, no retry button.
 - Otherwise: a responsive grid of `Card` components, one per entry in `promotions`, in the order the API returned them. Each card shows:
   - Title and description resolved via a pure `camelCase(id)` transform: id `university-email` → `t.promotions.universityEmailTitle` and `t.promotions.universityEmailDescription`. No manual id → key mapping table — the transform is the mapping.
-  - Credit amount formatted as `R$X.XX` by the page (reuse the `SUBSCRIPTION_PRICE_CENTS` formatter already in the file). The number is rendered directly; it is **not** baked into any translation string.
+  - Credit amount formatted as `R$X.XX` by the page (reuse the `SUBSCRIPTION_PRICE_CENTS` formatter already in the file), then interpolated into `t.promotions.creditAmount` via `.replace('{amount}', formatted)` — same pattern as `t.subscription.proUntil` elsewhere on the page. The number is **never** baked into any translation string; only the placeholder substitution happens at render time. The modal uses the same `t.promotions.creditAmount` string so card and modal stay visually consistent.
   - A `Badge` with `t.promotions.claimed` in the top-right when `claimed === true`.
   - The whole card is clickable (pointer cursor, hover state) and opens the modal for that promotion.
 
@@ -1242,23 +1242,24 @@ Reuses the existing `Modal` UI primitive (same as `PaymentModal`). Props: the se
 Local state inside the modal:
 
 - `claiming: boolean` — true while the POST request is in flight.
-- `error: string | null` — the last error key (e.g. `'NOT_ELIGIBLE'`, `'ALREADY_CLAIMED'`, `'UNKNOWN'`), mapped to a translation string for display.
 
-Rendered content depends on the promotion's flags:
+All user feedback for claim results goes through `useToast`, matching how `PaymentModal`, `UploadingView`, and the chat page report outcomes. The modal never renders an inline error message — it always closes after a claim attempt resolves, and the toast carries the message.
+
+Rendered content depends on the promotion's flags (these are informational views for when the user opens the modal on a card already in that state — not error states):
 
 - **Eligible, not claimed** — show title, description, credit amount, and an enabled `Claim` button. Clicking the button:
-  1. Sets `claiming = true`, clears any prior error.
+  1. Sets `claiming = true`.
   2. Calls `POST /api/promotions/[id]/claim`.
-  3. On 200: call `useToast` with `t.promotions.claimSuccess`, fire `onClaimed()` (which triggers the two parent refetches), then close the modal.
-  4. On 400 `ALREADY_CLAIMED`: set `error` to the `alreadyClaimed` key, fire `onClaimed()` so the parent refetches and the card flips to "Claimed", leave the modal open so the user sees the message. This can happen if the user claimed in another tab or if the page data is stale.
-  5. On 400 `NOT_ELIGIBLE`: set `error` to the `notEligible` key, fire `onClaimed()` so the card re-renders with the correct state.
-  6. On 404 `NOT_FOUND` / 5xx / network error: set `error` to `t.promotions.claimError`; do not refetch.
-  7. In all cases: set `claiming = false` at the end.
+  3. On 200: show toast `t.promotions.claimSuccess` (`'success'` variant), fire `onClaimed()` (triggers the two parent refetches), close the modal.
+  4. On 400 `ALREADY_CLAIMED`: show toast `t.promotions.alreadyClaimed` (`'error'` variant), fire `onClaimed()` so the parent refetches and the card flips to "Claimed", close the modal. This can happen if the user claimed in another tab or if the page data is stale.
+  5. On 400 `NOT_ELIGIBLE`: show toast `t.promotions.notEligible` (`'error'` variant), fire `onClaimed()` so the card re-renders with the correct state, close the modal.
+  6. On 404 `NOT_FOUND` / 5xx / network error: show toast `t.promotions.claimError` (`'error'` variant), close the modal. No refetch.
+  7. In all cases: set `claiming = false` before closing.
   - While `claiming === true`, the button shows a small spinner and is disabled. The modal can still be closed normally.
 - **Not eligible** — show title, description, credit amount, and a muted `t.promotions.notEligible` line. No button. Close button works normally.
 - **Already claimed** — show title, description, credit amount, and a muted `t.promotions.alreadyClaimed` line with a "Claimed" badge next to the title. No button.
 
-No optimistic updates — the modal waits for the POST to return before changing anything. Given the claim is a one-shot server action with real money implications (credits), the clarity of pessimistic UI is worth the ~200ms latency.
+No optimistic updates — the modal waits for the POST to return before firing `onClaimed()` and closing. Given the claim is a one-shot server action with real money implications (credits), the clarity of pessimistic UI is worth the ~200ms latency.
 
 ### Accessibility & design constraints
 
@@ -1271,7 +1272,7 @@ No optimistic updates — the modal waits for the POST to return before changing
 1. Load `/subscription` → promotions section appears below balance, single "university-email" card visible with `eligible: true, claimed: false`.
 2. Click the card → modal opens → click `Claim` → button shows spinner → success toast → modal closes → card shows "Claimed" badge → navbar balance chip updated to +R$20.
 3. Reopen the card → modal shows "Already claimed" line, no button.
-4. Open a second tab, claim there first, then click `Claim` in the first tab → modal shows `ALREADY_CLAIMED` error, the underlying card flips to "Claimed" after the background refetch.
+4. Open a second tab, claim there first, then click `Claim` in the first tab → modal closes → error toast with `t.promotions.alreadyClaimed` → the underlying card flips to "Claimed" after the background refetch.
 
 With a `@gmail.com` user:
 
@@ -1279,7 +1280,7 @@ With a `@gmail.com` user:
 
 Network failure:
 
-6. Offline the tab, click `Claim` → modal shows generic error, card state unchanged.
+6. Offline the tab, click `Claim` → modal closes → error toast with `t.promotions.claimError` → card state unchanged.
 
 ---
 
@@ -1294,8 +1295,8 @@ promotions: {
   title: 'Promotions' / 'Promoções',
 
   // Per-promotion strings — keyed by camelCase(id)
-  universityEmailTitle: 'Estuda na Unicamp ou USP? Ganhe 1 mês grátis!',
-  universityEmailDescription: 'Se o email da sua conta pertence à Unicamp ou USP...',
+  universityEmailTitle: 'Estuda na Unicamp ou USP? Ganhe 1 mês grátis!' / 'Studying at Unicamp or USP? Get 1 month free!',
+  universityEmailDescription: 'Se o email da sua conta pertence à Unicamp ou USP, resgate R$20 em créditos — o suficiente para um mês inteiro de Pro.' / 'If your account email belongs to Unicamp or USP, claim R$20 in credits — enough for a full month of Pro.',
 
   // Fallback when the backend returns an id the frontend doesn't know
   unknownTitle: 'Promoção' / 'Promotion',
