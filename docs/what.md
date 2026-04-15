@@ -105,8 +105,20 @@ When the user clicks a topic from the Studying page, they enter an AI chat speci
 - **RAG**: The AI can search the student's uploaded materials to find relevant content, exam questions, etc.
 - **Rate limit**: Max 10 messages per minute. If exceeded, a message asks the student to wait.
 - **Revision chat**: Same interface, but for general questions across all topics in the section.
+- **Usage limits**: Chat has a daily usage limit. As the student approaches the limit they see warning toasts (at 75% and 90%). When they cross the "best model" threshold a lighter model takes over mid-conversation and a toast explains the switch (with an upgrade link for free users). Free users who hit the hard cutoff see their message bounced back to the input box and a toast inviting them to come back tomorrow or subscribe. Pro users never hit a hard cutoff — the lighter model keeps working indefinitely.
+- **Error recovery**: If a message fails to send for any reason (usage limit, network error, API error), the text is bounced back to the input box so the student can try again.
+
+### Subscription
+
+- **Tiers**: a **Free** tier with daily usage limits and a **Pro** tier (R$20 for 30 days) with much higher limits and no hard cutoff.
+- **Credit balance**: every user has a balance in R$ that can be used to pay for Pro or that can be earned through bonuses. Credits do not expire.
+- **Subscription page** (`/subscription`): reachable from the profile dropdown (always) and from a "Subscribe to Pro" chip in the navbar (free users only).
+  - **Free users** see a Free vs Pro comparison, a "Subscribe to Pro" button, their balance, and the bonuses list.
+  - **Pro users** see a "You are Pro until [date]" status card, their balance, and the bonuses list.
+- **Payment flow**: clicking "Subscribe to Pro" opens a modal with a balance toggle ("Use my balance"). If credits cover the full price, the subscription activates immediately. Otherwise the modal switches to a PIX QR code screen with a 10-minute expiration timer. The page polls for payment confirmation and transitions to a "You're now Pro!" success state. The modal can be closed at any time — the subscription still activates if the payment goes through.
+- **Bonuses**: shown as cards on the subscription page. Clicking a card opens a detail modal explaining how to qualify and a "Claim" button. Claimed bonuses are marked. The first bonus gives R$20 in credits (one month of Pro) to students with a Unicamp or USP email.
 
 ### Navigation
 
-- **Navbar**: Fixed at the top. Logo "Eduh" on the left (gradient text). Avatar button on the right that opens a dropdown with language switcher and logout.
+- **Navbar**: Fixed at the top. Logo "Eduh" on the left (gradient text). For free users, a "Subscribe to Pro" chip sits to the left of the profile button. Avatar button on the right that opens a dropdown with a "Subscription" link, language switcher, and logout.
 - **Breadcrumb**: Below the navbar. Shows: Dashboard > Section Name > Topic Name. Section and topic names have dropdowns for quick navigation to other sections/topics.

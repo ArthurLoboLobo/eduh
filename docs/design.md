@@ -139,6 +139,28 @@ Desktop-first with responsive breakpoints. Dashboard grid: 3 → 2 → 1 columns
 - Tool indicator: "Searching study materials" with jumping dots.
 - Input: fixed bottom, `bg-surface/80`, `backdrop-blur-xl`, `rounded-[32px]`, gradient fade above.
 - Send button: `rounded-full`, `bg-accent-blue`.
+- Usage toasts: warning (info variant) at 75% / 90%, degradation info toast when the lighter model takes over, error toast with upgrade link when a free user hits the hard cutoff. Errored messages bounce back into the input area.
+
+### Subscription Page
+- **Navbar chip** (free users only): pill-shaped, `bg-accent-blue/20`, `text-accent-blue`, sits left of the profile button. Accent-blue hover state. Hidden for pro users.
+- **Plan comparison**: two side-by-side cards (`bg-surface/60`, `backdrop-blur-sm`, `rounded-3xl`). Pro card has a faint accent-blue glow / border to signal it as the highlighted option. Free card emphasizes limits.
+- **Pro status card**: shown instead of the subscribe button for pro users. Displays "You are Pro until [date]" in primary text with a small muted-text subtitle.
+- **Balance display**: inline row with a coin/wallet icon and the balance in R$.
+- **Promotions list**: grid of promotion cards (same surface styling as dashboard cards). Each card shows title + credit amount badge + "Claimed" badge if applicable. Clicking opens the detail modal.
+
+### Payment Modal
+- Standard modal surface (`bg-surface`, `rounded-3xl`). Three sequential states share the same shell:
+  1. **Confirmation**: credits box at the top with a toggle ("Use my balance"). Disabled/greyed when balance is 0. Primary button at the bottom says either "Confirm subscription" (when credits cover the full price) or "Pay R$X.XX with Pix".
+  2. **QR code**: large QR image centered, copy-paste PIX code directly below with a copy button, expiration countdown in muted text, short instructions at the bottom.
+  3. **Success**: centered "You're now Pro!" with a Close button.
+- Close (X) button top-right on all states. No destructive action on close — the QR just expires on its own.
+
+### Promotion Detail Modal
+- Title + description + optional progress copy ("2/5 friends invited").
+- Primary action button at the bottom:
+  - **Claim** (accent-blue) when eligible and unclaimed.
+  - **Disabled** with an explanation line when the user hasn't met the criteria yet.
+  - **"Already claimed"** label instead of a button when already redeemed.
 
 ## Empty States
 All lists show a centered message guiding the user on what to do next (e.g., "No sections created yet. Click Create new Section to get started.").
