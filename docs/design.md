@@ -72,7 +72,7 @@ The body uses subtle fixed radial gradients for depth:
 Variants: default (`bg-white/10`), blue (`bg-accent-blue/20`), green (`bg-success-green/20`), red (`bg-danger-red/20`), muted (`bg-white/5`). All are `rounded-full`, `text-xs`, `px-2.5 py-0.5`.
 
 ### Checkboxes
-Custom styled: `w-4 h-4`, `rounded`, `border border-border-subtle`. Checked: `bg-accent-blue`. Focus: `ring-1 ring-accent-blue/30`.
+Custom styled: `w-5 h-5`, `rounded-md`, `border-2 border-white/20`, `bg-white/5`. Checked: `bg-accent-blue`. Focus: `ring-1 ring-accent-blue/30`. Hover: `border-white/40`, `bg-white/10`. In topic cards, the checkbox area reveals a text label ("Concluir"/"Concluído") on card hover with a subtle background pill and scale-up animation.
 
 ### Progress Bar
 `h-2` (or `h-3` in studying view), `bg-white/10` container, `bg-success-green` fill, both `rounded-full`.

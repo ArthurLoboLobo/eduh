@@ -113,6 +113,8 @@ export interface Translations {
     loading: string;
     errorLoading: string;
     retry: string;
+    markComplete: string;
+    completed: string;
   };
   chat: {
     loading: string;
@@ -322,6 +324,8 @@ const ptBR: Translations = {
     loading: 'Carregando tópicos...',
     errorLoading: 'Erro ao carregar tópicos.',
     retry: 'Tentar novamente',
+    markComplete: 'Concluir',
+    completed: 'Concluído',
   },
   chat: {
     loading: 'Carregando conversa...',

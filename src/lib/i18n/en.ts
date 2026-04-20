@@ -119,6 +119,8 @@ const en: Translations = {
     loading: 'Loading topics...',
     errorLoading: 'Failed to load topics.',
     retry: 'Try again',
+    markComplete: 'Complete',
+    completed: 'Completed',
   },
   chat: {
     loading: 'Loading conversation...',

@@ -219,13 +219,18 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
 
                       {/* Checkbox Action */}
                       <div
-                        className="absolute top-6 right-6 p-2 -m-2 cursor-pointer transition-transform active:scale-90"
+                        className="absolute top-5 right-5 flex items-center gap-2 cursor-pointer transition-all duration-300 active:scale-95 rounded-full px-2.5 py-1.5 -mr-1 group-hover:bg-white/[0.06]"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleToggle(topic.id);
                         }}
                       >
-                        <Checkbox checked={topic.is_completed} readOnly />
+                        <span className="text-xs font-medium text-muted-text transition-all duration-300 select-none opacity-0 group-hover:opacity-70 max-w-0 group-hover:max-w-[100px] overflow-hidden whitespace-nowrap">
+                          {topic.is_completed ? t.studying.completed : t.studying.markComplete}
+                        </span>
+                        <div className="flex items-center transition-all duration-300 group-hover:scale-110 group-hover:[&_input]:border-white/40 group-hover:[&_input]:bg-white/10">
+                          <Checkbox checked={topic.is_completed} readOnly />
+                        </div>
                       </div>
                     </div>
                   </Card>

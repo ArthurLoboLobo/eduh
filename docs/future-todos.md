@@ -2,27 +2,38 @@
 
 
 ## Actual TODOs
+
+### UX / Aesthetics
+- **Fix Enter on mobile**: Fix the Enter key on mobile devices so that it inserts a newline instead of sending.
+- **Make topic completion toggle more visible**: The button/toggle to mark a topic as complete is not noticeable enough. Users are not marking topics as complete because they can't see it.
+- **Correct daily limit message**: Correct the message when the free user reaches its daily limit. Currently it's like that: "Você já usou NaN% do seu limite diário restante."
+
+
+### Chat / AI
+- **System prompt update**: Include in the system prompt: "Do not use emojis".
+- **Concurrent messaging**: Let the user write messages while the AI is generating a response.
+- **Page refresh resilience**: Make it possible to refresh the page without interfering with the response.
+- **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
+- **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
+
+### Subscription / Payments
+- **AbacatePay minimum PIX amount**: AbacatePay rejects PIX QR codes with `amount < 100` (R$1.00). If a user's balance leaves a PIX remainder below R$1.00 (e.g. balance = R$19.99), the subscribe endpoint returns `PAYMENT_CREATION_FAILED`. Needs to be handled gracefully.
+- **Auto-renewal**: Add an auto-renew toggle to the subscription page. When enabled, if the user has enough balance at expiration, debit and extend automatically. If not, downgrade and notify. Requires a cron job (e.g. Vercel Cron) to check expirations periodically. (Automatic Pix)
+- **Cron-based expiration handling**: Currently, plan expiration is checked on every API request. Add a cron job to proactively handle expirations (needed for auto-renewal and email notifications).
+- **Email notifications for subscription events**: Notify users when their Pro subscription expires, when auto-renewal succeeds or fails due to insufficient balance.
+- **More promotions**: Add new hardcoded promotions beyond the initial "university email" promotion (e.g. "Refer X friends → gain Y credits").
+
+### Features
+- **Share study plans**: Implement the ability to share study plans with others. Consider how both logged-in and non-logged-in users will view a shared plan, and how the sharing mechanism works (e.g., shareable link, copy-to-clipboard, etc.).
+
+### Security / Anti-abuse
 - **Production deployment**:
   - Add safety measures against spam (e.g., rate limiting OTP requests, captcha, abuse detection).
   - Limit on:
     - Number of topics and subtopics (very high, just to prevent spam)
     - Size of a message (very high, since since we will have a usage limit)
     - Size and number of tokens in the uploaded files (not very high, think of something reasonable)
-- **Share study plans**: Implement the ability to share study plans with others. Consider how both logged-in and non-logged-in users will view a shared plan, and how the sharing mechanism works (e.g., shareable link, copy-to-clipboard, etc.).
-- **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
-- **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
-- **Fix Enter on mobile**: Fix the Enter key on mobile devices so that it inserts a newline instead of sending.
-- **Fix message view**: Fix the view of the last message when the message box expands.
-- **System prompt update**: Include in the system prompt: "Do not use emojis".
-- **Concurrent messaging**: Let the user write messages while the AI is generating a response.
-- **Page refresh resilience**: Make it possible to refresh the page without interfering with the response.
-- **AbacatePay minimum PIX amount**: AbacatePay rejects PIX QR codes with `amount < 100` (R$1.00). If a user's balance leaves a PIX remainder below R$1.00 (e.g. balance = R$19.99), the subscribe endpoint returns `PAYMENT_CREATION_FAILED`. Needs to be handled gracefully.
-- **Auto-renewal**: Add an auto-renew toggle to the subscription page. When enabled, if the user has enough balance at expiration, debit and extend automatically. If not, downgrade and notify. Requires a cron job (e.g. Vercel Cron) to check expirations periodically. (Automatic Pix)
-- **Cron-based expiration handling**: Currently, plan expiration is checked on every API request. Add a cron job to proactively handle expirations (needed for auto-renewal and email notifications).
-- **Email notifications for subscription events**: Notify users when their Pro subscription expires, when auto-renewal succeeds or fails due to insufficient balance.
-- **More promotions**: Add new hardcoded promotions beyond the initial "university email" promotion (e.g. "Refer X friends → gain Y credits").
 - **Email Alias Loophole**: Normalize emails by stripping "plus" aliases (e.g., `user+test@gmail.com` -> `user@gmail.com`). Currently, aliases create separate accounts, which allows users to bypass limits and claim promotions multiple times.
-- **Countdown fix**: The countdown isn't working correctly. Every time I go out of the page it stops counting.
 
 
 

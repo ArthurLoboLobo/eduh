@@ -69,23 +69,22 @@ export default function PaymentModal({ open, onClose, balance, onSuccess }: Paym
     if (step !== 'qr' || !qrData) return;
 
     const expiresMs = new Date(qrData.expiresAt).getTime();
-    const nowMs = Date.now();
-    const remaining = Math.max(0, Math.floor((expiresMs - nowMs) / 1000));
-    setSecondsLeft(remaining);
-    setExpired(remaining <= 0);
+    const computeRemaining = () => Math.max(0, Math.floor((expiresMs - Date.now()) / 1000));
 
-    if (remaining <= 0) return;
+    const initial = computeRemaining();
+    setSecondsLeft(initial);
+    setExpired(initial <= 0);
+
+    if (initial <= 0) return;
 
     countdownRef.current = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          if (countdownRef.current) clearInterval(countdownRef.current);
-          if (pollingRef.current) clearInterval(pollingRef.current);
-          setExpired(true);
-          return 0;
-        }
-        return prev - 1;
-      });
+      const remaining = computeRemaining();
+      setSecondsLeft(remaining);
+      if (remaining <= 0) {
+        if (countdownRef.current) clearInterval(countdownRef.current);
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        setExpired(true);
+      }
     }, 1000);
 
     return () => {
