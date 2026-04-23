@@ -229,7 +229,7 @@ Rounded-2xl with backdrop-blur. Dismiss button on each toast.
 - Usage toasts: warning (info variant) at 75% / 90%, degradation info toast when the lighter model takes over, error toast with upgrade link when a free user hits the hard cutoff. Errored messages bounce back into the input area.
 
 ### Subscription Page
-- **Navbar chip** (free users only): pill-shaped, `bg-accent-blue/20`, `text-accent-blue`, sits left of the profile button. Accent-blue hover state. Hidden for pro users.
+
 - **Plan comparison**: two side-by-side cards (`bg-surface/60`, `backdrop-blur-sm`, `rounded-3xl`). Pro card has a faint accent-blue glow / border to signal it as the highlighted option. Free card emphasizes limits.
 - **Pro status card**: shown instead of the subscribe button for pro users. Displays "You are Pro until [date]" in primary text with a small muted-text subtitle.
 - **Balance display**: inline row with a coin/wallet icon and the balance in R$.
