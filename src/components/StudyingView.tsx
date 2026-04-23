@@ -186,9 +186,9 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                         {topic.is_completed ? <CheckIcon size={16} /> : <span className="font-bold text-sm">{idx + 1}</span>}
                       </div>
 
-                      <div className="flex-1 min-w-0 pr-10">
+                      <div className="flex-1 min-w-0 pr-10 group-hover:pr-40 transition-[padding] duration-300">
                         {/* Topic Title */}
-                        <h3 className={`text-lg font-bold mb-3 leading-snug transition-colors ${
+                        <h3 className={`truncate text-lg font-bold mb-3 leading-snug transition-colors ${
                           topic.is_completed ? 'text-primary-text' : isNextToStudy ? 'text-accent-blue' : 'text-primary-text'
                         }`}>
                           {topic.title}

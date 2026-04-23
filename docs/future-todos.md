@@ -13,14 +13,17 @@
 
 
 ### Mobile
-- **Fix topic completion checkbox overlapping title**: On mobile, the checkbox used to mark a topic as completed in the study phase overlaps the topic title. Fix the layout so the checkbox and title are properly spaced and never collide.
-- **Fix breadcrumb dropdown overflow + add ellipsis truncation**: On mobile, the dropdown that appears when clicking the chat name in the breadcrumbs leaks off the right edge of the screen. Fix the dropdown positioning so it stays within the viewport. Also add `...` truncation to both the breadcrumb title and the dropdown items when the text is too long to fit.
-- **Fix long AI response lines causing horizontal overflow**: When the LLM produces a very long single line (e.g. a long code snippet or unbroken string), it renders without wrapping and forces the entire page to be wider than the viewport. Ensure the message container enforces `overflow-wrap: break-word` / `word-break: break-all` (or equivalent) so no single line can stretch the page layout.
+- **Fix long AI response lines causing horizontal overflow**: When the LLM produces a very long single line (e.g. a long code snippet or unbroken string), it renders without wrapping and forces the entire page to be wider than the viewport. Ensure that no single line can stretch the page layout.
 
 
 ### Chat / AI
 - **Image uploads in chat**: Allow users to attach and send images in a chat message, so the AI can reason about visual content (e.g. problem screenshots, diagrams, handwritten notes).
 - **System prompt update**: Include in the system prompt: "Do not use emojis".
+- **Fix $$ formatting problem**: Stop dealing with the `$$` formatting problem by changing the LLM output. Instead, include how it should be done directly in the system prompt. The LLM needs to know that to correctly use `$$` it has to format it like:
+  $$
+  x
+  $$
+  instead of `$$ x $$`
 - **Concurrent messaging**: Let the user write messages while the AI is generating a response.
 - **Page refresh resilience**: Make it possible to refresh the page without interfering with the response.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.

@@ -122,17 +122,17 @@ export default function Breadcrumb() {
                   setSectionOpen((v) => !v);
                   setChatOpen(false);
                 }}
-                className={`flex items-center gap-1 hover:text-accent-blue cursor-pointer ${
+                className={`flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs hover:text-accent-blue cursor-pointer ${
                   isOnChat ? 'text-muted-text' : 'text-primary-text'
                 }`}
                 aria-expanded={sectionOpen}
               >
-                <span>{currentSection?.name ?? sectionId}</span>
+                <span className="truncate">{currentSection?.name ?? sectionId}</span>
                 <ChevronDownIcon />
               </button>
 
               {sectionOpen && sections.length > 0 && (
-                <div className="absolute left-0 top-8 min-w-56 max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
+                <div className="absolute left-0 top-8 min-w-56 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
                   {sections.map((s) => (
                     <button
                       key={s.id}
@@ -160,15 +160,15 @@ export default function Breadcrumb() {
                   setChatOpen((v) => !v);
                   setSectionOpen(false);
                 }}
-                className="flex items-center gap-1 text-primary-text hover:text-accent-blue cursor-pointer"
+                className="flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs text-primary-text hover:text-accent-blue cursor-pointer"
                 aria-expanded={chatOpen}
               >
-                <span>{currentChat?.name ?? chatId}</span>
+                <span className="truncate">{currentChat?.name ?? chatId}</span>
                 <ChevronDownIcon />
               </button>
 
               {chatOpen && chats.length > 0 && (
-                <div className="absolute left-0 top-8 min-w-56 max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
+                <div className="absolute right-0 top-8 min-w-56 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
                   {chats.map((c) => (
                     <button
                       key={c.id}
