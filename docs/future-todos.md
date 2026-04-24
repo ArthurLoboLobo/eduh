@@ -13,7 +13,6 @@
 
 
 ### Mobile
-- **Fix long AI response lines causing horizontal overflow**: When the LLM produces a very long single line (e.g. a long code snippet or unbroken string), it renders without wrapping and forces the entire page to be wider than the viewport. Ensure that no single line can stretch the page layout.
 
 
 ### Chat / AI

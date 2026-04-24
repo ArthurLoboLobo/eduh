@@ -70,7 +70,7 @@ function ChatMessageItem({
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-[95%] text-[15px] leading-relaxed text-primary-text prose-chat">
+      <div className="max-w-[95%] min-w-0 overflow-hidden text-[15px] leading-relaxed text-primary-text prose-chat">
         {textContent && (
           <ReactMarkdown
             remarkPlugins={[remarkMath]}
@@ -85,7 +85,7 @@ function ChatMessageItem({
                       style={oneDark}
                       language={match[1]}
                       PreTag="div"
-                      customStyle={{ borderRadius: '0.75rem', fontSize: '0.8125rem', margin: '1rem 0' }}
+                      customStyle={{ borderRadius: '0.75rem', fontSize: '0.8125rem', margin: '1rem 0', maxWidth: '100%', overflowX: 'auto' }}
                     >
                       {codeString}
                     </SyntaxHighlighter>

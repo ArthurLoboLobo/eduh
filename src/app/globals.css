@@ -48,6 +48,7 @@ body {
 }
 
 /* Chat markdown prose styles */
+.prose-chat { overflow-wrap: anywhere; }
 .prose-chat h1, .prose-chat h2, .prose-chat h3, .prose-chat h4 {
   font-weight: 600;
   margin-top: 1em;
@@ -78,6 +79,14 @@ body {
   text-align: left;
 }
 .prose-chat th { background: var(--surface); font-weight: 600; }
+
+/* Allow long KaTeX display formulas to scroll horizontally inside their bubble
+   instead of stretching the page. */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
 
 /* Micro-animations */
 @keyframes fade-in-up {

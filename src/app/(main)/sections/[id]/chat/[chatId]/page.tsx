@@ -272,7 +272,7 @@ export default function ChatPage() {
 
   return (
     <>
-      <div className="relative flex flex-col min-h-[calc(100vh-12rem)] w-full animate-fade-in-up">
+      <div className="relative flex flex-col min-h-[calc(100vh-12rem)] w-full overflow-x-hidden animate-fade-in-up">
         {/* Messages */}
       <div className="flex-1 px-4 py-2 space-y-6 max-w-3xl mx-auto w-full">
         {messages.map((message) => (
