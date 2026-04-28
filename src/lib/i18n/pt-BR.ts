@@ -210,13 +210,13 @@ export interface Translations {
 
 const ptBR: Translations = {
   auth: {
-    tagline: 'Estude menos. Estude melhor. Com IA.',
-    hero: 'Transforme seus materiais em um plano de estudos personalizado e guiado por IA.',
+    tagline: 'Um plano, não uma conversa solta.',
+    hero: 'Envie provas, slides e notas. O Eduh organiza o conteúdo em uma sequência de estudo e guia cada tópico com base nos seus materiais.',
     learnMore: 'Entenda como funciona',
     steps: [
-      { title: 'Envie Seus Materiais', description: 'O Eduh vai além de um tutor genérico. Envie provas anteriores, slides e anotações, e ele aprenderá exatamente o que você precisa saber.' },
-      { title: 'Receba um Plano de Estudos Inteligente', description: 'Nossa IA analisa automaticamente seus documentos e estrutura um plano de estudos personalizado, dividido em tópicos e subtópicos fáceis de assimilar. Edite, reordene e refine o plano antes de começar.' },
-      { title: 'Domine Tópicos com IA', description: 'Mergulhe em chats de IA dedicados para cada tópico. Resolva problemas gerados dinamicamente, acompanhe seu progresso e converse com um modelo que se baseia exatamente nos materiais que você enviou.' },
+      { title: 'Envie seus materiais', description: 'Provas antigas, slides e anotações entram no mesmo espaço de estudo.' },
+      { title: 'Revise o plano', description: 'O Eduh separa tópicos e subtópicos em uma ordem editável antes da sessão começar.' },
+      { title: 'Estude por tópico', description: 'Cada tópico tem uma conversa própria, com explicações e exercícios ancorados nos arquivos enviados.' },
     ],
     emailLabel: 'E-mail',
     emailPlaceholder: 'seu@email.com',
@@ -229,8 +229,8 @@ const ptBR: Translations = {
     back: 'Voltar',
     sending: 'Enviando...',
     verifying: 'Verificando...',
-    bonusBadge: 'Alunos da USP e Unicamp ganham 1 mês grátis!',
-    bonusDescription: 'Basta fazer login com seu e-mail universitário e acessar a página de assinatura para resgatar a oferta.',
+    bonusBadge: 'USP e Unicamp: 1 mês grátis.',
+    bonusDescription: 'Entre com seu e-mail universitário e resgate na assinatura.',
   },
   nav: {
     language: 'Idioma',

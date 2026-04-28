@@ -139,17 +139,19 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="relative flex flex-col min-h-screen overflow-x-hidden">
-      {/* Language switcher */}
-      <div className="absolute top-6 right-6 z-50">
-        <div className="flex overflow-hidden rounded-full border border-border-subtle text-sm bg-surface/50 backdrop-blur-md shadow-sm">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-[oklch(0.155_0.008_30)] text-[oklch(0.93_0.012_80)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(68rem_42rem_at_18%_8%,oklch(0.52_0.12_30_/_0.16),transparent_64%),radial-gradient(46rem_34rem_at_88%_18%,oklch(0.46_0.13_20_/_0.11),transparent_68%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,oklch(0.155_0.008_30)_72%)]" />
+
+      <div className="absolute right-5 top-5 z-50 md:right-8 md:top-8">
+        <div className="flex overflow-hidden rounded-md border border-[oklch(0.93_0.012_80_/_0.16)] bg-[oklch(0.21_0.01_30_/_0.72)] text-[0.8125rem] font-medium">
           <button
             type="button"
             onClick={() => setLanguage('pt-BR')}
-            className={`px-4 py-2 transition-colors cursor-pointer ${
+            className={`px-3.5 py-2 transition-colors cursor-pointer ${
               language === 'pt-BR'
-                ? 'bg-accent-blue text-background font-semibold'
-                : 'text-muted-text hover:text-primary-text hover:bg-surface-hover'
+                ? 'bg-[oklch(0.46_0.13_20)] text-[oklch(0.93_0.012_80)]'
+                : 'text-[oklch(0.78_0.015_80)] hover:bg-[oklch(0.255_0.012_30)] hover:text-[oklch(0.93_0.012_80)]'
             }`}
           >
             PT
@@ -157,10 +159,10 @@ export default function AuthPage() {
           <button
             type="button"
             onClick={() => setLanguage('en')}
-            className={`px-4 py-2 transition-colors cursor-pointer ${
+            className={`px-3.5 py-2 transition-colors cursor-pointer ${
               language === 'en'
-                ? 'bg-accent-blue text-background font-semibold'
-                : 'text-muted-text hover:text-primary-text hover:bg-surface-hover'
+                ? 'bg-[oklch(0.46_0.13_20)] text-[oklch(0.93_0.012_80)]'
+                : 'text-[oklch(0.78_0.015_80)] hover:bg-[oklch(0.255_0.012_30)] hover:text-[oklch(0.93_0.012_80)]'
             }`}
           >
             EN
@@ -168,245 +170,198 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 py-20 lg:flex-row lg:gap-24 animate-fade-in-up">
-        {/* Left panel — info */}
-        <div className="mb-12 max-w-xl text-center lg:mb-0 lg:text-left flex flex-col justify-center">
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary-text via-accent-blue to-primary-text bg-clip-text text-transparent pb-2">
+      <section className="relative grid min-h-[88svh] items-center gap-12 px-5 pb-16 pt-28 md:px-10 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-16 lg:px-16 xl:px-24">
+        <div className="max-w-3xl animate-fade-in-up">
+          <p className="mb-5 max-w-max border-b border-[oklch(0.93_0.012_80_/_0.16)] pb-2 text-[0.8125rem] font-medium text-[oklch(0.78_0.015_80)]">
+            {t.auth.tagline}
+          </p>
+          <h1 className="max-w-[11ch] font-serif text-7xl font-normal leading-[0.88] text-[oklch(0.93_0.012_80)] md:text-8xl lg:text-9xl">
             Eduh
           </h1>
-          <p className="mt-4 text-xl lg:text-2xl font-medium text-accent-blue">{t.auth.tagline}</p>
-          <p className="mt-6 text-lg text-muted-text leading-relaxed">
+          <p className="mt-8 max-w-[34rem] text-lg font-normal leading-[1.7] text-[oklch(0.78_0.015_80)] md:text-xl">
             {t.auth.hero}
           </p>
 
-          <div className="mt-10 lg:mt-12 group inline-flex mx-auto lg:mx-0 items-center gap-2 text-sm font-medium text-muted-text hover:text-primary-text transition-colors cursor-pointer" onClick={() => window.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' })}>
+          <button
+            type="button"
+            className="group mt-10 inline-flex items-center gap-2 border-b border-[oklch(0.93_0.012_80_/_0.22)] pb-2 text-sm font-medium text-[oklch(0.78_0.015_80)] transition-colors hover:text-[oklch(0.93_0.012_80)] cursor-pointer"
+            onClick={() => window.scrollTo({ top: window.innerHeight * 0.88, behavior: 'smooth' })}
+          >
             <span>{t.auth.learnMore}</span>
-            <svg className="w-4 h-4 group-hover:translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
-          </div>
+          </button>
         </div>
 
-        {/* Right panel */}
-        <div className="w-full max-w-md flex flex-col gap-6">
-          {/* Auth form */}
-          <div className="bg-surface/80 backdrop-blur-xl rounded-3xl border border-border-subtle p-8 shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
-          {step === 'email' ? (
-            <form onSubmit={handleSendCode} className="animate-fade-in-up">
-              <label htmlFor="email" className="mb-2 block text-sm font-medium text-primary-text">
-                {t.auth.emailLabel}
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t.auth.emailPlaceholder}
-                className="w-full rounded-2xl border border-border-subtle bg-background/50 backdrop-blur-sm px-4 py-3 text-[15px] text-primary-text placeholder:text-muted-text focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 focus:outline-none transition-all"
-              />
-              {error && <p className="mt-3 text-sm text-danger-red font-medium">{error}</p>}
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent-blue px-5 py-3 text-sm font-semibold text-background hover:bg-accent-blue-hover disabled:opacity-50 transition-colors cursor-pointer active:scale-95"
-              >
-                {loading && <Spinner />}
-                {loading ? t.auth.sending : t.auth.sendCode}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyCode} className="animate-fade-in-up">
-              <label htmlFor="code" className="mb-2 block text-sm font-medium text-primary-text">
-                {t.auth.codeLabel}
-              </label>
-              <input
-                id="code"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={6}
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                placeholder={t.auth.codePlaceholder}
-                className="w-full rounded-2xl border border-border-subtle bg-background/50 backdrop-blur-sm px-4 py-4 text-center font-mono text-2xl tracking-[0.5em] text-primary-text placeholder:text-muted-text focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 focus:outline-none transition-all"
-              />
-              {error && <p className="mt-3 text-sm text-danger-red font-medium">{error}</p>}
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent-blue px-5 py-3 text-sm font-semibold text-background hover:bg-accent-blue-hover disabled:opacity-50 transition-colors cursor-pointer active:scale-95"
-              >
-                {loading && <Spinner />}
-                {loading ? t.auth.verifying : t.auth.verify}
-              </button>
-
-              <div className="mt-6 flex items-center justify-between text-sm">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="font-medium text-muted-text hover:text-primary-text transition-colors cursor-pointer"
-                >
-                  {t.auth.back}
-                </button>
-                {countdown > 0 ? (
-                  <span className="text-muted-text font-medium">
-                    {t.auth.resendIn} {countdown}s
-                  </span>
-                ) : (
+        <div className="w-full max-w-md justify-self-center lg:justify-self-end">
+          <div className="relative rounded-[14px] bg-[oklch(0.21_0.01_30)] p-6 shadow-[0_0_60px_-12px_oklch(0.62_0.12_45_/_0.32)] md:p-8">
+            <div className="pointer-events-none absolute inset-0 rounded-[14px] bg-[radial-gradient(120%_80%_at_50%_0%,oklch(0.62_0.12_45_/_0.16),transparent_70%)]" />
+            <div className="relative">
+              {step === 'email' ? (
+                <form onSubmit={handleSendCode} className="animate-fade-in-up">
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-[oklch(0.93_0.012_80)]">
+                    {t.auth.emailLabel}
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t.auth.emailPlaceholder}
+                    className="w-full rounded-md bg-[oklch(0.155_0.008_30_/_0.72)] px-4 py-3 text-[15px] font-normal text-[oklch(0.93_0.012_80)] placeholder:text-[oklch(0.62_0.01_80)] transition-shadow focus:outline-none focus:shadow-[0_0_0_3px_oklch(0.46_0.13_20_/_0.28)]"
+                  />
+                  {error && <p className="mt-3 text-sm font-medium text-[oklch(0.58_0.15_38)]">{error}</p>}
                   <button
-                    type="button"
-                    onClick={handleResend}
+                    type="submit"
                     disabled={loading}
-                    className="font-medium text-accent-blue hover:text-accent-blue-hover disabled:opacity-50 transition-colors cursor-pointer"
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-[oklch(0.46_0.13_20)] px-5 py-3 text-sm font-semibold text-[oklch(0.93_0.012_80)] transition-colors hover:bg-[oklch(0.56_0.16_22)] disabled:opacity-50 cursor-pointer"
                   >
-                    {t.auth.resendCode}
+                    {loading && <Spinner />}
+                    {loading ? t.auth.sending : t.auth.sendCode}
                   </button>
-                )}
-              </div>
-            </form>
-          )}
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyCode} className="animate-fade-in-up">
+                  <label htmlFor="code" className="mb-2 block text-sm font-medium text-[oklch(0.93_0.012_80)]">
+                    {t.auth.codeLabel}
+                  </label>
+                  <input
+                    id="code"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    required
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder={t.auth.codePlaceholder}
+                    className="w-full rounded-md bg-[oklch(0.155_0.008_30_/_0.72)] px-4 py-4 text-center font-mono text-2xl text-[oklch(0.93_0.012_80)] placeholder:text-[oklch(0.62_0.01_80)] transition-shadow focus:outline-none focus:shadow-[0_0_0_3px_oklch(0.46_0.13_20_/_0.28)]"
+                  />
+                  {error && <p className="mt-3 text-sm font-medium text-[oklch(0.58_0.15_38)]">{error}</p>}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-[oklch(0.46_0.13_20)] px-5 py-3 text-sm font-semibold text-[oklch(0.93_0.012_80)] transition-colors hover:bg-[oklch(0.56_0.16_22)] disabled:opacity-50 cursor-pointer"
+                  >
+                    {loading && <Spinner />}
+                    {loading ? t.auth.verifying : t.auth.verify}
+                  </button>
+
+                  <div className="mt-6 flex items-center justify-between text-sm">
+                    <button
+                      type="button"
+                      onClick={handleBack}
+                      className="font-medium text-[oklch(0.78_0.015_80)] transition-colors hover:text-[oklch(0.93_0.012_80)] cursor-pointer"
+                    >
+                      {t.auth.back}
+                    </button>
+                    {countdown > 0 ? (
+                      <span className="font-medium text-[oklch(0.78_0.015_80)]">
+                        {t.auth.resendIn} {countdown}s
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleResend}
+                        disabled={loading}
+                        className="font-medium text-[oklch(0.56_0.16_22)] transition-colors hover:text-[oklch(0.68_0.16_24)] disabled:opacity-50 cursor-pointer"
+                      >
+                        {t.auth.resendCode}
+                      </button>
+                    )}
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
 
-          {/* Bonus Banner */}
-          <div className="bg-accent-blue/5 border border-accent-blue/20 rounded-2xl p-5 text-center animate-fade-in-up md:px-6">
-            <div className="inline-flex items-center justify-center gap-2 mb-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-blue opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-blue"></span>
-              </span>
-              <h3 className="font-semibold text-accent-blue">
-                {t.auth.bonusBadge}
-              </h3>
-            </div>
-            <p className="text-sm text-muted-text font-medium leading-normal">
+          <div className="mt-4 border-t border-[oklch(0.93_0.012_80_/_0.16)] pt-4 text-sm leading-relaxed text-[oklch(0.78_0.015_80)] animate-fade-in-up">
+            <p className="font-semibold text-[oklch(0.93_0.012_80)]">
+              {t.auth.bonusBadge}
+            </p>
+            <p className="mt-1">
               {t.auth.bonusDescription}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Details Section: The 3 Steps */}
-      <section className="relative w-full max-w-5xl mx-auto px-6 py-24 lg:py-32 flex flex-col gap-24">
-        
-        {/* Step 1 */}
-        <div className="flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-24 opacity-0 animate-[fade-in-up_0.6s_ease-out_0.2s_forwards]">
-          <div className="lg:w-1/2 flex justify-center w-full">
-            {/* Flip Container */}
-            <div className="w-full max-w-xs lg:max-w-none group [perspective:1000px]">
-              <div className="relative w-full aspect-video rounded-3xl transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
-                
-                {/* Front */}
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-surface to-background rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden]">
-                  {/* Abstract decorative icon for Uploading */}
-                  <svg className="w-24 h-24 text-accent-blue/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                </div>
-
-                {/* Back */}
-                <div className="absolute inset-0 w-full h-full bg-surface rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden">
-                  {/* Image Placeholder */}
-                  <Image
-                    src="/images/step1.png"
-                    alt="Step 1 Preview"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div className="lg:w-1/2 space-y-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-accent-blue/10 text-accent-blue font-bold text-xl mb-2">1</div>
-            <h2 className="text-3xl font-bold text-primary-text">{t.auth.steps[0].title}</h2>
-            <p className="text-lg text-muted-text leading-relaxed">
-              {t.auth.steps[0].description}
-            </p>
-          </div>
+      <section className="relative mx-auto w-full max-w-7xl px-5 py-20 md:px-10 lg:px-16 lg:py-28 xl:px-24">
+        <div className="mb-10 border-t border-[oklch(0.93_0.012_80_/_0.16)] pt-8 md:mb-14 md:flex md:items-end md:justify-between md:gap-10">
+          <h2 className="font-serif text-4xl font-normal leading-tight text-[oklch(0.93_0.012_80)] md:text-5xl">
+            {language === 'pt-BR' ? 'Como funciona' : 'How it works'}
+          </h2>
+          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[oklch(0.78_0.015_80)] md:mt-0">
+            {language === 'pt-BR'
+              ? 'Três etapas, uma sequência clara: materiais, plano, estudo.'
+              : 'Three steps, one clear sequence: materials, plan, study.'}
+          </p>
         </div>
 
-        {/* Step 2 */}
-        <div className="flex flex-col-reverse lg:flex-row-reverse items-center gap-12 lg:gap-24 opacity-0 animate-[fade-in-up_0.6s_ease-out_0.4s_forwards]">
-          <div className="lg:w-1/2 flex justify-center w-full">
-            {/* Flip Container */}
-            <div className="w-full max-w-xs lg:max-w-none group [perspective:1000px]">
-              <div className="relative w-full aspect-video rounded-3xl transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
-                
-                {/* Front */}
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-bl from-surface to-background rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden]">
-                  {/* Abstract decorative icon for Planning */}
-                  <svg className="w-24 h-24 text-accent-blue/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-
-                {/* Back */}
-                <div className="absolute inset-0 w-full h-full bg-surface rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden">
-                  {/* Image Placeholder */}
-                  <Image
-                    src="/images/step2.png"
-                    alt="Step 2 Preview"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div className="lg:w-1/2 space-y-4 text-left lg:text-right">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-accent-blue/10 text-accent-blue font-bold text-xl mb-2 lg:ml-auto">2</div>
-            <h2 className="text-3xl font-bold text-primary-text">{t.auth.steps[1].title}</h2>
-            <p className="text-lg text-muted-text leading-relaxed">
-              {t.auth.steps[1].description}
-            </p>
-          </div>
+        <div className="grid gap-4 md:grid-cols-3 md:gap-5">
+          {t.auth.steps.map((stepItem, index) => (
+            <StepCard
+              key={stepItem.title}
+              index={index}
+              title={stepItem.title}
+              description={stepItem.description}
+              imageSrc={`/images/step${index + 1}.png`}
+            />
+          ))}
         </div>
-
-        {/* Step 3 */}
-        <div className="flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-24 opacity-0 animate-[fade-in-up_0.6s_ease-out_0.6s_forwards]">
-          <div className="lg:w-1/2 flex justify-center w-full">
-            {/* Flip Container */}
-            <div className="w-full max-w-xs lg:max-w-none group [perspective:1000px]">
-              <div className="relative w-full aspect-video rounded-3xl transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
-                
-                {/* Front */}
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-surface to-background rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden]">
-                  {/* Abstract decorative icon for Studying/Chat */}
-                  <svg className="w-24 h-24 text-accent-blue/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-
-                {/* Back */}
-                <div className="absolute inset-0 w-full h-full bg-surface rounded-3xl border border-border-subtle flex items-center justify-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden">
-                  {/* Image Placeholder */}
-                  <Image
-                    src="/images/step3.png"
-                    alt="Step 3 Preview"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div className="lg:w-1/2 space-y-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-accent-blue/10 text-accent-blue font-bold text-xl mb-2">3</div>
-            <h2 className="text-3xl font-bold text-primary-text">{t.auth.steps[2].title}</h2>
-            <p className="text-lg text-muted-text leading-relaxed">
-              {t.auth.steps[2].description}
-            </p>
-          </div>
-        </div>
-
       </section>
     </div>
+  );
+}
+
+function StepCard({
+  index,
+  title,
+  description,
+  imageSrc,
+}: {
+  index: number;
+  title: string;
+  description: string;
+  imageSrc: string;
+}) {
+  return (
+    <article className="group h-[26rem] [perspective:1200px]">
+      <div className="relative h-full rounded-[10px] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] group-focus-within:[transform:rotateY(180deg)]">
+        <div className="absolute inset-0 flex h-full flex-col rounded-[10px] bg-[oklch(0.21_0.01_30)] p-6 [backface-visibility:hidden] md:p-7">
+          <div className="mb-8 flex items-center justify-between border-b border-[oklch(0.93_0.012_80_/_0.16)] pb-4">
+            <span className="font-mono text-sm text-[oklch(0.62_0.01_80)]">
+              0{index + 1}
+            </span>
+            <span className="h-2 w-2 rounded-full bg-[oklch(0.46_0.13_20)]" />
+          </div>
+          <h3 className="font-serif text-3xl font-normal leading-tight text-[oklch(0.93_0.012_80)]">
+            {title}
+          </h3>
+          <p className="mt-5 max-w-[28ch] text-[15px] font-normal leading-relaxed text-[oklch(0.78_0.015_80)]">
+            {description}
+          </p>
+          <div className="mt-auto h-1.5 w-12 rounded-full bg-[oklch(0.46_0.13_20)]" />
+        </div>
+
+        <div className="absolute inset-0 overflow-hidden rounded-[10px] bg-[oklch(0.21_0.01_30)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <Image
+            src={imageSrc}
+            alt=""
+            fill
+            sizes="(min-width: 768px) 33vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(to_top,oklch(0.155_0.008_30_/_0.9),transparent)] p-6">
+            <p className="font-serif text-2xl font-normal text-[oklch(0.93_0.012_80)]">
+              {title}
+            </p>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 

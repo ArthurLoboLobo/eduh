@@ -2,13 +2,13 @@ import type { Translations } from './pt-BR';
 
 const en: Translations = {
   auth: {
-    tagline: 'Study less. Study Better. With AI.',
-    hero: 'Turn your study materials into a personalized, AI-guided study plan.',
+    tagline: 'A plan, not a loose chat.',
+    hero: 'Upload exams, slides, and notes. Eduh turns them into a study sequence and guides each topic from your own materials.',
     learnMore: 'Learn how it works',
     steps: [
-      { title: 'Upload Your Materials', description: "Eduh is not your average tutor. Upload your past exams, lecture slides, and notes. It learns exactly what you need to know." },
-      { title: 'Get a Smart Study Plan', description: 'Our AI automatically analyzes your documents and structures a custom study plan broken down into digestible topics and subtopics. Edit, reorder, and refine the plan before you begin.' },
-      { title: 'Master Topics with AI', description: 'Dive into dedicated AI chats for each topic. Solve dynamically generated problems, track your progress, and chat with an LLM that explicitly leverages the exact material you uploaded.' },
+      { title: 'Upload materials', description: 'Past exams, slides, and notes live in one study space.' },
+      { title: 'Review the plan', description: 'Eduh separates topics and subtopics into an editable order before the session starts.' },
+      { title: 'Study by topic', description: 'Each topic gets its own conversation, with explanations and exercises grounded in your files.' },
     ],
     emailLabel: 'Email',
     emailPlaceholder: 'you@email.com',
@@ -21,8 +21,8 @@ const en: Translations = {
     back: 'Back',
     sending: 'Sending...',
     verifying: 'Verifying...',
-    bonusBadge: 'USP and Unicamp students get 1 month free!',
-    bonusDescription: 'Just log in with your university email and go to the subscription page to claim the offer.',
+    bonusBadge: 'USP and Unicamp: 1 month free.',
+    bonusDescription: 'Use your university email and claim it on the subscription page.',
   },
   nav: {
     language: 'Language',
