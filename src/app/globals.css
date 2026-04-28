@@ -15,6 +15,22 @@
   --success-green: #81C995;
   --danger-red: #F28B82;
   --warning-amber: #FDD663;
+
+  /* New Eduh Design System Tokens */
+  --lamp-night: #1a1614;
+  --desk-surface: #231d1a;
+  --desk-surface-hover: #2c2421;
+  --page-cream: #ece5d6;
+  --page-cream-muted: #c4baa6;
+  --page-cream-faint: #9a8f7e;
+  --oxblood: #7e3128;
+  --oxblood-bright: #9d4337;
+  --oxblood-tint: #7e312820;
+  --forest-success: #5e8c6f;
+  --rust-danger: #b65a36;
+  --brass-warning: #d6a85a;
+  --hairline: #ece5d629;
+  --code-surface: #262a2c;
 }
 
 @theme inline {
@@ -34,6 +50,29 @@
   --color-warning-amber: var(--warning-amber);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* New Eduh Design System Tokens */
+  --color-lamp-night: var(--lamp-night);
+  --color-desk-surface: var(--desk-surface);
+  --color-desk-surface-hover: var(--desk-surface-hover);
+  --color-page-cream: var(--page-cream);
+  --color-page-cream-muted: var(--page-cream-muted);
+  --color-page-cream-faint: var(--page-cream-faint);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-bright: var(--oxblood-bright);
+  --color-oxblood-tint: var(--oxblood-tint);
+  --color-forest-success: var(--forest-success);
+  --color-rust-danger: var(--rust-danger);
+  --color-brass-warning: var(--brass-warning);
+  --color-hairline: var(--hairline);
+  --color-code-surface: var(--code-surface);
+
+  --font-display: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-headline: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-title: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-body-prose: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -131,3 +170,23 @@ body {
 .jumping-dot:nth-child(1) { animation-delay: 0s; }
 .jumping-dot:nth-child(2) { animation-delay: 0.15s; }
 .jumping-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* Design System Elevations & Effects */
+@utility lamp-halo {
+  box-shadow: 0 0 60px -12px rgba(196, 120, 66, 0.20);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(120% 80% at 50% 0%, rgba(196, 120, 66, 0.18), transparent 70%);
+    z-index: 1;
+  }
+}
+
+@utility modal-lift {
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--hairline);
+}
