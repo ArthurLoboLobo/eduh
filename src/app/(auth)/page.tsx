@@ -173,10 +173,10 @@ export default function AuthPage() {
       <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 py-20 lg:flex-row lg:gap-32 animate-fade-in-up max-w-[1200px] mx-auto w-full">
         {/* Left panel — info */}
         <div className="mb-16 max-w-xl text-center lg:mb-0 lg:text-left flex flex-col justify-center">
-          <h1 className="font-display text-[clamp(3.5rem,8vw,5.5rem)] leading-[1.05] tracking-[-0.01em] text-page-cream pb-4">
+          <h1 className="font-display text-[clamp(2.75rem,7vw,5rem)] leading-[1.05] tracking-[-0.01em] text-page-cream pb-4">
             Eduh
           </h1>
-          <p className="font-headline text-[1.5rem] leading-[1.3] text-page-cream-muted max-w-[32ch] mx-auto lg:mx-0">
+          <p className="font-headline text-[1.75rem] leading-[1.2] tracking-[-0.005em] text-page-cream-muted max-w-[32ch] mx-auto lg:mx-0">
             {t.auth.tagline}
           </p>
           <p className="mt-4 font-body-prose text-[1.0625rem] leading-[1.65] text-page-cream-faint max-w-[40ch] mx-auto lg:mx-0">
@@ -291,7 +291,7 @@ export default function AuthPage() {
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
-              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
+              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                 
                 {/* Front */}
                 <div className="absolute inset-0 w-full h-full bg-desk-surface rounded-[10px] border border-hairline flex items-center justify-center [backface-visibility:hidden]">
@@ -325,7 +325,7 @@ export default function AuthPage() {
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
-              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
+              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                 
                 {/* Front */}
                 <div className="absolute inset-0 w-full h-full bg-desk-surface rounded-[10px] border border-hairline flex items-center justify-center [backface-visibility:hidden]">
@@ -359,7 +359,7 @@ export default function AuthPage() {
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
-              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
+              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                 
                 {/* Front */}
                 <div className="absolute inset-0 w-full h-full bg-desk-surface rounded-[10px] border border-hairline flex items-center justify-center [backface-visibility:hidden]">
