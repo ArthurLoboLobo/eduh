@@ -12,7 +12,8 @@
 
 
 ### Mobile
-
+- **Fix "Entenda Como Funciona" button**: The button is currently not functioning on mobile devices. Investigate and fix the click handler or link.
+- **Improve spacing in "How it works" section**: The spacing between elements in the "How it works" section on mobile is inconsistent or too tight. Review and improve the layout for better readability.
 
 ### Chat / AI
 - **Image uploads in chat**: Allow users to attach and send images in a chat message, so the AI can reason about visual content (e.g. problem screenshots, diagrams, handwritten notes).

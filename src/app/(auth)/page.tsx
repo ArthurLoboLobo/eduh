@@ -291,7 +291,7 @@ export default function AuthPage() {
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
-              <div className="relative w-full aspect-[4/3] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
+              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
                 
                 {/* Front */}
                 <div className="absolute inset-0 w-full h-full bg-desk-surface rounded-[10px] border border-hairline flex items-center justify-center [backface-visibility:hidden]">
@@ -325,7 +325,7 @@ export default function AuthPage() {
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
-              <div className="relative w-full aspect-[4/3] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
+              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
                 
                 {/* Front */}
                 <div className="absolute inset-0 w-full h-full bg-desk-surface rounded-[10px] border border-hairline flex items-center justify-center [backface-visibility:hidden]">
@@ -359,7 +359,7 @@ export default function AuthPage() {
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
-              <div className="relative w-full aspect-[4/3] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
+              <div className="relative w-full aspect-[2306/1292] rounded-[10px] transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl">
                 
                 {/* Front */}
                 <div className="absolute inset-0 w-full h-full bg-desk-surface rounded-[10px] border border-hairline flex items-center justify-center [backface-visibility:hidden]">
