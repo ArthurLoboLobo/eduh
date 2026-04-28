@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-04-28T00:00:00Z",
+  "title": "Design System: Eduh",
+  "extensions": {
+    "colorMeta": {
+      "lamp-night": {
+        "role": "neutral",
+        "displayName": "Lamp Night",
+        "canonical": "oklch(0.155 0.008 30)",
+        "tonalRamp": [
+          "oklch(0.08 0.006 30)",
+          "oklch(0.155 0.008 30)",
+          "oklch(0.21 0.01 30)",
+          "oklch(0.28 0.012 30)",
+          "oklch(0.42 0.015 30)",
+          "oklch(0.58 0.018 30)",
+          "oklch(0.74 0.014 30)",
+          "oklch(0.9 0.008 30)"
+        ]
+      },
+      "desk-surface": {
+        "role": "neutral",
+        "displayName": "Desk Surface",
+        "canonical": "oklch(0.21 0.01 30)",
+        "tonalRamp": [
+          "oklch(0.1 0.006 30)",
+          "oklch(0.16 0.008 30)",
+          "oklch(0.21 0.01 30)",
+          "oklch(0.28 0.012 30)",
+          "oklch(0.4 0.015 30)",
+          "oklch(0.55 0.018 30)",
+          "oklch(0.72 0.014 30)",
+          "oklch(0.89 0.008 30)"
+        ]
+      },
+      "desk-surface-hover": {
+        "role": "neutral",
+        "displayName": "Desk Surface Hover",
+        "canonical": "oklch(0.255 0.012 30)",
+        "tonalRamp": [
+          "oklch(0.1 0.006 30)",
+          "oklch(0.18 0.008 30)",
+          "oklch(0.255 0.012 30)",
+          "oklch(0.32 0.014 30)",
+          "oklch(0.45 0.016 30)",
+          "oklch(0.6 0.018 30)",
+          "oklch(0.76 0.014 30)",
+          "oklch(0.9 0.008 30)"
+        ]
+      },
+      "page-cream": {
+        "role": "neutral",
+        "displayName": "Page Cream",
+        "canonical": "oklch(0.93 0.012 80)",
+        "tonalRamp": [
+          "oklch(0.2 0.008 80)",
+          "oklch(0.35 0.012 80)",
+          "oklch(0.5 0.014 80)",
+          "oklch(0.62 0.014 80)",
+          "oklch(0.74 0.014 80)",
+          "oklch(0.84 0.014 80)",
+          "oklch(0.93 0.012 80)",
+          "oklch(0.97 0.008 80)"
+        ]
+      },
+      "page-cream-muted": {
+        "role": "neutral",
+        "displayName": "Page Cream Muted",
+        "canonical": "oklch(0.78 0.015 80)",
+        "tonalRamp": [
+          "oklch(0.18 0.01 80)",
+          "oklch(0.32 0.014 80)",
+          "oklch(0.46 0.016 80)",
+          "oklch(0.58 0.016 80)",
+          "oklch(0.68 0.016 80)",
+          "oklch(0.78 0.015 80)",
+          "oklch(0.88 0.013 80)",
+          "oklch(0.95 0.009 80)"
+        ]
+      },
+      "page-cream-faint": {
+        "role": "neutral",
+        "displayName": "Page Cream Faint",
+        "canonical": "oklch(0.62 0.01 80)",
+        "tonalRamp": [
+          "oklch(0.18 0.008 80)",
+          "oklch(0.3 0.01 80)",
+          "oklch(0.42 0.011 80)",
+          "oklch(0.52 0.011 80)",
+          "oklch(0.62 0.01 80)",
+          "oklch(0.74 0.01 80)",
+          "oklch(0.85 0.009 80)",
+          "oklch(0.94 0.007 80)"
+        ]
+      },
+      "oxblood": {
+        "role": "primary",
+        "displayName": "Oxblood",
+        "canonical": "oklch(0.46 0.13 20)",
+        "tonalRamp": [
+          "oklch(0.18 0.06 20)",
+          "oklch(0.28 0.09 20)",
+          "oklch(0.38 0.12 20)",
+          "oklch(0.46 0.13 20)",
+          "oklch(0.56 0.16 22)",
+          "oklch(0.68 0.14 22)",
+          "oklch(0.8 0.1 24)",
+          "oklch(0.92 0.05 26)"
+        ]
+      },
+      "oxblood-bright": {
+        "role": "primary",
+        "displayName": "Oxblood Bright",
+        "canonical": "oklch(0.56 0.16 22)",
+        "tonalRamp": [
+          "oklch(0.2 0.07 22)",
+          "oklch(0.32 0.11 22)",
+          "oklch(0.42 0.14 22)",
+          "oklch(0.5 0.15 22)",
+          "oklch(0.56 0.16 22)",
+          "oklch(0.66 0.15 22)",
+          "oklch(0.78 0.11 24)",
+          "oklch(0.92 0.05 26)"
+        ]
+      },
+      "oxblood-tint": {
+        "role": "primary",
+        "displayName": "Oxblood Tint (12% alpha)",
+        "canonical": "oklch(0.46 0.13 20 / 0.12)",
+        "tonalRamp": [
+          "oklch(0.46 0.13 20 / 0.04)",
+          "oklch(0.46 0.13 20 / 0.08)",
+          "oklch(0.46 0.13 20 / 0.12)",
+          "oklch(0.46 0.13 20 / 0.16)",
+          "oklch(0.46 0.13 20 / 0.24)",
+          "oklch(0.46 0.13 20 / 0.36)",
+          "oklch(0.46 0.13 20 / 0.6)",
+          "oklch(0.46 0.13 20 / 1)"
+        ]
+      },
+      "forest-success": {
+        "role": "tertiary",
+        "displayName": "Forest Success",
+        "canonical": "oklch(0.62 0.09 150)",
+        "tonalRamp": [
+          "oklch(0.2 0.04 150)",
+          "oklch(0.32 0.06 150)",
+          "oklch(0.42 0.08 150)",
+          "oklch(0.52 0.09 150)",
+          "oklch(0.62 0.09 150)",
+          "oklch(0.74 0.08 150)",
+          "oklch(0.85 0.06 150)",
+          "oklch(0.94 0.03 150)"
+        ]
+      },
+      "rust-danger": {
+        "role": "tertiary",
+        "displayName": "Rust Danger",
+        "canonical": "oklch(0.58 0.15 38)",
+        "tonalRamp": [
+          "oklch(0.2 0.07 38)",
+          "oklch(0.32 0.1 38)",
+          "oklch(0.42 0.13 38)",
+          "oklch(0.5 0.14 38)",
+          "oklch(0.58 0.15 38)",
+          "oklch(0.7 0.13 38)",
+          "oklch(0.82 0.09 38)",
+          "oklch(0.93 0.04 38)"
+        ]
+      },
+      "brass-warning": {
+        "role": "tertiary",
+        "displayName": "Brass Warning",
+        "canonical": "oklch(0.78 0.12 80)",
+        "tonalRamp": [
+          "oklch(0.22 0.05 80)",
+          "oklch(0.36 0.07 80)",
+          "oklch(0.48 0.09 80)",
+          "oklch(0.6 0.11 80)",
+          "oklch(0.7 0.12 80)",
+          "oklch(0.78 0.12 80)",
+          "oklch(0.88 0.1 80)",
+          "oklch(0.96 0.05 80)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline (16% cream)",
+        "canonical": "oklch(0.93 0.012 80 / 0.16)",
+        "tonalRamp": [
+          "oklch(0.93 0.012 80 / 0.04)",
+          "oklch(0.93 0.012 80 / 0.08)",
+          "oklch(0.93 0.012 80 / 0.16)",
+          "oklch(0.93 0.012 80 / 0.24)",
+          "oklch(0.93 0.012 80 / 0.36)",
+          "oklch(0.93 0.012 80 / 0.5)",
+          "oklch(0.93 0.012 80 / 0.75)",
+          "oklch(0.93 0.012 80 / 1)"
+        ]
+      },
+      "code-surface": {
+        "role": "neutral",
+        "displayName": "Code Surface",
+        "canonical": "oklch(0.22 0.005 240)",
+        "tonalRamp": [
+          "oklch(0.1 0.003 240)",
+          "oklch(0.16 0.004 240)",
+          "oklch(0.22 0.005 240)",
+          "oklch(0.3 0.006 240)",
+          "oklch(0.42 0.007 240)",
+          "oklch(0.58 0.008 240)",
+          "oklch(0.74 0.007 240)",
+          "oklch(0.9 0.005 240)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Auth and landing hero only. Newsreader at clamp display size, light weight." },
+      "headline": { "displayName": "Headline", "purpose": "Section and topic page titles. Newsreader at 1.75rem." },
+      "title": { "displayName": "Title", "purpose": "Card titles, modal titles, topic names. Newsreader at 1.25rem." },
+      "body-prose": { "displayName": "Body Prose", "purpose": "AI explanations and long-form topic content. Newsreader at 17px, line-height 1.65, capped at 75ch." },
+      "body": { "displayName": "Body", "purpose": "UI body text — modal copy, descriptions, dashboard subtitles. Inter at 15px." },
+      "label": { "displayName": "Label", "purpose": "Buttons, badges, form labels, navbar, breadcrumb. Inter at 13px / 500 / +0.01em." },
+      "mono": { "displayName": "Mono", "purpose": "Inline code, code blocks, KaTeX inline. JetBrains Mono at 14px." }
+    },
+    "shadows": [
+      { "name": "lamp-halo", "value": "0 0 60px -12px rgba(196, 120, 66, 0.20)", "purpose": "Warm radial glow paired with a ::before radial-gradient overlay. Applied to the single actively-focused surface only." },
+      { "name": "modal-lift", "value": "0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(236, 229, 214, 0.16)", "purpose": "Modal surfaces over the dimmed page. Soft, deep, low-chroma." },
+      { "name": "focus-ring", "value": "0 0 0 3px rgba(126, 49, 40, 0.32)", "purpose": "Keyboard focus on inputs and buttons. Replaces the browser default outline." }
+    ],
+    "motion": [
+      { "name": "fade-in-up", "value": "0.4s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Initial render of new messages and page sections. Translate Y 16px → 0, opacity 0 → 1." },
+      { "name": "modal-pop", "value": "0.3s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Modal open. Scale 0.96 → 1, opacity 0 → 1." },
+      { "name": "backdrop-fade", "value": "0.3s ease-out", "purpose": "Modal backdrop opacity 0 → 1." },
+      { "name": "jumping-dots", "value": "1s infinite ease-in-out", "purpose": "Tool-use indicator while the AI is searching student materials." },
+      { "name": "pulsing-dots", "value": "1.4s infinite", "purpose": "Loading and typing indicators." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single chromatic action button. One per page, on the dominant action.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Send code</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background: #7e3128; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.3; letter-spacing: 0.01em; border: none; border-radius: 6px; cursor: pointer; transition: background-color 200ms ease-out, box-shadow 200ms ease-out; } .ds-btn-primary:hover { background: #9d4337; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); } .ds-btn-primary:active { box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ghost button bordered by the cream hairline. For Cancel, Back, and low-priority actions.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Cancel</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background: transparent; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.3; letter-spacing: 0.01em; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 6px; cursor: pointer; transition: background-color 200ms ease-out, border-color 200ms ease-out; } .ds-btn-secondary:hover { background: #2c2421; border-color: rgba(236, 229, 214, 0.24); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Single-line text input. Borderless at rest, oxblood-tint focus ring on keyboard focus.",
+      "html": "<input class=\"ds-input\" type=\"email\" placeholder=\"you@email.com\" />",
+      "css": ".ds-input { width: 100%; padding: 12px 14px; background: #231d1a; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 400; line-height: 1.55; border: none; border-radius: 6px; outline: none; transition: box-shadow 200ms ease-out; } .ds-input::placeholder { color: #9a8f7e; } .ds-input:focus-visible { box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); } .ds-input[aria-invalid=\"true\"] { box-shadow: 0 0 0 3px rgba(182, 90, 54, 0.25); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Default container. Flat at rest. Hairline rule below the title separates heading from body.",
+      "html": "<article class=\"ds-card\"><header class=\"ds-card-header\"><h3 class=\"ds-card-title\">Cálculo II</h3></header><div class=\"ds-card-body\"><p class=\"ds-card-meta\">12 topics · 3 completed</p></div></article>",
+      "css": ".ds-card { background: #231d1a; color: #ece5d6; border-radius: 10px; padding: 20px; transition: background-color 200ms ease-out; } .ds-card:hover { background: #2c2421; } .ds-card-header { padding-bottom: 12px; border-bottom: 1px solid rgba(236, 229, 214, 0.16); margin-bottom: 12px; } .ds-card-title { font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 1.25rem; font-weight: 500; line-height: 1.3; color: #ece5d6; margin: 0; } .ds-card-meta { font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.55; color: #c4baa6; margin: 0; }"
+    },
+    {
+      "name": "Topic Card (Active)",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Signature component: a topic in the studying timeline, in its active state with the Lamp Halo.",
+      "html": "<article class=\"ds-topic-card ds-topic-card--active\"><div class=\"ds-topic-node\">3</div><div class=\"ds-topic-body\"><h4 class=\"ds-topic-title\">Limites e continuidade</h4><p class=\"ds-topic-subs\">definição formal · regras de cálculo · teorema do confronto</p></div><label class=\"ds-topic-check\"><input type=\"checkbox\" /><span class=\"ds-topic-check-box\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M2.5 6.5l2.5 2.5 4.5-5\" fill=\"none\" stroke=\"#ece5d6\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span></label></article>",
+      "css": ".ds-topic-card { position: relative; display: flex; align-items: center; gap: 16px; padding: 20px; background: #231d1a; color: #ece5d6; border-radius: 10px; transition: background-color 200ms ease-out; } .ds-topic-card--active { background: #2c2421; box-shadow: 0 0 60px -12px rgba(196, 120, 66, 0.20); } .ds-topic-card--active::before { content: ''; position: absolute; inset: -8px; pointer-events: none; background: radial-gradient(120% 80% at 50% 0%, rgba(196, 120, 66, 0.18), transparent 70%); border-radius: 16px; z-index: -1; } .ds-topic-node { width: 28px; height: 28px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; background: #7e3128; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1; } .ds-topic-body { flex: 1; min-width: 0; } .ds-topic-title { margin: 0 0 4px; font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 1.25rem; font-weight: 500; line-height: 1.3; color: #ece5d6; } .ds-topic-subs { margin: 0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; line-height: 1.4; color: #c4baa6; } .ds-topic-check { display: inline-flex; cursor: pointer; } .ds-topic-check input { position: absolute; opacity: 0; pointer-events: none; } .ds-topic-check-box { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; background: #231d1a; border: 1.5px solid #9a8f7e; border-radius: 4px; transition: background-color 150ms ease-out, border-color 150ms ease-out; } .ds-topic-check input:checked + .ds-topic-check-box { background: #7e3128; border-color: #7e3128; }"
+    },
+    {
+      "name": "Chat Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Signature component: bottom-of-screen multi-line chat input. Lamp Halo on focus-within, oxblood send button.",
+      "html": "<form class=\"ds-chat-input\" autocomplete=\"off\"><textarea class=\"ds-chat-textarea\" rows=\"1\" placeholder=\"Type your message...\"></textarea><button class=\"ds-chat-send\" type=\"submit\" aria-label=\"Send message\"><span aria-hidden=\"true\">↵</span></button></form>",
+      "css": ".ds-chat-input { position: relative; display: flex; align-items: flex-end; gap: 10px; padding: 14px 14px 14px 18px; background: #231d1a; border-radius: 14px; transition: box-shadow 250ms ease-out; } .ds-chat-input:focus-within { background: #2c2421; box-shadow: 0 0 60px -12px rgba(196, 120, 66, 0.20); } .ds-chat-input:focus-within::before { content: ''; position: absolute; inset: -8px; pointer-events: none; background: radial-gradient(120% 80% at 50% 0%, rgba(196, 120, 66, 0.18), transparent 70%); border-radius: 22px; z-index: -1; } .ds-chat-textarea { flex: 1; min-height: 24px; max-height: 200px; padding: 0; background: transparent; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 1.55; border: none; outline: none; resize: none; } .ds-chat-textarea::placeholder { color: #9a8f7e; } .ds-chat-send { width: 32px; height: 32px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #7e3128; color: #ece5d6; border: none; border-radius: 9999px; cursor: pointer; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; transition: background-color 200ms ease-out; } .ds-chat-send:hover { background: #9d4337; } .ds-chat-send:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
+    },
+    {
+      "name": "Navbar",
+      "kind": "nav",
+      "refersTo": "navbar",
+      "description": "Top navigation. Eduh wordmark in Newsreader (no gradient), avatar dropdown on the right.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-logo\" href=\"/dashboard\">Eduh</a><div class=\"ds-nav-right\"><button class=\"ds-nav-avatar\" type=\"button\" aria-label=\"Profile menu\">A</button></div></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; background: #1a1614; color: #ece5d6; border-bottom: 1px solid rgba(236, 229, 214, 0.16); } .ds-nav-logo { font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 1.25rem; font-weight: 500; color: #ece5d6; text-decoration: none; letter-spacing: -0.005em; } .ds-nav-right { display: flex; align-items: center; gap: 12px; } .ds-nav-avatar { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: #231d1a; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 9999px; cursor: pointer; transition: background-color 200ms ease-out; } .ds-nav-avatar:hover { background: #2c2421; } .ds-nav-avatar:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
+    },
+    {
+      "name": "Code Block",
+      "kind": "custom",
+      "refersTo": "code-block",
+      "description": "Quotation-style code listing on the cool code-surface. The only cool note in the palette.",
+      "html": "<pre class=\"ds-code\"><code><span class=\"ds-code-kw\">def</span> <span class=\"ds-code-id\">limit</span>(f, x0):\n    <span class=\"ds-code-kw\">return</span> <span class=\"ds-code-str\">'L'</span>  <span class=\"ds-code-cm\"># the value f approaches</span></code></pre>",
+      "css": ".ds-code { margin: 0; padding: 16px; background: #262a2c; color: #ece5d6; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 400; line-height: 1.55; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 6px; overflow-x: auto; } .ds-code code { font-family: inherit; } .ds-code-kw { color: #9d4337; font-weight: 500; } .ds-code-id { color: #ece5d6; } .ds-code-str { color: #d6a85a; } .ds-code-cm { color: #9a8f7e; font-style: italic; }"
+    },
+    {
+      "name": "Toast (Success)",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Bottom-right ephemeral notification. Tinted background plus leading icon — no side stripe.",
+      "html": "<div class=\"ds-toast ds-toast--success\" role=\"status\"><span class=\"ds-toast-icon\" aria-hidden=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><path d=\"M3.5 8.5l3 3 6-7\" fill=\"none\" stroke=\"#5e8c6f\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><span class=\"ds-toast-body\">Credits added to your balance.</span></div>",
+      "css": ".ds-toast { display: inline-flex; align-items: center; gap: 12px; padding: 14px 18px; background: #231d1a; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 1.5; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 10px; max-width: 360px; } .ds-toast--success { background: rgba(94, 140, 111, 0.12); border-color: rgba(94, 140, 111, 0.32); } .ds-toast-icon { display: inline-flex; flex-shrink: 0; } .ds-toast-body { flex: 1; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Carrel After Hours",
+    "overview": "A carrel is the private study desk in a university library: a small wooden booth with a green-shaded reading lamp, surrounded by silence and the spines of borrowed books. Eduh is what that carrel looks like when a Unicamp student logs in to study at 11pm the night before a P1. Warm, dim, focused, structured by the rhythm of reading.\n\nThe room is built from three materials. Warm-dark wood-tone surfaces (deep, slightly red-brown, never charcoal-cool) for the page and desk. Warm-cream paper-tone text (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, oxblood, the leather binding of the textbook resting on the desk. Light comes from one source only: a soft warm halo on whatever surface you are actively working on. Everything off-focus stays in restful shadow.\n\nType does the academic work. Newsreader serif sets every heading, every topic title, every paragraph the AI hands back to you. Inter sans handles UI chrome cleanly and unobtrusively. JetBrains Mono appears only for code and KaTeX. Hairline cream rules separate sections of the page the way a chapter rule separates chapters of a book.",
+    "keyCharacteristics": [
+      "Warm-dark only. Background is oklch(0.155 0.008 30), a deep warm sepia near-black. No pure or cool charcoal.",
+      "Single chromatic voice: oxblood (oklch(0.46 0.13 20)), used on under 10% of any visible screen.",
+      "Newsreader serif for long-form and structural type, Inter for UI chrome, JetBrains Mono for code.",
+      "Hairline cream rules at structural breaks. Otherwise borderless surface separation by tonal layering.",
+      "A subtle warm radial glow (the 'lamp') on the actively-focused surface only. One lamp per page."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Oxblood is the only chromatic action color. Status colors (forest, rust, brass) communicate state, not interaction. If you find yourself reaching for forest or brass on a button, the system has lost its voice.", "section": "colors" },
+      { "name": "The No-White Rule", "body": "Pure #ffffff and pure #000000 are forbidden. All neutrals carry the warm hue. Page-cream replaces white. Lamp-night replaces black.", "section": "colors" },
+      { "name": "The Cool-Code Rule", "body": "The neutral-grey code surface is the only cool note in the palette. Cool tones must not leak anywhere else.", "section": "colors" },
+      { "name": "The Two-Voice Rule", "body": "Newsreader for content the AI gives the student (explanations, examples, worked solutions, topic titles, plan headings). Inter for the affordances the student uses to navigate (buttons, inputs, navbar, breadcrumbs, dashboard chrome). Mixing the two breaks the voice.", "section": "typography" },
+      { "name": "The 75ch Rule", "body": "Body prose is capped at 75ch (~680px at 17px). Wider lines fatigue tired students faster than any other typography failure.", "section": "typography" },
+      { "name": "The No-Gradient-Type Rule", "body": "No background-clip: text. The previous Eduh wordmark with a page-cream-to-blue gradient is retired. Solid page-cream Newsreader.", "section": "typography" },
+      { "name": "The Lamp Rule", "body": "There is exactly one lamp on a page at a time. The lamp belongs on the active topic card, the focused chat input, or the auth form. Not on hover. Not on every card. One.", "section": "elevation" },
+      { "name": "The No-Lift Rule", "body": "Cards do not raise off the page on hover. Hover changes the background (desk-surface to desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add translate-y, scale, or shadow. The lamp does the lifting.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Newsreader for all AI-authored prose, all topic titles, and all plan headings. Inter for everything the user clicks, types, or navigates. JetBrains Mono only for code and KaTeX.",
+      "Do apply the warm radial Lamp Halo on the single actively-focused surface per page only (the topic being studied, the focused chat input, the auth form). One lamp per room.",
+      "Do use Hairline rules at structural breaks, under section and topic headings, between chat messages and the input, between plan items.",
+      "Do keep oxblood under 10% of any visible screen. It is the binding of the book, not the cover.",
+      "Do warm-shift any new status color into the palette's hue family (10–80, or olive 140–155).",
+      "Do test layouts with real Brazilian Portuguese strings; pt-BR runs 15–25% longer than English.",
+      "Do cap body prose at 75ch."
+    ],
+    "donts": [
+      "Don't revive the Gemini-clone palette. No #131314 charcoal, no #A2C7FF pastel blue.",
+      "Don't use pure #ffffff text or #000000 background anywhere. Page-cream replaces white. Lamp-night replaces black.",
+      "Don't use side-stripe borders (a border-left or border-right greater than 1px as a colored accent).",
+      "Don't use gradient text. Solid page-cream Newsreader for the wordmark.",
+      "Don't add EdTech-cliché motifs: streaks, achievement badges, mascots, confetti, cartoon illustrations, kid-friendly saturated palettes.",
+      "Don't drift into ChatGPT / Claude / Gemini lookalike. The plan and topic timeline must visibly anchor every authenticated screen.",
+      "Don't add ambient micro-animations. Motion confirms state changes only.",
+      "Don't use modals as a first thought. Inline disclosure, progressive forms, and contextual panels come first.",
+      "Don't lift cards on hover. The Lamp does the lifting.",
+      "Don't use bright syntax-highlighting themes (Dracula, Synthwave, Monokai).",
+      "Don't use cards as the lazy answer to every grouping.",
+      "Don't use em dashes in copy."
+    ]
+  }
+}
