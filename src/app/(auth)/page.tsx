@@ -284,7 +284,13 @@ export default function AuthPage() {
       </div>
 
       {/* Details Section: The 3 Steps */}
-      <section className="relative w-full max-w-[1000px] mx-auto px-6 py-24 lg:py-32 flex flex-col gap-32">
+      <section className="relative w-full max-w-[1000px] mx-auto px-6 py-24 lg:py-32 flex flex-col gap-24 lg:gap-32">
+        <div className="scroll-reveal max-w-[760px]">
+          <h2 className="font-display text-[clamp(2.25rem,5vw,4rem)] leading-[1.05] tracking-[-0.01em] text-page-cream">
+            {t.auth.howItWorksTitle}
+          </h2>
+          <hr className="mt-8 w-20 border-0 border-t border-hairline" />
+        </div>
         
         {/* Step 1 */}
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24 scroll-reveal">
@@ -312,7 +318,7 @@ export default function AuthPage() {
             </div>
           </div>
           <div className="lg:w-1/2 space-y-5">
-            <h2 className="font-title text-[1.25rem] leading-[1.3] text-page-cream">{t.auth.steps[0].title}</h2>
+            <h3 className="font-title text-[1.25rem] leading-[1.3] text-page-cream">{t.auth.steps[0].title}</h3>
             <hr className="w-12 border-0 border-t border-hairline" />
             <p className="font-body-prose text-[1.0625rem] leading-[1.65] text-page-cream-muted max-w-[60ch]">
               {t.auth.steps[0].description}
@@ -346,7 +352,7 @@ export default function AuthPage() {
             </div>
           </div>
           <div className="lg:w-1/2 space-y-5">
-            <h2 className="font-title text-[1.25rem] leading-[1.3] text-page-cream">{t.auth.steps[1].title}</h2>
+            <h3 className="font-title text-[1.25rem] leading-[1.3] text-page-cream">{t.auth.steps[1].title}</h3>
             <hr className="w-12 border-0 border-t border-hairline" />
             <p className="font-body-prose text-[1.0625rem] leading-[1.65] text-page-cream-muted max-w-[60ch]">
               {t.auth.steps[1].description}
@@ -380,7 +386,7 @@ export default function AuthPage() {
             </div>
           </div>
           <div className="lg:w-1/2 space-y-5">
-            <h2 className="font-title text-[1.25rem] leading-[1.3] text-page-cream">{t.auth.steps[2].title}</h2>
+            <h3 className="font-title text-[1.25rem] leading-[1.3] text-page-cream">{t.auth.steps[2].title}</h3>
             <hr className="w-12 border-0 border-t border-hairline" />
             <p className="font-body-prose text-[1.0625rem] leading-[1.65] text-page-cream-muted max-w-[60ch]">
               {t.auth.steps[2].description}

@@ -3,6 +3,7 @@ export interface Translations {
     tagline: string;
     hero: string;
     learnMore: string;
+    howItWorksTitle: string;
     steps: { title: string; description: string }[];
     emailLabel: string;
     emailPlaceholder: string;
@@ -213,6 +214,7 @@ const ptBR: Translations = {
     tagline: 'Estude menos. Estude melhor. Com IA.',
     hero: 'Transforme seus materiais em um plano de estudos personalizado e guiado por IA.',
     learnMore: 'Entenda como funciona',
+    howItWorksTitle: 'Como o Eduh funciona',
     steps: [
       { title: 'Envie Seus Materiais', description: 'O Eduh vai além de um tutor genérico. Envie provas anteriores, slides e anotações, e ele aprenderá exatamente o que você precisa saber.' },
       { title: 'Receba um Plano de Estudos Inteligente', description: 'Nossa IA analisa automaticamente seus documentos e estrutura um plano de estudos personalizado, dividido em tópicos e subtópicos fáceis de assimilar. Edite, reordene e refine o plano antes de começar.' },

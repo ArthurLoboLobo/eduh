@@ -5,6 +5,7 @@ const en: Translations = {
     tagline: 'Study less. Study Better. With AI.',
     hero: 'Turn your study materials into a personalized, AI-guided study plan.',
     learnMore: 'Learn how it works',
+    howItWorksTitle: 'How Eduh works',
     steps: [
       { title: 'Upload Your Materials', description: "Eduh is not your average tutor. Upload your past exams, lecture slides, and notes. It learns exactly what you need to know." },
       { title: 'Get a Smart Study Plan', description: 'Our AI automatically analyzes your documents and structures a custom study plan broken down into digestible topics and subtopics. Edit, reorder, and refine the plan before you begin.' },
