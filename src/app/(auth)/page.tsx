@@ -172,7 +172,7 @@ export default function AuthPage() {
       {/* Hero Section */}
       <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 py-20 lg:flex-row lg:gap-32 animate-fade-in-up max-w-[1200px] mx-auto w-full">
         {/* Left panel — info */}
-        <div className="mb-16 max-w-xl text-center lg:mb-0 lg:text-left flex flex-col justify-center">
+        <div className="mb-16 max-w-xl text-center lg:mb-0 lg:text-left flex flex-col justify-center hero-drift">
           <h1 className="font-display text-[clamp(2.75rem,7vw,5rem)] leading-[1.05] tracking-[-0.01em] text-page-cream pb-4">
             Eduh
           </h1>
@@ -195,7 +195,7 @@ export default function AuthPage() {
         </div>
 
         {/* Right panel */}
-        <div className="w-full max-w-[380px] flex flex-col gap-6 relative z-10 lg:mt-8">
+        <div className="w-full max-w-[380px] flex flex-col gap-6 relative z-10 lg:mt-8 hero-drift">
           {/* Auth form */}
           <div className="bg-desk-surface rounded-[10px] p-8 focus-within:lamp-halo transition-all duration-500 relative">
           {step === 'email' ? (
@@ -280,14 +280,14 @@ export default function AuthPage() {
 
       {/* Break Rule */}
       <div className="w-full max-w-[1000px] mx-auto px-6">
-        <hr className="border-0 border-t border-hairline" />
+        <hr className="border-0 border-t border-hairline hairline-reveal" />
       </div>
 
       {/* Details Section: The 3 Steps */}
       <section className="relative w-full max-w-[1000px] mx-auto px-6 py-24 lg:py-32 flex flex-col gap-32">
         
         {/* Step 1 */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24 opacity-0 animate-[fade-in-up_0.6s_ease-out_0.2s_forwards]">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24 scroll-reveal">
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
@@ -321,7 +321,7 @@ export default function AuthPage() {
         </div>
 
         {/* Step 2 */}
-        <div className="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-24 opacity-0 animate-[fade-in-up_0.6s_ease-out_0.4s_forwards]">
+        <div className="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-24 scroll-reveal">
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">
@@ -355,7 +355,7 @@ export default function AuthPage() {
         </div>
 
         {/* Step 3 */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24 opacity-0 animate-[fade-in-up_0.6s_ease-out_0.6s_forwards]">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24 scroll-reveal">
           <div className="lg:w-1/2 flex justify-center w-full">
             {/* Flip Container */}
             <div className="w-full max-w-sm lg:max-w-none group [perspective:1200px]">

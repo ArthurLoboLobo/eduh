@@ -167,3 +167,54 @@ body {
 @utility modal-lift {
   box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--hairline);
 }
+
+/* ── Scroll-driven hero parallax (Direction A) ── */
+
+/* Fallback for browsers without scroll-driven animations */
+.scroll-reveal {
+  opacity: 0;
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* Hero text sinks back into library darkness */
+    @keyframes hero-drift {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-60px); }
+    }
+
+    /* Hairline rule expands from center */
+    @keyframes reveal-expand {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* Steps reveal on scroll entry */
+    @keyframes scroll-reveal-up {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0% 30%;
+    }
+
+    .hairline-reveal {
+      transform-origin: center;
+      animation: reveal-expand linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+    }
+
+    .scroll-reveal {
+      opacity: 0;
+      animation: scroll-reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
