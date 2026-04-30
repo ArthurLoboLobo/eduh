@@ -82,10 +82,11 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
+      const finalCode = code.replace(/\s/g, '');
       const res = await fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code: finalCode }),
       });
       const data = await res.json();
 
@@ -227,18 +228,91 @@ export default function AuthPage() {
               <label htmlFor="code" className="mb-2 block font-label text-[13px] text-page-cream-muted">
                 {t.auth.codeLabel}
               </label>
-              <input
-                id="code"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={6}
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                placeholder={t.auth.codePlaceholder}
-                className="w-full rounded-[6px] border border-hairline bg-lamp-night px-[14px] py-[16px] text-center font-mono text-[16px] tracking-[0.5em] text-page-cream placeholder:text-page-cream-faint focus:input-focus-glow focus:outline-none transition-shadow"
-              />
+              <div className="flex justify-between gap-2 sm:gap-3">
+                {[0, 1, 2, 3, 4, 5].map((index) => {
+                  const char = code[index] || '';
+                  const displayChar = char === ' ' ? '' : char;
+                  return (
+                    <input
+                      key={index}
+                      id={index === 0 ? "code" : undefined}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      required={index === 0}
+                      value={displayChar}
+                      disabled={loading}
+                      onPaste={(e) => {
+                        e.preventDefault();
+                        if (error) setError('');
+                        const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                        if (pasted) {
+                          setCode(pasted);
+                          const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
+                          const focusIndex = Math.min(5, pasted.length);
+                          if (inputs?.[focusIndex]) {
+                            (inputs[focusIndex] as HTMLInputElement).focus();
+                          } else if (inputs?.[5]) {
+                            (inputs[5] as HTMLInputElement).focus();
+                          }
+                        }
+                      }}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => {
+                        if (error) setError('');
+                        
+                        const val = e.target.value.replace(/\D/g, '');
+                        
+                        const newCodeArray = code.padEnd(6, ' ').split('');
+                        
+                        if (!val) {
+                          newCodeArray[index] = ' ';
+                          setCode(newCodeArray.join('').replace(/\s+$/, ''));
+                          return;
+                        }
+
+                        if (val.length > 1) {
+                          const pastedChars = val.split('');
+                          for (let i = 0; i < pastedChars.length && index + i < 6; i++) {
+                            newCodeArray[index + i] = pastedChars[i];
+                          }
+                          setCode(newCodeArray.join('').replace(/\s+$/, ''));
+                          const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
+                          const nextIndex = Math.min(5, index + pastedChars.length);
+                          if (inputs?.[nextIndex]) {
+                            (inputs[nextIndex] as HTMLInputElement).focus();
+                          }
+                          return;
+                        }
+
+                        newCodeArray[index] = val.slice(-1);
+                        setCode(newCodeArray.join('').replace(/\s+$/, ''));
+                        
+                        if (index < 5) {
+                          const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
+                          if (inputs?.[index + 1]) {
+                            (inputs[index + 1] as HTMLInputElement).focus();
+                          }
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Backspace' && !displayChar && index > 0) {
+                          const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
+                          if (inputs?.[index - 1]) {
+                            (inputs[index - 1] as HTMLInputElement).focus();
+                          }
+                        }
+                      }}
+                      className={`w-full aspect-[4/5] max-h-[64px] rounded-none border-0 border-b-2 bg-transparent px-0 py-0 text-center font-mono text-[24px] text-page-cream caret-oxblood focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 ease-out ${
+                        error
+                          ? 'border-rust-danger text-rust-danger focus:border-rust-danger'
+                          : 'border-hairline hover:border-page-cream-muted focus:border-oxblood'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
               {error && <p className="mt-3 text-[13px] text-rust-danger font-medium">{error}</p>}
               <button
                 type="submit"
