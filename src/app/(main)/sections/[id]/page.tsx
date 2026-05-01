@@ -57,7 +57,7 @@ export default function SectionPage() {
   if (notFound || !section) {
     return (
       <div className="text-center py-20">
-        <p className="text-sm text-muted-text">{t.section.notFound}</p>
+        <p className="font-body text-[14px] text-page-cream-muted">{t.section.notFound}</p>
       </div>
     );
   }
@@ -71,12 +71,30 @@ export default function SectionPage() {
     );
   }
 
+  if (section.status === 'loading-planning') {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <Spinner size={28} />
+        <p className="font-body text-[14px] text-page-cream-muted">{t.section.loadingPlanning}</p>
+      </div>
+    );
+  }
+
   if (section.status === 'planning') {
     return (
       <PlanningView
         sectionId={section.id}
         onStatusChange={(status) => setSection({ ...section, status })}
       />
+    );
+  }
+
+  if (section.status === 'loading-studying') {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <Spinner size={28} />
+        <p className="font-body text-[14px] text-page-cream-muted">{t.section.loadingStudying}</p>
+      </div>
     );
   }
 

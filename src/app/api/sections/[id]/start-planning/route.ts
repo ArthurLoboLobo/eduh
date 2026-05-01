@@ -31,7 +31,7 @@ export async function POST(
       return NextResponse.json({ error: 'FILES_NOT_READY' }, { status: 400 });
     }
 
-    await updateSectionStatus(id, 'planning');
+    await updateSectionStatus(id, 'loading-planning');
 
     try {
       const texts = await getExtractedTexts(id);
@@ -45,6 +45,7 @@ export async function POST(
       }
 
       await createPlanDraft(id, plan);
+      await updateSectionStatus(id, 'planning');
       return NextResponse.json({ success: true });
     } catch (planError) {
       console.error(`Plan generation failed for section ${id}:`, planError);

@@ -4,17 +4,33 @@
 ## Actual TODOs
 
 ### UX / Aesthetics
-- **Fix Enter on mobile**: Fix the Enter key on mobile devices so that it inserts a newline instead of sending.
+- **Improve warnings**: Review and improve the warning messages shown to users (e.g. usage limits, validation errors, subscription alerts) to be clearer, more actionable, and consistent in tone.
+- **Add title to "How it works" section**: The "How it works" section on the landing page is missing a visible title/heading. Add one to make the section clearer and easier to scan.
+- **Remove dashboard search bar**: The search bar on the dashboard is unnecessary since users have very few sections. Remove it to simplify the UI.
+- **Remove section descriptions**: Section descriptions serve no real purpose and add visual noise. Remove them from the UI and all related forms. _Note: requires a database migration to drop the `description` column from the sections table._
+- **Fix breadcrumb flash**: Breadcrumbs briefly show the raw ID instead of the section/chat name on initial load. Fix by either passing the name through the route state or showing a skeleton placeholder until the name is available. 
 
+
+### Mobile
+- **Fix "Entenda Como Funciona" button**: The button is currently not functioning on mobile devices. Investigate and fix the click handler or link.
+- **Improve spacing in "How it works" section**: The spacing between elements in the "How it works" section on mobile is inconsistent or too tight. Review and improve the layout for better readability.
 
 ### Chat / AI
+- **Image uploads in chat**: Allow users to attach and send images in a chat message, so the AI can reason about visual content (e.g. problem screenshots, diagrams, handwritten notes).
 - **System prompt update**: Include in the system prompt: "Do not use emojis".
+- **Fix $$ formatting problem**: Stop dealing with the `$$` formatting problem by changing the LLM output. Instead, include how it should be done directly in the system prompt. The LLM needs to know that to correctly use `$$` it has to format it like:
+  $$
+  x
+  $$
+  instead of `$$ x $$`
+- **Fix duplicated AI message on first load refresh**: If the chat page is reloaded when it's first loading, the first AI message gets duplicated because it calls the GET endpoint where it generates the first AI message again.
 - **Concurrent messaging**: Let the user write messages while the AI is generating a response.
 - **Page refresh resilience**: Make it possible to refresh the page without interfering with the response.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
 - **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
 
 ### Subscription / Payments
+- **Pix payment loading state**: When the user clicks to pay with Pix in the payment modal, show a spinning/loading icon while the QR code is being generated, so the UI doesn't feel frozen.
 - **AbacatePay minimum PIX amount**: AbacatePay rejects PIX QR codes with `amount < 100` (R$1.00). If a user's balance leaves a PIX remainder below R$1.00 (e.g. balance = R$19.99), the subscribe endpoint returns `PAYMENT_CREATION_FAILED`. Needs to be handled gracefully.
 - **Auto-renewal**: Add an auto-renew toggle to the subscription page. When enabled, if the user has enough balance at expiration, debit and extend automatically. If not, downgrade and notify. Requires a cron job (e.g. Vercel Cron) to check expirations periodically. (Automatic Pix)
 - **Cron-based expiration handling**: Currently, plan expiration is checked on every API request. Add a cron job to proactively handle expirations (needed for auto-renewal and email notifications).
@@ -23,6 +39,13 @@
 
 ### Features
 - **Share study plans**: Implement the ability to share study plans with others. Consider how both logged-in and non-logged-in users will view a shared plan, and how the sharing mechanism works (e.g., shareable link, copy-to-clipboard, etc.).
+
+### Files / Storage
+- **File re-upload collision on Blob**: When a user uploads a file, deletes it, and then tries to upload it again, the upload fails because the file still exists in Vercel Blob (deletion didn't remove it or the key collides). Fix by either ensuring deletion fully removes the blob before the UI allows re-upload, or by generating a unique key (e.g. with a timestamp or UUID) for every upload so collisions are impossible.
+- **Better file size limit handling**: Improve the upload experience when a file exceeds the size limit — instead of hard-rejecting it, consider compressing the file automatically (e.g. for PDFs or images) before uploading. Show a clear, actionable error if the file still exceeds the limit after compression.
+- **Show storage usage to the user**: Display the total file size limit and how much of it the user has already consumed (e.g. a progress bar or "X MB of Y MB used") so they know at a glance how much space they have left.
+- **Impose and display a token limit on files**: Define a maximum token budget for uploaded files and enforce it server-side. Show the user their current token usage vs. the limit (similar to the storage usage indicator) so they understand how much of their file quota is being used by the AI context.
+
 
 ### Security / Anti-abuse
 - **Production deployment**:

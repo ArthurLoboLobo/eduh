@@ -45,7 +45,6 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
 
   const [files, setFiles] = useState<LocalFile[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [startingPlan, setStartingPlan] = useState(false);
   const [previewFile, setPreviewFile] = useState<LocalFile | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<LocalFile | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -106,7 +105,7 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
   const handleFilesSelected = useCallback(
     (fileList: FileList) => {
       Array.from(fileList).forEach(async (file) => {
-        const tempId = crypto.randomUUID();
+        const tempId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
 
         setFiles((prev) => [
           ...prev,
@@ -224,15 +223,6 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
   const allProcessed =
     files.length > 0 && files.every((f) => f.status === 'processed');
 
-  if (startingPlan) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <Spinner size={28} />
-        <p className="text-sm text-muted-text">{t.planning.loading}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="animate-fade-in-up">
       {/* Upload drop zone */}
@@ -246,12 +236,12 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
         onDragLeave={handleDragLeave}
         className={`
           flex flex-col items-center justify-center gap-3
-          border-2 border-dashed rounded-3xl p-12 cursor-pointer bg-surface/30 backdrop-blur-sm shadow-inner transition-all duration-300
-          ${isDragOver ? 'border-accent-blue bg-accent-blue/10 scale-[1.02]' : 'border-border-subtle hover:border-accent-blue/50 hover:bg-surface-hover/50 hover:shadow-md'}
+          border-2 border-dashed rounded-[14px] p-12 cursor-pointer bg-desk-surface transition-all duration-300
+          ${isDragOver ? 'border-oxblood bg-oxblood-tint scale-[1.02]' : 'border-hairline hover:border-oxblood/50 hover:bg-desk-surface-hover hover:shadow-md'}
         `}
       >
         <UploadIcon />
-        <p className="text-sm text-muted-text">
+        <p className="font-body text-[14px] text-page-cream-muted">
           {isDragOver ? t.uploading.dropZoneActive : t.uploading.dropZoneLabel}
         </p>
         <input
@@ -275,7 +265,7 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
           <Spinner size={24} />
         </div>
       ) : files.length === 0 ? (
-        <p className="text-sm text-muted-text text-center py-8">
+        <p className="font-body text-[14px] text-page-cream-muted text-center py-8">
           {t.uploading.emptyFiles}
         </p>
       ) : (
@@ -283,15 +273,15 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
           {files.map((file) => (
             <div
               key={file.tempId}
-              className="flex items-center gap-4 bg-surface border border-border-subtle rounded-2xl px-5 py-4 transition-all hover:shadow-md"
+              className="flex items-center gap-4 bg-desk-surface border border-hairline rounded-[10px] px-5 py-4 transition-all hover:bg-desk-surface-hover"
             >
               {/* File name — clickable for preview */}
               <button
                 onClick={() => file.blobUrl ? setPreviewFile(file) : undefined}
-                className={`text-sm truncate text-left flex-1 ${
+                className={`font-label text-[14px] truncate text-left flex-1 ${
                   file.blobUrl
-                    ? 'text-primary-text hover:text-accent-blue cursor-pointer'
-                    : 'text-muted-text cursor-default'
+                    ? 'text-page-cream hover:text-oxblood cursor-pointer'
+                    : 'text-page-cream-muted cursor-default'
                 }`}
                 disabled={!file.blobUrl}
               >
@@ -307,7 +297,7 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
               {file.status === 'error' && file.id && !file.localError && (
                 <button
                   onClick={() => handleRetry(file.id!)}
-                  className="text-muted-text hover:text-accent-blue cursor-pointer shrink-0 p-0.5 transition-colors"
+                  className="text-page-cream-muted hover:text-oxblood cursor-pointer shrink-0 p-0.5 transition-colors"
                   title={t.uploading.retry}
                   aria-label={t.uploading.retry}
                 >
@@ -321,7 +311,7 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
                   e.stopPropagation();
                   setDeleteTarget(file);
                 }}
-                className="shrink-0 text-muted-text hover:text-danger-red cursor-pointer p-0.5"
+                className="shrink-0 text-page-cream-muted hover:text-rust-danger cursor-pointer p-0.5"
                 aria-label="Delete"
               >
                 <TrashIcon />
@@ -334,10 +324,9 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
       {/* Start Planning button */}
       <div className="mt-6 flex justify-end">
         <Button
-          disabled={!allProcessed || startingPlan}
-          loading={startingPlan}
+          disabled={!allProcessed}
           onClick={async () => {
-            setStartingPlan(true);
+            onStatusChange?.('loading-planning');
             try {
               const res = await fetch(`/api/sections/${sectionId}/start-planning`, {
                 method: 'POST',
@@ -345,9 +334,18 @@ export default function UploadingView({ sectionId, onStatusChange }: UploadingVi
               if (!res.ok) throw new Error();
               onStatusChange?.('planning');
             } catch {
+              try {
+                const r = await fetch(`/api/sections/${sectionId}`);
+                if (r.ok) {
+                  const data = await r.json();
+                  onStatusChange?.(data.section.status);
+                } else {
+                  onStatusChange?.('uploading');
+                }
+              } catch {
+                onStatusChange?.('uploading');
+              }
               showToast(t.errors.UNKNOWN);
-            } finally {
-              setStartingPlan(false);
             }
           }}
         >
@@ -422,15 +420,15 @@ function FilePreview({
   if (file.fileType === 'text/plain') {
     const current = textFetch?.url === file.blobUrl ? textFetch : null;
     if (current === null) return <div className="flex justify-center py-8"><Spinner size={24} /></div>;
-    if (current.error || current.content === null) return <p className="text-sm text-muted-text text-center py-8">{noPreviewLabel}</p>;
+    if (current.error || current.content === null) return <p className="font-body text-[14px] text-page-cream-muted text-center py-8">{noPreviewLabel}</p>;
     return (
-      <pre className="text-sm text-primary-text whitespace-pre-wrap break-words overflow-y-auto max-h-[70vh] font-mono p-4 bg-background rounded-md">
+      <pre className="font-body text-[14px] text-page-cream whitespace-pre-wrap break-words overflow-y-auto max-h-[70vh] font-mono p-4 bg-lamp-night rounded-[6px]">
         {current.content}
       </pre>
     );
   }
   return (
-    <p className="text-sm text-muted-text text-center py-8">{noPreviewLabel}</p>
+    <p className="font-body text-[14px] text-page-cream-muted text-center py-8">{noPreviewLabel}</p>
   );
 }
 
@@ -442,7 +440,7 @@ function UploadIcon() {
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
-      className="text-muted-text"
+      className="text-page-cream-muted"
     >
       <path
         d="M12 16V4m0 0l-4 4m4-4l4 4M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2"

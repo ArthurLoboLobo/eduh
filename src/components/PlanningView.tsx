@@ -35,11 +35,9 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
   const [plan, setPlan] = useState<PlanJSON | null>(null);
   const [mode, setMode] = useState<'loading' | 'error' | 'editor'>('loading');
   const [saving, setSaving] = useState(false);
-  const [startingStudy, setStartingStudy] = useState(false);
   const [inlineError, setInlineError] = useState<string | null>(null);
   const [showRegenerateInput, setShowRegenerateInput] = useState(false);
   const [guidanceText, setGuidanceText] = useState('');
-  const [errorSource, setErrorSource] = useState<'load' | 'regenerate'>('load');
 
   const draftCountRef = useRef(1);
   const canUndo = draftCountRef.current >= 2;
@@ -57,7 +55,6 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
       try {
         const res = await fetch(`/api/sections/${sectionId}/plan`);
         if (!res.ok) {
-          setErrorSource('load');
           setMode('error');
           return;
         }
@@ -66,11 +63,9 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
           setPlan(data.plan);
           setMode('editor');
         } else {
-          setErrorSource('load');
           setMode('error');
         }
       } catch {
-        setErrorSource('load');
         setMode('error');
       }
     }
@@ -137,14 +132,12 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
         body: JSON.stringify({ guidance: guidanceText }),
       });
       if (!res.ok) {
-        setErrorSource('regenerate');
         setMode('error');
         return;
       }
       // Fetch the new draft
       const getRes = await fetch(`/api/sections/${sectionId}/plan`);
       if (!getRes.ok) {
-        setErrorSource('regenerate');
         setMode('error');
         return;
       }
@@ -154,26 +147,21 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
       setGuidanceText('');
       setMode('editor');
     } catch {
-      setErrorSource('regenerate');
       setMode('error');
     }
   }
 
   async function handleStartStudying() {
-    setStartingStudy(true);
-    setSaving(true);
+    onStatusChange?.('loading-studying');
     try {
       const res = await fetch(`/api/sections/${sectionId}/start-studying`, {
         method: 'POST',
       });
-      if (res.ok) {
-        onStatusChange?.('studying');
-      }
+      if (!res.ok) throw new Error();
+      onStatusChange?.('studying');
     } catch {
-      // fail silently
-    } finally {
-      setStartingStudy(false);
-      setSaving(false);
+      // Server reverts to 'planning' on failure; match that client-side.
+      onStatusChange?.('planning');
     }
   }
 
@@ -291,22 +279,12 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
-  // --- Starting study loading state ---
-  if (startingStudy) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <Spinner size={28} />
-        <p className="text-sm text-muted-text">{t.studying.loading}</p>
-      </div>
-    );
-  }
-
   // --- Loading state ---
   if (mode === 'loading') {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <Spinner size={28} />
-        <p className="text-sm text-muted-text">{t.planning.loading}</p>
+        <p className="font-body text-[14px] text-page-cream-muted">{t.planning.loading}</p>
       </div>
     );
   }
@@ -315,15 +293,11 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
   if (mode === 'error') {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <p className="text-sm text-primary-text">
-          {errorSource === 'load' ? t.planning.errorInterrupted : t.planning.errorMessage}
-        </p>
-        {errorSource === 'regenerate' && (
-          <Button onClick={handleRegenerate}>
-            <RefreshIcon size={16} />
-            {t.planning.retry}
-          </Button>
-        )}
+        <p className="font-body text-[14px] text-page-cream">{t.planning.errorMessage}</p>
+        <Button onClick={() => window.location.reload()}>
+          <RefreshIcon size={16} />
+          {t.planning.retry}
+        </Button>
       </div>
     );
   }
@@ -336,7 +310,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
       {/* Top bar */}
       <div className="flex items-center justify-end gap-3 mb-4 min-h-[36px]">
         {inlineError && (
-          <p className="text-xs text-danger-red mr-auto">{inlineError}</p>
+          <p className="font-label text-[12px] text-rust-danger mr-auto">{inlineError}</p>
         )}
         {saving && <Spinner size={16} />}
         <Button
@@ -385,7 +359,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
 
       {/* Add topic */}
       <button
-        className="mt-3 flex items-center gap-1.5 text-sm text-muted-text hover:text-primary-text cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-3 flex items-center gap-1.5 font-label text-[13px] text-page-cream-muted hover:text-page-cream cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         disabled={saving}
         onClick={handleAddTopic}
       >
@@ -394,7 +368,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
       </button>
 
       {/* Regenerate section */}
-      <div className="mt-6 border-t border-border pt-4">
+      <div className="mt-6 border-t border-hairline pt-4">
         {!showRegenerateInput ? (
           <Button
             variant="ghost"
@@ -410,7 +384,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
               value={guidanceText}
               onChange={(e) => setGuidanceText(e.target.value)}
               placeholder={t.planning.regenerateGuidancePlaceholder}
-              className="flex-1 px-4 py-3 rounded-full text-sm bg-surface text-primary-text border border-border-subtle placeholder:text-muted-text focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/20 transition-all"
+              className="flex-1 px-4 py-3 rounded-[6px] font-body text-[14px] bg-desk-surface text-page-cream border border-hairline placeholder:text-page-cream-faint focus:outline-none focus:input-focus-glow transition-all"
               disabled={saving}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && guidanceText.trim()) handleRegenerate();
@@ -438,7 +412,7 @@ export default function PlanningView({ sectionId, onStatusChange }: PlanningView
 
       {/* Start studying */}
       <div className="mt-6 flex justify-end">
-        <Button disabled={saving} loading={saving} onClick={handleStartStudying}>
+        <Button disabled={saving} onClick={handleStartStudying}>
           {t.planning.startStudying}
         </Button>
       </div>
@@ -504,13 +478,13 @@ function TopicCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group bg-surface border border-border-subtle rounded-3xl p-5 md:p-6 transition-all shadow-sm hover:shadow-md ${topic.isKnown ? 'opacity-50' : ''}`}
+      className={`group bg-desk-surface border border-hairline rounded-[10px] p-5 md:p-6 transition-colors hover:bg-desk-surface-hover ${topic.isKnown ? 'opacity-50' : ''}`}
     >
       {/* Topic header */}
       <div className="flex items-start gap-2">
         {/* Drag handle */}
         <button
-          className="mt-1 cursor-grab text-muted-text hover:text-primary-text shrink-0 touch-none"
+          className="mt-1 cursor-grab text-page-cream-muted hover:text-page-cream shrink-0 touch-none"
           {...attributes}
           {...listeners}
           aria-label="Drag"
@@ -524,7 +498,7 @@ function TopicCard({
             value={topic.title}
             onSave={onEditTitle}
             disabled={saving}
-            className="text-base font-semibold text-primary-text"
+            className="font-title text-[1.25rem] text-page-cream"
           />
         </div>
 
@@ -542,7 +516,7 @@ function TopicCard({
           <button
             onClick={onDeleteTopic}
             disabled={saving}
-            className="shrink-0 text-muted-text hover:text-danger-red cursor-pointer p-0.5 opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="shrink-0 text-page-cream-muted hover:text-rust-danger cursor-pointer p-0.5 opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Delete topic"
           >
             <TrashIcon />
@@ -576,7 +550,7 @@ function TopicCard({
 
         {/* Add subtopic */}
         <button
-          className="mt-1 flex items-center gap-1 text-xs text-muted-text hover:text-primary-text cursor-pointer opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-1 flex items-center gap-1 font-label text-[12px] text-page-cream-muted hover:text-page-cream cursor-pointer opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           disabled={saving}
           onClick={onAddSubtopic}
         >
@@ -623,7 +597,7 @@ function SubtopicItem({ id, text, saving, canDelete, onDelete, onEdit }: Subtopi
     >
       {/* Drag handle */}
       <button
-        className="cursor-grab text-muted-text hover:text-primary-text shrink-0 touch-none"
+        className="cursor-grab text-page-cream-muted hover:text-page-cream shrink-0 touch-none"
         {...attributes}
         {...listeners}
         aria-label="Drag"
@@ -637,7 +611,7 @@ function SubtopicItem({ id, text, saving, canDelete, onDelete, onEdit }: Subtopi
           value={text}
           onSave={onEdit}
           disabled={saving}
-          className="text-sm text-muted-text"
+          className="font-body text-[14px] text-page-cream-muted"
         />
       </div>
 
@@ -646,7 +620,7 @@ function SubtopicItem({ id, text, saving, canDelete, onDelete, onEdit }: Subtopi
         <button
           onClick={onDelete}
           disabled={saving}
-          className="shrink-0 text-muted-text hover:text-danger-red cursor-pointer p-0.5 opacity-0 group-hover/sub:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="shrink-0 text-page-cream-muted hover:text-rust-danger cursor-pointer p-0.5 opacity-0 group-hover/sub:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Delete subtopic"
         >
           <TrashIcon size={12} />
@@ -704,7 +678,7 @@ function InlineEdit({ value, onSave, disabled, className = '' }: InlineEditProps
             setEditing(false);
           }
         }}
-        className={`w-full bg-transparent border-b border-accent-blue outline-none ${className}`}
+        className={`w-full bg-transparent border-b border-oxblood-tint text-page-cream focus:outline-none focus:border-oxblood ${className}`}
         disabled={disabled}
       />
     );
@@ -712,7 +686,7 @@ function InlineEdit({ value, onSave, disabled, className = '' }: InlineEditProps
 
   return (
     <span
-      className={`block truncate ${disabled ? '' : 'cursor-pointer hover:text-accent-blue'} ${className}`}
+      className={`block truncate ${disabled ? '' : 'cursor-pointer hover:text-page-cream'} ${className}`}
       onClick={() => !disabled && setEditing(true)}
     >
       {value}

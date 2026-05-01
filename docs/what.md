@@ -1,6 +1,6 @@
 # What is Eduh?
 
-Eduh is a platform that helps university students prepare for exams using AI. The goal is to prepare for a specific exam — not a subject as a whole. Users upload study materials, the AI generates a structured study plan, and then provides interactive tutoring through topic-specific chats.
+Eduh is a platform that helps university students prepare for exams using AI. The goal is to prepare for a specific exam. Users upload study materials, the AI generates a structured study plan, and then provides interactive tutoring through topic-specific chats.
 
 ## User Flow
 

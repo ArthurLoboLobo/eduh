@@ -5,6 +5,7 @@ const en: Translations = {
     tagline: 'Study less. Study Better. With AI.',
     hero: 'Turn your study materials into a personalized, AI-guided study plan.',
     learnMore: 'Learn how it works',
+    howItWorksTitle: 'How Eduh works',
     steps: [
       { title: 'Upload Your Materials', description: "Eduh is not your average tutor. Upload your past exams, lecture slides, and notes. It learns exactly what you need to know." },
       { title: 'Get a Smart Study Plan', description: 'Our AI automatically analyzes your documents and structures a custom study plan broken down into digestible topics and subtopics. Edit, reorder, and refine the plan before you begin.' },
@@ -32,10 +33,10 @@ const en: Translations = {
     subscription: 'Subscription',
   },
   dashboard: {
-    searchPlaceholder: 'Search sections...',
-    createSection: 'Create new Section',
+    title: 'Your Sections',
+    createSection: 'New Section',
     emptyTitle: 'No sections created yet.',
-    emptyDescription: "Click 'Create new Section' to get started.",
+    emptyDescription: "Click 'New Section' to get started.",
     topicsCompleted: 'topics completed',
     deleteConfirmTitle: 'Delete section',
     deleteConfirmMessage: 'Are you sure you want to delete this section? This action cannot be undone.',
@@ -45,6 +46,8 @@ const en: Translations = {
       uploading: 'Uploading',
       planning: 'Planning',
       studying: 'Studying',
+      'loading-planning': 'Planning',
+      'loading-studying': 'Preparing',
     },
     createModal: {
       title: 'Create new Section',
@@ -59,6 +62,8 @@ const en: Translations = {
   section: {
     notFound: 'Section not found.',
     loading: 'Loading...',
+    loadingPlanning: 'Creating your study plan...',
+    loadingStudying: 'Preparing your study session...',
     uploadingPlaceholder: 'File upload',
     planningPlaceholder: 'Study planning',
     studyingPlaceholder: 'Studying',
@@ -91,7 +96,6 @@ const en: Translations = {
   planning: {
     loading: 'Creating your study plan...',
     errorMessage: 'Failed to generate the study plan.',
-    errorInterrupted: 'Plan generation was interrupted. Go back to the dashboard and try again.',
     retry: 'Try again',
     undo: 'Undo',
     regenerate: 'Regenerate Plan',

@@ -187,8 +187,8 @@ export default function PaymentModal({ open, onClose, balance, onSuccess }: Paym
       {/* Confirmation Step */}
       {step === 'confirmation' && (
         <div className="flex flex-col gap-4">
-          <div className="bg-background/60 rounded-2xl p-4 border border-border-subtle">
-            <p className="text-sm text-muted-text">
+          <div className="bg-desk-surface rounded-[6px] p-4 border border-hairline">
+            <p className="font-body text-[14px] text-page-cream-muted">
               {t.subscription.yourBalance.replace('{amount}', balanceFormatted)}
             </p>
           </div>
@@ -215,21 +215,21 @@ export default function PaymentModal({ open, onClose, balance, onSuccess }: Paym
         <div className="flex flex-col items-center gap-4">
           {!expired ? (
             <>
-              <div className="bg-white rounded-2xl p-3">
+              <div className="bg-desk-surface rounded-[6px] p-3 border border-hairline">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrData.brCodeBase64} alt="Pix QR Code" className="w-48 h-48" />
+                <img src={qrData.brCodeBase64} alt="Pix QR Code" className="w-48 h-48 rounded-[4px]" />
               </div>
 
-              <p className="text-sm text-muted-text text-center">
+              <p className="font-body text-[14px] text-page-cream-muted text-center">
                 {t.subscription.pixInstructions}
               </p>
 
-              <p className="text-sm text-muted-text">
+              <p className="font-body text-[14px] text-page-cream-muted">
                 {t.subscription.payWithinMinutes.replace('{time}', formatTime(secondsLeft))}
               </p>
 
-              <div className="w-full bg-background/60 rounded-2xl p-3 border border-border-subtle">
-                <code className="text-xs text-muted-text break-all block mb-2 max-h-20 overflow-y-auto">
+              <div className="w-full bg-desk-surface rounded-[6px] p-3 border border-hairline">
+                <code className="font-label text-[12px] text-page-cream-muted break-all block mb-2 max-h-20 overflow-y-auto">
                   {qrData.brCode}
                 </code>
                 <Button variant="ghost" onClick={handleCopy} className="w-full">
@@ -239,7 +239,7 @@ export default function PaymentModal({ open, onClose, balance, onSuccess }: Paym
             </>
           ) : (
             <div className="py-8 text-center">
-              <p className="text-sm text-muted-text">{t.subscription.paymentExpired}</p>
+              <p className="font-body text-[14px] text-page-cream-muted">{t.subscription.paymentExpired}</p>
             </div>
           )}
         </div>
@@ -248,11 +248,11 @@ export default function PaymentModal({ open, onClose, balance, onSuccess }: Paym
       {/* Success Step */}
       {step === 'success' && (
         <div className="flex flex-col items-center gap-6 py-4">
-          <div className="w-16 h-16 rounded-full bg-success-green/20 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-forest-success/20 flex items-center justify-center">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
                 d="M5 13l4 4L19 7"
-                stroke="var(--success-green)"
+                stroke="var(--forest-success)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -260,7 +260,7 @@ export default function PaymentModal({ open, onClose, balance, onSuccess }: Paym
             </svg>
           </div>
 
-          <p className="text-lg font-semibold text-primary-text">
+          <p className="font-title text-[1.25rem] text-page-cream text-center">
             {t.subscription.youAreNowPro}
           </p>
 

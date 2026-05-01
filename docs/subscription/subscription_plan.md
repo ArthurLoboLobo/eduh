@@ -687,7 +687,7 @@ Each component that calls `useUser()` makes its own fetch. The navbar and subscr
 ### Modify `src/components/Navbar.tsx`
 
 1. Call `useUser()` on mount.
-2. **Free users**: Show a chip `<Link href="/subscription">Subscribe to Pro</Link>` to the left of the profile icon. Style: small pill with accent-blue background.
+
 3. **Profile dropdown**: Add "Subscription" menu item linking to `/subscription`, for both plans. Place it above "Logout".
 4. While `loading` is true, don't show the chip (prevent flash of wrong state).
 

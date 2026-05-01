@@ -28,10 +28,12 @@ export async function verifyToken(token: string): Promise<{ userId: string } | n
   }
 }
 
+const isSecure = process.env.NODE_ENV === 'production';
+
 export function setAuthCookie(response: NextResponse, token: string): void {
   response.cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: true,
+    secure: isSecure,
     sameSite: 'lax',
     maxAge: THIRTY_DAYS_SECONDS,
     path: '/',
@@ -41,7 +43,7 @@ export function setAuthCookie(response: NextResponse, token: string): void {
 export function removeAuthCookie(response: NextResponse): void {
   response.cookies.set(COOKIE_NAME, '', {
     httpOnly: true,
-    secure: true,
+    secure: isSecure,
     sameSite: 'lax',
     maxAge: 0,
     path: '/',

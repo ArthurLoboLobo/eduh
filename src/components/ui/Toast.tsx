@@ -32,9 +32,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const variantClass: Record<ToastVariant, string> = {
-    error: 'bg-danger-red/10 border border-danger-red/30 text-danger-red',
-    success: 'bg-success-green/10 border border-success-green/30 text-success-green',
-    info: 'bg-white/5 border border-border text-muted-text',
+    error: 'bg-rust-danger/10 border border-rust-danger/30 text-rust-danger',
+    success: 'bg-forest-success/10 border border-forest-success/30 text-forest-success',
+    info: 'bg-desk-surface border border-hairline text-page-cream-muted',
     warning: 'bg-warning-amber/10 border border-warning-amber/30 text-warning-amber',
   };
 
@@ -45,7 +45,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between gap-3 rounded-2xl px-5 py-3.5 text-sm max-w-sm backdrop-blur-md shadow-lg animate-fade-in-up ${variantClass[toast.variant]}`}
+            className={`pointer-events-auto flex items-center justify-between gap-3 rounded-[10px] px-5 py-3.5 font-label text-[13px] max-w-sm bg-lamp-night shadow-lg animate-fade-in-up ${variantClass[toast.variant]}`}
           >
             <span>{toast.message}</span>
             <button

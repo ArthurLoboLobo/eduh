@@ -40,26 +40,34 @@ export async function POST(
       return NextResponse.json({ error: 'EMPTY_PLAN' }, { status: 400 });
     }
 
-    await createTopicsFromPlan(id, plan);
+    await updateSectionStatus(id, 'loading-studying');
 
-    // Chunk and embed files for RAG
-    const files = await listFiles(id);
-    for (const file of files) {
-      if (!file.extracted_text) continue;
-      const chunks = chunkText(file.extracted_text);
-      if (chunks.length === 0) continue;
-      const embeddings = await embedTexts(chunks, 'RETRIEVAL_DOCUMENT');
-      await createEmbeddings(id, file.id, chunks, embeddings);
+    try {
+      await createTopicsFromPlan(id, plan);
+
+      // Chunk and embed files for RAG
+      const files = await listFiles(id);
+      for (const file of files) {
+        if (!file.extracted_text) continue;
+        const chunks = chunkText(file.extracted_text);
+        if (chunks.length === 0) continue;
+        const embeddings = await embedTexts(chunks, 'RETRIEVAL_DOCUMENT');
+        await createEmbeddings(id, file.id, chunks, embeddings);
+      }
+
+      const topics = await listTopics(id);
+      const topicIds = topics.map((t) => t.id);
+      await createChatsForSection(id, topicIds);
+
+      await updateSectionStatus(id, 'studying');
+      await deleteAllPlanDrafts(id);
+
+      return NextResponse.json({ success: true });
+    } catch (studyingError) {
+      console.error(`start-studying failed for section ${id}:`, studyingError);
+      await updateSectionStatus(id, 'planning');
+      return NextResponse.json({ error: 'START_STUDYING_FAILED' }, { status: 500 });
     }
-
-    const topics = await listTopics(id);
-    const topicIds = topics.map((t) => t.id);
-    await createChatsForSection(id, topicIds);
-
-    await deleteAllPlanDrafts(id);
-    await updateSectionStatus(id, 'studying');
-
-    return NextResponse.json({ success: true });
   } catch (err) {
     console.error('POST /api/sections/:id/start-studying error:', err);
     return NextResponse.json({ error: 'UNKNOWN' }, { status: 500 });
