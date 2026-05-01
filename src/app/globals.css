@@ -13,6 +13,8 @@
   --oxblood: #7e3128;
   --oxblood-bright: #9d4337;
   --oxblood-tint: #7e312820;
+  --confirm-danger: #a94138;
+  --confirm-danger-hover: #bd5045;
   --forest-success: #5e8c6f;
   --rust-danger: #b65a36;
   --brass-warning: #d6a85a;
@@ -35,6 +37,8 @@
   --color-oxblood: var(--oxblood);
   --color-oxblood-bright: var(--oxblood-bright);
   --color-oxblood-tint: var(--oxblood-tint);
+  --color-confirm-danger: var(--confirm-danger);
+  --color-confirm-danger-hover: var(--confirm-danger-hover);
   --color-forest-success: var(--forest-success);
   --color-rust-danger: var(--rust-danger);
   --color-brass-warning: var(--brass-warning);

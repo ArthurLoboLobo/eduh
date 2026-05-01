@@ -25,7 +25,7 @@ export default function ConfirmDialog({
   loading = false,
 }: ConfirmDialogProps) {
   return (
-    <Modal open={open} onClose={onClose} title={title}>
+    <Modal open={open} onClose={onClose} title={title} className="max-w-md bg-desk-surface">
       <p className="font-body text-[15px] text-page-cream-muted mb-6">{message}</p>
       <div className="flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose} disabled={loading}>
