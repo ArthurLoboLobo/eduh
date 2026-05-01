@@ -16,7 +16,7 @@
   --confirm-danger: #a94138;
   --confirm-danger-hover: #bd5045;
   --forest-success: #5e8c6f;
-  --rust-danger: #b65a36;
+  --rust-danger: #cf5a52;
   --brass-warning: #d6a85a;
   --hairline: #ece5d629;
   --code-surface: #262a2c;
@@ -56,8 +56,8 @@
 body {
   background: var(--lamp-night);
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(126, 49, 40, 0.04), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(214, 168, 90, 0.03), transparent 25%);
+    radial-gradient(circle at 15% 50%, rgb(from var(--oxblood) r g b / 0.04), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgb(from var(--brass-warning) r g b / 0.03), transparent 25%);
   background-attachment: fixed;
   color: var(--page-cream);
   font-family: var(--font-sans), sans-serif;
@@ -98,7 +98,7 @@ body {
   margin: 1.15em 0 1.25em;
   border: 1px solid var(--hairline);
   border-radius: 10px;
-  background: rgba(35, 29, 26, 0.52);
+  background: rgb(from var(--desk-surface) r g b / 0.52);
 }
 .prose-chat table {
   width: 100%;
@@ -119,7 +119,7 @@ body {
   vertical-align: top;
 }
 .prose-chat th {
-  background: rgba(236, 229, 214, 0.055);
+  background: rgb(from var(--page-cream) r g b / 0.055);
   font-weight: 500;
   color: var(--page-cream);
 }
@@ -196,12 +196,12 @@ body {
 }
 
 @utility input-focus-glow {
-  border-color: rgba(157, 67, 55, 0.58);
-  box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64);
+  border-color: rgb(from var(--oxblood-bright) r g b / 0.58);
+  box-shadow: 0 0 0 1px rgb(from var(--oxblood-bright) r g b / 0.28), 0 0 12px -8px rgb(from var(--oxblood-bright) r g b / 0.64);
 }
 
 @utility modal-lift {
-  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--hairline);
+  box-shadow: 0 24px 48px -16px rgb(from var(--lamp-night) r g b / 0.6), 0 0 0 1px var(--hairline);
 }
 
 /* ── Scroll-driven hero parallax (Direction A) ── */

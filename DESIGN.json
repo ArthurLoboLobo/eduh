@@ -157,16 +157,16 @@
       "rust-danger": {
         "role": "tertiary",
         "displayName": "Rust Danger",
-        "canonical": "oklch(0.58 0.15 38)",
+        "canonical": "oklch(0.61 0.15 28)",
         "tonalRamp": [
-          "oklch(0.2 0.07 38)",
-          "oklch(0.32 0.1 38)",
-          "oklch(0.42 0.13 38)",
-          "oklch(0.5 0.14 38)",
-          "oklch(0.58 0.15 38)",
-          "oklch(0.7 0.13 38)",
-          "oklch(0.82 0.09 38)",
-          "oklch(0.93 0.04 38)"
+          "oklch(0.22 0.07 28)",
+          "oklch(0.34 0.1 28)",
+          "oklch(0.46 0.13 28)",
+          "oklch(0.54 0.14 28)",
+          "oklch(0.61 0.15 28)",
+          "oklch(0.72 0.13 28)",
+          "oklch(0.84 0.09 28)",
+          "oklch(0.94 0.04 28)"
         ]
       },
       "brass-warning": {
@@ -267,7 +267,7 @@
       "refersTo": "input-field",
       "description": "Single-line text input. Hairline border at rest, restrained oxblood border glow on focus.",
       "html": "<input class=\"ds-input\" type=\"email\" placeholder=\"you@email.com\" />",
-      "css": ".ds-input { width: 100%; padding: 12px 14px; background: #231d1a; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 400; line-height: 1.55; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 6px; outline: none; transition: border-color 200ms ease-out, box-shadow 200ms ease-out; } .ds-input::placeholder { color: #9a8f7e; } .ds-input:focus-visible { border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64); } .ds-input[aria-invalid=\"true\"] { border-color: rgba(182, 90, 54, 0.62); box-shadow: 0 0 0 3px rgba(182, 90, 54, 0.25); }"
+      "css": ".ds-input { width: 100%; padding: 12px 14px; background: #231d1a; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 400; line-height: 1.55; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 6px; outline: none; transition: border-color 200ms ease-out, box-shadow 200ms ease-out; } .ds-input::placeholder { color: #9a8f7e; } .ds-input:focus-visible { border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64); } .ds-input[aria-invalid=\"true\"] { border-color: rgba(207, 90, 82, 0.62); box-shadow: 0 0 0 3px rgba(207, 90, 82, 0.25); }"
     },
     {
       "name": "Card",

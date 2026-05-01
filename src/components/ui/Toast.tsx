@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     error: 'bg-rust-danger/10 border border-rust-danger/30 text-rust-danger',
     success: 'bg-forest-success/10 border border-forest-success/30 text-forest-success',
     info: 'bg-desk-surface border border-hairline text-page-cream-muted',
-    warning: 'bg-warning-amber/10 border border-warning-amber/30 text-warning-amber',
+    warning: 'bg-brass-warning/10 border border-brass-warning/30 text-brass-warning',
   };
 
   return (

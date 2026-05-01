@@ -12,7 +12,7 @@ colors:
   oxblood-bright: "#9d4337"
   oxblood-tint: "#7e312820"
   forest-success: "#5e8c6f"
-  rust-danger: "#b65a36"
+  rust-danger: "#cf5a52"
   brass-warning: "#d6a85a"
   hairline: "#ece5d629"
   code-surface: "#262a2c"
@@ -194,7 +194,7 @@ The palette is built from three materials of a university reading room: warm woo
 
 ### Tertiary (Status)
 - **Forest Success** (`#5e8c6f` / `oklch(0.62 0.09 150)`): Topic completion marks, progress fills, success toasts. Olive-leaning so it does not read as Gemini-pastel green.
-- **Rust Danger** (`#b65a36` / `oklch(0.58 0.15 38)`): Delete affordances, error toasts, validation errors. Sits at hue 38 (orange-red), distinguishable from oxblood (hue 20).
+- **Rust Danger** (`#cf5a52` / `oklch(0.61 0.15 28)`): Delete affordances, error toasts, validation errors. Clear red signal, still warm enough to sit with the library palette and distinguishable from oxblood (hue 20).
 - **Brass Warning** (`#d6a85a` / `oklch(0.78 0.12 80)`): Usage warnings (75% / 90% caps), intermediate states. The lamp's brass fitting.
 - **Code Surface** (`#262a2c` / `oklch(0.22 0.005 240)`): Background for code blocks and KaTeX displays only. The single cool note in the room, by design, to mark "this is verbatim, not prose."
 
@@ -259,7 +259,7 @@ The system is **flat by default**. Surfaces do not lift physically; they are sep
 ### Inputs
 - **Style:** `background: var(--desk-surface)`, `border: 1px solid var(--hairline)`, `rounded: 6px`, padding `12px 14px`. Body typography (Inter 15px / 400). Placeholder color: `var(--page-cream-faint)`.
 - **Focus:** Border shifts to a restrained oxblood glow: `border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)`. Background unchanged.
-- **Error:** `box-shadow: 0 0 0 3px rgba(182, 90, 54, 0.25)` (rust-tint focus ring). Error message in `var(--rust-danger)` directly below the field.
+- **Error:** `box-shadow: 0 0 0 3px rgba(207, 90, 82, 0.25)` (rust-tint focus ring). Error message in `var(--rust-danger)` directly below the field.
 - **Search:** Same shape, with a JetBrains Mono `/` keystroke hint inside, page-cream-faint, right-aligned.
 
 ### Cards / Containers

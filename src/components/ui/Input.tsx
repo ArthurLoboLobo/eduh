@@ -25,7 +25,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             focus:outline-none focus:input-focus-glow
             transition-all
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? 'ring-[3px] ring-[rgba(182,90,54,0.25)]' : ''}
+            ${error ? 'ring-[3px] ring-rust-danger/25' : ''}
             ${className}
           `}
           {...props}

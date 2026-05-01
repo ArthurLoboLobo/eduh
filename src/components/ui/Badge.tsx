@@ -7,11 +7,11 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  default: 'bg-[rgba(236,229,214,0.08)] text-page-cream',
+  default: 'bg-page-cream/[0.08] text-page-cream',
   blue: 'bg-oxblood-tint text-oxblood-bright',
   green: 'bg-forest-success/20 text-forest-success',
   red: 'bg-rust-danger/20 text-rust-danger',
-  muted: 'bg-[rgba(236,229,214,0.08)] text-page-cream-faint',
+  muted: 'bg-page-cream/[0.08] text-page-cream-faint',
 };
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {

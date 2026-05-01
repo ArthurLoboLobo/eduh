@@ -100,7 +100,7 @@ function ChatMessageItem({
                   );
                 }
                 return (
-                  <code className="bg-[rgba(236,229,214,0.08)] px-1.5 py-0.5 rounded-md font-body text-[0.7556em]" {...props}>
+                  <code className="bg-page-cream/[0.08] px-1.5 py-0.5 rounded-md font-body text-[0.7556em]" {...props}>
                     {children}
                   </code>
                 );
