@@ -97,7 +97,7 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <Spinner size={28} />
-        <p className="text-sm text-muted-text">{t.studying.loading}</p>
+        <p className="font-body text-[14px] text-page-cream-muted">{t.studying.loading}</p>
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <p className="text-sm text-muted-text">{t.studying.errorLoading}</p>
+        <p className="font-body text-[14px] text-page-cream-muted">{t.studying.errorLoading}</p>
         <Button variant="ghost" onClick={fetchTopics}>
           <RefreshIcon size={16} />
           {t.studying.retry}
@@ -120,30 +120,30 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
     <div className="max-w-5xl mx-auto py-4 space-y-10 animate-fade-in-up">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-br from-primary-text to-muted-text bg-clip-text text-transparent tracking-tight">
+        <h1 className="font-headline text-[1.75rem] text-page-cream tracking-tight">
           {t.studying.title}
         </h1>
       </div>
 
       {/* Progress Dashboard Widget */}
-      <div className="bg-surface/60 backdrop-blur-md border border-border-subtle rounded-[32px] p-6 shadow-sm flex flex-col gap-5">
+      <div className="bg-desk-surface border border-hairline rounded-[10px] p-6 shadow-sm flex flex-col gap-5">
         <div className="flex items-center justify-between">
-           <h2 className="text-base font-semibold text-primary-text">{t.studying.progressTitle}</h2>
-           <span className="text-sm font-bold text-accent-blue">{Math.round(progressPercent)}%</span>
+           <h2 className="font-label text-[12px] tracking-[0.05em] text-page-cream-muted uppercase">{t.studying.progressTitle}</h2>
+           <span className="font-display text-[2rem] text-page-cream leading-none">{Math.round(progressPercent)}%</span>
         </div>
         <ProgressBar value={progressPercent} className="h-3 rounded-full" />
-        <p className="text-sm text-muted-text font-medium">
+        <p className="font-body text-[14px] text-page-cream-muted">
           {progress.completed} <span className="opacity-70">/ {progress.total}</span> {t.studying.progressText}
         </p>
       </div>
 
       <div>
-        <h2 className="text-xl font-bold text-primary-text mb-6 px-2">{t.studying.topicsTitle}</h2>
+        <h2 className="font-title text-[1.25rem] text-page-cream mb-6 px-2">{t.studying.topicsTitle}</h2>
         
         {/* Topic Timeline */}
         <div className="relative pb-4">
           {/* Connecting Vertical Line (Desktop only) */}
-          <div className="absolute left-[2.25rem] top-8 bottom-8 w-[2px] bg-border-subtle hidden md:block" />
+          <div className="absolute left-[2.25rem] top-8 bottom-8 w-[1px] bg-hairline hidden md:block" />
 
           <div className="space-y-6">
             {topics.map((topic, idx) => {
@@ -154,12 +154,12 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                   
                   {/* Timeline Node (Desktop) */}
                   <div className="relative z-10 hidden md:flex flex-col items-center mt-6">
-                    <div className={`flex items-center justify-center w-12 h-12 rounded-full border-4 border-background shrink-0 transition-all duration-300 shadow-sm ${
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full border-[3px] border-lamp-night shrink-0 transition-all duration-300 shadow-sm ${
                       topic.is_completed 
-                        ? 'bg-accent-blue text-background' 
+                        ? 'bg-forest-success text-desk-surface' 
                         : isNextToStudy 
-                          ? 'bg-surface border-accent-blue/30 text-accent-blue shadow-[0_0_15px_rgba(49,130,206,0.25)]' 
-                          : 'bg-surface text-muted-text border-border-subtle/40'
+                          ? 'bg-desk-surface ring-[2px] ring-oxblood text-oxblood' 
+                          : 'bg-lamp-night text-page-cream-faint border-hairline'
                     }`}>
                       {topic.is_completed ? <CheckIcon size={20} /> : <span className="font-bold">{idx + 1}</span>}
                     </div>
@@ -170,10 +170,10 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                     clickable
                     className={`flex-1 relative overflow-hidden transition-all duration-300 ${
                       topic.is_completed 
-                        ? 'opacity-70 hover:opacity-100 bg-surface/40' 
+                        ? 'opacity-70 hover:opacity-100 bg-desk-surface border border-hairline' 
                         : isNextToStudy
-                          ? 'bg-surface border-accent-blue/40 shadow-md hover:shadow-lg hover:border-accent-blue/60'
-                          : 'bg-surface hover:shadow-md hover:border-border-subtle/80'
+                          ? 'bg-desk-surface ring-1 ring-oxblood hover:ring-2 hover:ring-oxblood shadow-md'
+                          : 'bg-desk-surface border border-hairline hover:bg-desk-surface-hover hover:border-page-cream-faint'
                     }`}
                     onClick={() => router.push(`/sections/${sectionId}/chat/${topic.chat_id}`)}
                     style={{ padding: '1.5rem' }}
@@ -181,15 +181,15 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                     <div className="flex items-start gap-4">
                       {/* Mobile Node */}
                       <div className={`md:hidden flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors ${
-                        topic.is_completed ? 'bg-accent-blue text-background' : isNextToStudy ? 'bg-accent-blue/10 text-accent-blue' : 'bg-surface border border-border-subtle text-muted-text'
+                        topic.is_completed ? 'bg-forest-success text-desk-surface' : isNextToStudy ? 'bg-oxblood-tint text-oxblood' : 'bg-lamp-night border border-hairline text-page-cream-muted'
                       }`}>
                         {topic.is_completed ? <CheckIcon size={16} /> : <span className="font-bold text-sm">{idx + 1}</span>}
                       </div>
 
                       <div className="flex-1 min-w-0 pr-10 group-hover:pr-40 transition-[padding] duration-300">
                         {/* Topic Title */}
-                        <h3 className={`truncate text-lg font-bold mb-3 leading-snug transition-colors ${
-                          topic.is_completed ? 'text-primary-text' : isNextToStudy ? 'text-accent-blue' : 'text-primary-text'
+                        <h3 className={`truncate font-title text-[1.25rem] mb-3 leading-snug transition-colors ${
+                          topic.is_completed ? 'text-page-cream' : isNextToStudy ? 'text-oxblood' : 'text-page-cream'
                         }`}>
                           {topic.title}
                         </h3>
@@ -198,16 +198,16 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                         {topic.subtopics && topic.subtopics.length > 0 && (
                           <div className="mb-5 space-y-2.5">
                             {topic.subtopics.map((sub) => (
-                              <div key={sub.id} className="flex items-start gap-3 text-sm text-muted-text group-hover:text-primary-text/80 transition-colors">
-                                <div className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${topic.is_completed ? 'bg-accent-blue/50' : 'bg-border-subtle'}`} />
-                                <span className="leading-relaxed line-clamp-2 font-medium">{sub.text}</span>
+                              <div key={sub.id} className="flex items-start gap-3 font-body text-[14px] text-page-cream-muted group-hover:text-page-cream transition-colors">
+                                <div className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${topic.is_completed ? 'bg-forest-success/50' : 'bg-hairline'}`} />
+                                <span className="leading-relaxed line-clamp-2">{sub.text}</span>
                               </div>
                             ))}
                           </div>
                         )}
 
                         {/* Interactions Footer */}
-                        <div className="flex items-center gap-2 text-xs text-muted-text font-semibold bg-background/60 inline-flex px-3 py-1.5 rounded-full">
+                        <div className="flex items-center gap-2 font-label text-[12px] text-page-cream-muted bg-lamp-night border border-hairline inline-flex px-3 py-1.5 rounded-[6px]">
                           <ChatBubbleIcon size={14} className="opacity-70" />
                           <span>
                             {topic.message_count > 0
@@ -225,10 +225,10 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                           handleToggle(topic.id);
                         }}
                       >
-                        <span className="text-xs font-medium text-muted-text transition-all duration-300 select-none opacity-0 group-hover:opacity-70 max-w-0 group-hover:max-w-[100px] overflow-hidden whitespace-nowrap">
+                        <span className="font-label text-[12px] text-page-cream-muted transition-all duration-300 select-none opacity-0 group-hover:opacity-70 max-w-0 group-hover:max-w-[100px] overflow-hidden whitespace-nowrap">
                           {topic.is_completed ? t.studying.completed : t.studying.markComplete}
                         </span>
-                        <div className="flex items-center transition-all duration-300 group-hover:scale-110 group-hover:[&_input]:border-white/40 group-hover:[&_input]:bg-white/10">
+                        <div className="flex items-center transition-all duration-300 group-hover:scale-110 group-hover:[&_input]:border-page-cream-faint group-hover:[&_input]:bg-desk-surface-hover">
                           <Checkbox checked={topic.is_completed} readOnly />
                         </div>
                       </div>
@@ -244,7 +244,7 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                 
                 {/* Timeline Node (Desktop) */}
                 <div className="relative z-10 hidden md:flex flex-col items-center mt-6">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-background shrink-0 transition-all duration-300 shadow-sm bg-surface text-muted-text border-border-subtle/40">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full border-[3px] border-lamp-night shrink-0 transition-all duration-300 shadow-sm bg-desk-surface text-page-cream-muted border-hairline">
                     <SparklesIcon size={20} />
                   </div>
                 </div>
@@ -252,24 +252,24 @@ export default function StudyingView({ sectionId }: StudyingViewProps) {
                 {/* Content Card */}
                 <Card
                   clickable
-                  className="flex-1 relative overflow-hidden transition-all duration-300 bg-surface hover:shadow-md hover:border-border-subtle/80"
+                  className="flex-1 relative overflow-hidden transition-all duration-300 bg-desk-surface border border-hairline hover:bg-desk-surface-hover"
                   onClick={() => router.push(`/sections/${sectionId}/chat/${revisionChatId}`)}
                   style={{ padding: '1.5rem' }}
                 >
                   <div className="flex items-start gap-4">
                     {/* Mobile Node */}
-                    <div className="md:hidden flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors bg-surface border border-border-subtle text-muted-text">
+                    <div className="md:hidden flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors bg-desk-surface border border-hairline text-page-cream-muted">
                       <SparklesIcon size={16} />
                     </div>
 
                     <div className="flex-1 min-w-0">
                       {/* Title */}
-                      <h3 className="text-lg font-bold mb-2 leading-snug transition-colors text-primary-text group-hover:text-accent-blue">
+                      <h3 className="font-title text-[1.25rem] mb-2 leading-snug transition-colors text-page-cream group-hover:text-oxblood">
                         {t.studying.revision}
                       </h3>
                       
                       {/* Description */}
-                      <p className="text-sm text-muted-text leading-relaxed">
+                      <p className="font-body text-[14px] text-page-cream-muted leading-relaxed">
                         {t.studying.revisionDescription}
                       </p>
                     </div>

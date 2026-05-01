@@ -1,84 +1,104 @@
 @import "tailwindcss";
 
 :root {
-  --background: #131314;
-  --surface: #1E1F20;
-  --surface-hover: #282A2C;
-  --border: transparent; /* No hard borders in gemini style by default, or very subtle */
-  --border-subtle: rgba(255, 255, 255, 0.08); /* Fallback border if needed */
-  --border-hover: rgba(255, 255, 255, 0.12);
-  --primary-text: #E3E3E3;
-  --muted-text: #C4C7C5;
-  --accent-blue: #A2C7FF; /* Gemini uses softer pastel blues */
-  --accent-blue-hover: #B4D1FF;
-  --accent-surface: rgba(162, 199, 255, 0.1);
-  --success-green: #81C995;
-  --danger-red: #F28B82;
-  --warning-amber: #FDD663;
+
+
+  /* New Eduh Design System Tokens */
+  --lamp-night: #1a1614;
+  --desk-surface: #231d1a;
+  --desk-surface-hover: #2c2421;
+  --page-cream: #ece5d6;
+  --page-cream-muted: #c4baa6;
+  --page-cream-faint: #9a8f7e;
+  --oxblood: #7e3128;
+  --oxblood-bright: #9d4337;
+  --oxblood-tint: #7e312820;
+  --confirm-danger: #a94138;
+  --confirm-danger-hover: #bd5045;
+  --forest-success: #5e8c6f;
+  --rust-danger: #b65a36;
+  --brass-warning: #d6a85a;
+  --hairline: #ece5d629;
+  --code-surface: #262a2c;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-border: var(--border);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-hover: var(--border-hover);
-  --color-primary-text: var(--primary-text);
-  --color-muted-text: var(--muted-text);
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-blue-hover: var(--accent-blue-hover);
-  --color-accent-surface: var(--accent-surface);
-  --color-success-green: var(--success-green);
-  --color-danger-red: var(--danger-red);
-  --color-warning-amber: var(--warning-amber);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* New Eduh Design System Tokens */
+  --color-lamp-night: var(--lamp-night);
+  --color-desk-surface: var(--desk-surface);
+  --color-desk-surface-hover: var(--desk-surface-hover);
+  --color-page-cream: var(--page-cream);
+  --color-page-cream-muted: var(--page-cream-muted);
+  --color-page-cream-faint: var(--page-cream-faint);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-bright: var(--oxblood-bright);
+  --color-oxblood-tint: var(--oxblood-tint);
+  --color-confirm-danger: var(--confirm-danger);
+  --color-confirm-danger-hover: var(--confirm-danger-hover);
+  --color-forest-success: var(--forest-success);
+  --color-rust-danger: var(--rust-danger);
+  --color-brass-warning: var(--brass-warning);
+  --color-hairline: var(--hairline);
+  --color-code-surface: var(--code-surface);
+
+  --font-display: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-headline: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-title: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-body-prose: "Newsreader", "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background: var(--lamp-night);
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(43, 92, 230, 0.05), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(61, 139, 94, 0.03), transparent 25%);
+    radial-gradient(circle at 15% 50%, rgba(126, 49, 40, 0.04), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(214, 168, 90, 0.03), transparent 25%);
   background-attachment: fixed;
-  color: var(--primary-text);
+  color: var(--page-cream);
   font-family: var(--font-sans), sans-serif;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* Chat markdown prose styles */
 .prose-chat { overflow-wrap: anywhere; }
 .prose-chat h1, .prose-chat h2, .prose-chat h3, .prose-chat h4 {
-  font-weight: 600;
+  font-weight: 400;
   margin-top: 1em;
   margin-bottom: 0.5em;
-  color: var(--primary-text);
+  color: var(--page-cream);
+  font-family: var(--font-title);
 }
-.prose-chat h1 { font-size: 1.25rem; }
-.prose-chat h2 { font-size: 1.125rem; }
-.prose-chat h3 { font-size: 1rem; }
-.prose-chat p { margin-bottom: 0.5em; line-height: 1.6; }
+.prose-chat h1 { font-size: 1.5rem; }
+.prose-chat h2 { font-size: 1.25rem; }
+.prose-chat h3 { font-size: 1.125rem; }
+.prose-chat p { margin-bottom: 0.5em; line-height: 1.65; }
 .prose-chat ul, .prose-chat ol { margin-bottom: 0.5em; padding-left: 1.5em; }
 .prose-chat li { margin-bottom: 0.25em; }
 .prose-chat ul { list-style-type: disc; }
 .prose-chat ol { list-style-type: decimal; }
 .prose-chat blockquote {
-  border-left: 3px solid var(--border-subtle);
-  padding-left: 0.75em;
-  margin: 0.5em 0;
-  color: var(--muted-text);
+  border-left: 2px solid var(--hairline);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--page-cream-muted);
+  font-style: italic;
 }
-.prose-chat strong { font-weight: 600; }
-.prose-chat a { color: var(--accent-blue); text-decoration: underline; }
-.prose-chat hr { border-color: var(--border-subtle); margin: 1em 0; }
-.prose-chat table { border-collapse: collapse; margin: 0.5em 0; }
+.prose-chat strong { font-weight: 600; color: var(--page-cream); }
+.prose-chat a { color: var(--oxblood); text-decoration: underline; text-decoration-color: var(--oxblood-tint); transition: all 0.2s; }
+.prose-chat a:hover { color: var(--oxblood-bright); text-decoration-color: var(--oxblood); }
+.prose-chat hr { border-color: var(--hairline); margin: 1.5em 0; border-top-width: 1px; }
+.prose-chat table { border-collapse: collapse; margin: 1em 0; font-family: var(--font-body); font-size: 0.875rem; }
 .prose-chat th, .prose-chat td {
-  border: 1px solid var(--border-subtle);
-  padding: 0.375em 0.75em;
+  border: 1px solid var(--hairline);
+  padding: 0.5em 0.75em;
   text-align: left;
 }
-.prose-chat th { background: var(--surface); font-weight: 600; }
+.prose-chat th { background: var(--desk-surface); font-weight: 500; color: var(--page-cream-muted); }
 
 /* Allow long KaTeX display formulas to scroll horizontally inside their bubble
    instead of stretching the page. */
@@ -131,3 +151,79 @@ body {
 .jumping-dot:nth-child(1) { animation-delay: 0s; }
 .jumping-dot:nth-child(2) { animation-delay: 0.15s; }
 .jumping-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* Design System Elevations & Effects */
+@utility lamp-halo {
+  box-shadow: 0 0 60px -12px rgba(196, 120, 66, 0.20);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(120% 80% at 50% 0%, rgba(196, 120, 66, 0.18), transparent 70%);
+    z-index: 1;
+  }
+}
+
+@utility input-focus-glow {
+  border-color: rgba(157, 67, 55, 0.58);
+  box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64);
+}
+
+@utility modal-lift {
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--hairline);
+}
+
+/* ── Scroll-driven hero parallax (Direction A) ── */
+
+/* Fallback for browsers without scroll-driven animations */
+.scroll-reveal {
+  opacity: 0;
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* Hero text sinks back into library darkness */
+    @keyframes hero-drift {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-60px); }
+    }
+
+    /* Hairline rule expands from center */
+    @keyframes reveal-expand {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* Steps reveal on scroll entry */
+    @keyframes scroll-reveal-up {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0% 30%;
+    }
+
+    .hairline-reveal {
+      transform-origin: center;
+      animation: reveal-expand linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+    }
+
+    .scroll-reveal {
+      opacity: 0;
+      animation: scroll-reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}

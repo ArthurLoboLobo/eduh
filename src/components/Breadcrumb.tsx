@@ -93,13 +93,13 @@ export default function Breadcrumb() {
   }
 
   return (
-    <div className="fixed top-14 inset-x-0 z-30 h-12 bg-background/80 backdrop-blur-md border-b border-border-subtle flex items-center px-8">
-      <nav className="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+    <div className="fixed top-[56px] inset-x-0 z-30 h-[48px] bg-lamp-night border-b border-hairline flex items-center px-8">
+      <nav className="flex items-center gap-2 font-label text-[13px]" aria-label="Breadcrumb">
         {/* Dashboard segment */}
         {isOnDashboard ? (
-          <span className="text-primary-text">{t.nav.dashboard}</span>
+          <span className="text-page-cream">{t.nav.dashboard}</span>
         ) : (
-          <Link href="/dashboard" className="text-muted-text hover:text-primary-text">
+          <Link href="/dashboard" className="text-page-cream-muted hover:text-page-cream transition-colors">
             {t.nav.dashboard}
           </Link>
         )}
@@ -107,23 +107,23 @@ export default function Breadcrumb() {
         {/* Subscription segment */}
         {isOnSubscription && (
           <>
-            <span className="text-muted-text select-none">›</span>
-            <span className="text-primary-text">{t.subscription.title}</span>
+            <span className="text-page-cream-faint select-none">›</span>
+            <span className="text-page-cream">{t.subscription.title}</span>
           </>
         )}
 
         {/* Section segment */}
         {isOnSection && (
           <>
-            <span className="text-muted-text select-none">›</span>
+            <span className="text-page-cream-faint select-none">›</span>
             <div className="relative" ref={sectionDropdownRef}>
               <button
                 onClick={() => {
                   setSectionOpen((v) => !v);
                   setChatOpen(false);
                 }}
-                className={`flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs hover:text-accent-blue cursor-pointer ${
-                  isOnChat ? 'text-muted-text' : 'text-primary-text'
+                className={`flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs hover:text-page-cream cursor-pointer transition-colors ${
+                  isOnChat ? 'text-page-cream-muted' : 'text-page-cream'
                 }`}
                 aria-expanded={sectionOpen}
               >
@@ -132,13 +132,13 @@ export default function Breadcrumb() {
               </button>
 
               {sectionOpen && sections.length > 0 && (
-                <div className="absolute left-0 top-8 min-w-56 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
+                <div className="absolute left-0 top-8 min-w-56 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-desk-surface border border-hairline rounded-[10px] p-1 shadow-2xl">
                   {sections.map((s) => (
                     <button
                       key={s.id}
                       onClick={() => handleSectionSelect(s.id)}
-                      className={`w-full text-left px-3 py-2 text-sm truncate cursor-pointer hover:bg-surface-hover rounded-xl transition-colors ${
-                        s.id === sectionId ? 'text-accent-blue bg-accent-surface' : 'text-primary-text'
+                      className={`w-full text-left px-3 py-2 font-label text-[13px] truncate cursor-pointer hover:bg-desk-surface-hover rounded-[6px] transition-colors ${
+                        s.id === sectionId ? 'text-oxblood-bright bg-oxblood-tint' : 'text-page-cream'
                       }`}
                     >
                       {s.name}
@@ -153,14 +153,14 @@ export default function Breadcrumb() {
         {/* Chat segment */}
         {isOnChat && (
           <>
-            <span className="text-muted-text select-none">›</span>
+            <span className="text-page-cream-faint select-none">›</span>
             <div className="relative" ref={chatDropdownRef}>
               <button
                 onClick={() => {
                   setChatOpen((v) => !v);
                   setSectionOpen(false);
                 }}
-                className="flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs text-primary-text hover:text-accent-blue cursor-pointer"
+                className="flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs text-page-cream hover:text-page-cream-muted transition-colors cursor-pointer"
                 aria-expanded={chatOpen}
               >
                 <span className="truncate">{currentChat?.name ?? chatId}</span>
@@ -168,13 +168,13 @@ export default function Breadcrumb() {
               </button>
 
               {chatOpen && chats.length > 0 && (
-                <div className="absolute right-0 top-8 min-w-56 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-surface border border-border-subtle rounded-2xl p-1 shadow-2xl">
+                <div className="absolute right-0 top-8 min-w-56 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-desk-surface border border-hairline rounded-[10px] p-1 shadow-2xl">
                   {chats.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => handleChatSelect(c.id)}
-                      className={`w-full text-left px-3 py-2 text-sm truncate cursor-pointer hover:bg-surface-hover rounded-xl transition-colors ${
-                        c.id === chatId ? 'text-accent-blue bg-accent-surface' : 'text-primary-text'
+                      className={`w-full text-left px-3 py-2 font-label text-[13px] truncate cursor-pointer hover:bg-desk-surface-hover rounded-[6px] transition-colors ${
+                        c.id === chatId ? 'text-oxblood-bright bg-oxblood-tint' : 'text-page-cream'
                       }`}
                     >
                       {c.name}

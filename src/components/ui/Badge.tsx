@@ -7,18 +7,18 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  default: 'bg-white/10 text-primary-text',
-  blue: 'bg-accent-blue/20 text-accent-blue',
-  green: 'bg-success-green/20 text-success-green',
-  red: 'bg-danger-red/20 text-danger-red',
-  muted: 'bg-white/5 text-muted-text',
+  default: 'bg-[rgba(236,229,214,0.08)] text-page-cream',
+  blue: 'bg-oxblood-tint text-oxblood-bright',
+  green: 'bg-forest-success/20 text-forest-success',
+  red: 'bg-rust-danger/20 text-rust-danger',
+  muted: 'bg-[rgba(236,229,214,0.08)] text-page-cream-faint',
 };
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
   return (
     <span
       className={`
-        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        inline-flex items-center px-[10px] py-[2px] rounded-full font-label text-[13px]
         ${variantClasses[variant]}
         ${className}
       `}

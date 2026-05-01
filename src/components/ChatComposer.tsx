@@ -36,6 +36,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCoarsePointer(window.matchMedia('(pointer: coarse)').matches);
     }, []);
 
@@ -97,9 +98,9 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
     return (
       <div
         ref={containerRef}
-        className="fixed bottom-0 inset-x-0 px-4 flex justify-center pb-6 pt-12 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none z-40"
+        className="fixed bottom-0 inset-x-0 px-4 flex justify-center pb-6 pt-12 bg-gradient-to-t from-lamp-night via-lamp-night/95 to-transparent pointer-events-none z-40"
       >
-        <div className="relative w-full max-w-3xl flex items-end bg-surface/80 backdrop-blur-xl border border-border-subtle rounded-[32px] p-2 pr-3 shadow-[0_8px_30px_rgb(0,0,0,0.5)] focus-within:ring-1 focus-within:ring-accent-blue/40 focus-within:border-accent-blue/60 transition-all pointer-events-auto">
+        <div className="relative w-full max-w-3xl flex items-end bg-desk-surface border border-hairline rounded-[14px] p-2 pr-3 modal-lift focus-within:input-focus-glow transition-all pointer-events-auto">
           <textarea
             ref={textareaRef}
             value={inputValue}
@@ -108,13 +109,13 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
             placeholder={placeholder}
             disabled={disabled}
             rows={1}
-            className="flex-1 resize-none bg-transparent px-4 mt-2 mb-2 text-[15px] leading-relaxed text-primary-text placeholder:text-muted-text focus:outline-none disabled:opacity-50"
+            className="flex-1 resize-none bg-transparent px-4 mt-2 mb-2 font-body text-[15px] leading-relaxed text-page-cream placeholder:text-page-cream-faint focus:outline-none disabled:opacity-50"
             style={{ maxHeight: '200px' }}
           />
           <button
             onClick={handleSend}
             disabled={disabled || !inputValue.trim()}
-            className="p-2.5 rounded-full bg-accent-blue hover:bg-accent-blue-hover text-background disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mb-0.5 shrink-0 transition-colors"
+            className="p-2.5 rounded-[6px] bg-oxblood hover:bg-oxblood-bright text-page-cream disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mb-0.5 shrink-0 transition-colors"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />

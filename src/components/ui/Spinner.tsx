@@ -9,7 +9,7 @@ export default function Spinner({ size = 20 }: SpinnerProps) {
       height={size}
       viewBox="0 0 20 20"
       fill="none"
-      className="animate-spin text-accent-blue"
+      className="animate-spin text-page-cream-muted"
       aria-hidden="true"
     >
       <circle

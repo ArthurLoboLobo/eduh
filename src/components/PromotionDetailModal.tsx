@@ -94,20 +94,20 @@ export default function PromotionDetailModal({
     <Modal open={open} onClose={onClose}>
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-base font-semibold text-primary-text">{title}</h2>
+          <h2 className="font-title text-[1.25rem] text-page-cream">{title}</h2>
           {promotion.claimed && <Badge variant="green">{t.promotions.claimed}</Badge>}
         </div>
 
-        <p className="text-sm text-muted-text">{description}</p>
+        <p className="font-body text-[14px] text-page-cream-muted">{description}</p>
 
-        <div className="bg-background/60 rounded-2xl p-4 border border-border-subtle">
-          <p className="text-sm text-primary-text">{creditLine}</p>
+        <div className="bg-desk-surface rounded-[6px] p-4 border border-hairline">
+          <p className="font-body text-[14px] text-page-cream">{creditLine}</p>
         </div>
 
         {promotion.claimed ? (
-          <p className="text-sm text-muted-text">{t.promotions.alreadyClaimed}</p>
+          <p className="font-body text-[14px] text-page-cream-muted">{t.promotions.alreadyClaimed}</p>
         ) : !promotion.eligible ? (
-          <p className="text-sm text-muted-text">{t.promotions.notEligible}</p>
+          <p className="font-body text-[14px] text-page-cream-muted">{t.promotions.notEligible}</p>
         ) : (
           <Button onClick={handleClaim} loading={claiming} className="w-full">
             {t.promotions.claim}

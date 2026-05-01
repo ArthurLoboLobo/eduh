@@ -70,7 +70,7 @@ export default function ChatPage() {
       const errStr = error.message ?? '';
       if (errStr.includes('USAGE_LIMIT_REACHED')) {
         showToast(
-          <span>{t.subscription.usageLimitFree}{' '}<Link href="/subscription" className="underline hover:text-primary-text">{t.subscription.subscribeToPro}</Link></span>,
+          <span>{t.subscription.usageLimitFree}{' '}<Link href="/subscription" className="underline hover:text-page-cream">{t.subscription.subscribeToPro}</Link></span>,
           'error',
         );
       } else if (errStr.includes('RATE_LIMITED')) {
@@ -253,7 +253,7 @@ export default function ChatPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-5.5rem)]">
         <Spinner size={28} />
-        <p className="mt-3 text-sm text-muted-text">{t.chat.loading}</p>
+        <p className="mt-3 font-body text-[14px] text-page-cream-muted">{t.chat.loading}</p>
       </div>
     );
   }
@@ -261,7 +261,7 @@ export default function ChatPage() {
   if (loadError) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-5.5rem)]">
-        <p className="text-sm text-muted-text mb-3">{t.chat.errorLoading}</p>
+        <p className="font-body text-[14px] text-page-cream-muted mb-3">{t.chat.errorLoading}</p>
         <Button variant="ghost" onClick={() => window.location.reload()}>
           <RefreshIcon size={16} />
           {t.chat.retry}

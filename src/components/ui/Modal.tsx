@@ -33,22 +33,22 @@ export default function Modal({ open, onClose, title, children, className = '' }
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-[#0F0F11]/80 backdrop-blur-sm animate-backdrop"
+        className="absolute inset-0 bg-lamp-night/85 backdrop-blur-[2px] animate-backdrop"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         className={`
           relative z-10 w-full m-auto
-          bg-surface border border-border-subtle rounded-3xl p-6 shadow-2xl animate-modal-pop
+          bg-desk-surface rounded-[14px] p-[28px] modal-lift animate-modal-pop
           ${className || 'max-w-md'}
         `}
       >
         <div className="flex items-start justify-between mb-4">
-          {title && <h2 className="text-base font-semibold text-primary-text">{title}</h2>}
+          {title && <h2 className="font-title text-[1.25rem] text-page-cream">{title}</h2>}
           <button
             onClick={onClose}
-            className="ml-auto text-muted-text hover:text-primary-text cursor-pointer"
+            className="ml-auto text-page-cream-muted hover:text-page-cream cursor-pointer"
             aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -56,7 +56,10 @@ export default function Modal({ open, onClose, title, children, className = '' }
             </svg>
           </button>
         </div>
-        {children}
+        {title && <hr className="w-full border-0 border-t border-hairline mb-5 -mt-1" />}
+        <div className="text-page-cream font-body text-[15px]">
+          {children}
+        </div>
       </div>
     </div>,
     document.body

@@ -106,12 +106,16 @@ components:
     padding: "10px 20px"
   input-field:
     backgroundColor: "{colors.desk-surface}"
+    borderColor: "{colors.hairline}"
+    focusBorderColor: "rgba(157, 67, 55, 0.58)"
+    focusShadow: "0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)"
     textColor: "{colors.page-cream}"
     typography: "{typography.body}"
     rounded: "{rounded.md}"
     padding: "12px 14px"
   card:
     backgroundColor: "{colors.desk-surface}"
+    borderColor: "{colors.hairline}"
     textColor: "{colors.page-cream}"
     rounded: "{rounded.lg}"
     padding: "20px"
@@ -153,7 +157,7 @@ components:
 
 A carrel is the private study desk in a university library: a small wooden booth with a green-shaded reading lamp, surrounded by silence and the spines of borrowed books. Eduh is what that carrel looks like when a Unicamp student logs in to study at 11pm the night before a P1. Warm, dim, focused, structured by the rhythm of reading. The kind of room where you can sit for two hours without your eyes burning out.
 
-The room is built from three materials. **Warm-dark wood-tone surfaces** (deep, slightly red-brown, never charcoal-cool) for the page and desk. **Warm-cream paper-tone text** (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, **oxblood**, the leather binding of the textbook resting on the desk. Light comes from one source only: a soft warm halo on whatever surface you are actively working on (the topic you are studying, the chat input you have focused). Everything off-focus stays in restful shadow.
+The room is built from three materials. **Warm-dark wood-tone surfaces** (deep, slightly red-brown, never charcoal-cool) for the page and desk. **Warm-cream paper-tone text** (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, **oxblood**, the leather binding of the textbook resting on the desk. Focus is shown through precise oxblood borders and hairlines.
 
 Type does the academic work. **Newsreader serif** sets every heading, every topic title, every paragraph the AI hands back to you, the long-form "this is the lesson" register. **Inter sans** handles UI chrome (buttons, fields, labels) cleanly and unobtrusively. **JetBrains Mono** appears only where it should: code blocks and KaTeX inline. **Hairline cream rules** separate sections of the page the way a chapter rule separates chapters of a book.
 
@@ -168,7 +172,7 @@ This system explicitly rejects:
 - Single chromatic voice: oxblood (`oklch(0.46 0.13 20)`), used on under 10% of any visible screen.
 - Newsreader serif for long-form and structural type, Inter for UI chrome, JetBrains Mono for code.
 - Hairline cream rules at structural breaks. Otherwise borderless surface separation by tonal layering.
-- A subtle warm radial glow (the "lamp") on the actively-focused surface only. One lamp per page.
+- Focus states use a restrained oxblood border glow.
 
 ## 2. Colors: The Carrel Palette
 
@@ -182,11 +186,11 @@ The palette is built from three materials of a university reading room: warm woo
 ### Neutral
 - **Lamp Night** (`#1a1614` / `oklch(0.155 0.008 30)`): The page background. Warm-tinted dark, far from cool charcoal. The room with the lamp turned down.
 - **Desk Surface** (`#231d1a` / `oklch(0.21 0.01 30)`): Cards, modals, navbar, dropdown panels. The wood of the desk, slightly lifted from the room shadow.
-- **Desk Surface Hover** (`#2c2421` / `oklch(0.255 0.012 30)`): The same desk under direct lamp light. Used on hover and on the actively-focused surface (combined with the Lamp Halo).
+- **Desk Surface Hover** (`#2c2421` / `oklch(0.255 0.012 30)`): The desk surface under direct interaction. Used on hover and selected surfaces.
 - **Page Cream** (`#ece5d6` / `oklch(0.93 0.012 80)`): Primary text. Warm off-white, the color of an old library book's pages. Never pure white.
 - **Page Cream Muted** (`#c4baa6` / `oklch(0.78 0.015 80)`): Secondary text. Descriptions, timestamps, placeholders.
 - **Page Cream Faint** (`#9a8f7e` / `oklch(0.62 0.01 80)`): Tertiary text. File metadata, captions, "topics completed" labels.
-- **Hairline** (`#ece5d629`, ~16% alpha cream): The structural rule line. Below section headings, between plan items, between chat messages and the input row. Never wraps a card.
+- **Hairline** (`#ece5d629`, ~16% alpha cream): The structural rule line. Below section headings, between plan items, between chat messages and the input row. Also used as the very soft full border on card surfaces that need clearer separation from the page.
 
 ### Tertiary (Status)
 - **Forest Success** (`#5e8c6f` / `oklch(0.62 0.09 150)`): Topic completion marks, progress fills, success toasts. Olive-leaning so it does not read as Gemini-pastel green.
@@ -230,18 +234,18 @@ The palette is built from three materials of a university reading room: warm woo
 
 ## 4. Elevation
 
-The system is **flat by default with one exception**: the Lamp Halo on the actively-focused surface. Surfaces do not lift physically; they are separated by warm tonal layering. Desk-surface sits over lamp-night by lightness alone. Hairlines mark structural breaks where physical elevation would be heavier than the design wants. Modals are the second exception: they cheat with a soft warm shadow because they need to sit clearly above the dimmed page. Everything else stays grounded.
+The system is **flat by default**. Surfaces do not lift physically; they are separated by warm tonal layering, hairlines, and restrained focus borders. Desk-surface sits over lamp-night by lightness alone. Hairlines mark structural breaks where physical elevation would be heavier than the design wants. Modals are the main exception: they cheat with a soft warm shadow because they need to sit clearly above the dimmed page. Everything else stays grounded.
 
 ### Shadow Vocabulary
-- **Lamp Halo** (`box-shadow: 0 0 60px -12px rgba(196, 120, 66, 0.20)` plus a `radial-gradient(120% 80% at 50% 0%, rgba(196, 120, 66, 0.18), transparent 70%)` overlay on a `::before` pseudo-element): The signature glow. Applied to the actively-focused surface only. Warm orange-amber, never cool.
+- **Input Focus Glow** (`border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)`): The standard focus treatment for text inputs, textareas, and input-like containers. It keeps focus visible at the component edge.
 - **Modal Lift** (`box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--hairline)`): Modal surfaces over the dimmed page. Soft, deep, low-chroma. The modal sits on the desk under the lamp; the rest of the room dims behind.
-- **Focus Ring** (`box-shadow: 0 0 0 3px var(--oxblood-tint)`): Keyboard focus on inputs and buttons. Replaces the browser default outline; never combined with a colored border shift.
+- **Focus Ring** (`box-shadow: 0 0 0 3px var(--oxblood-tint)`): Keyboard focus on buttons, checkboxes, and compact controls. Replaces the browser default outline. Text entry fields use the Input Focus Glow instead.
 
 ### Named Rules
 
-**The Lamp Rule.** There is exactly one lamp on a page at a time. Two lit surfaces fragment attention, which is the opposite of "calm under cognitive load." The lamp belongs on the active topic card, the focused chat input, or the auth form. Not on hover (hover gets a desk-surface-hover background, no halo). Not on every card. One.
+**The Focus Edge Rule.** Inputs, textareas, auth forms, and chat composers use a border-color shift plus a small oxblood glow that stays tight to the component edge.
 
-**The No-Lift Rule.** Cards do not raise off the page on hover. Hover changes the background (desk-surface → desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add `translate-y`, scale, or shadow. The lamp does the lifting. Cards stay flat.
+**The No-Lift Rule.** Cards do not raise off the page on hover. Hover changes the background (desk-surface → desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add `translate-y`, scale, or shadow. Cards stay flat.
 
 ## 5. Components
 
@@ -253,16 +257,16 @@ The system is **flat by default with one exception**: the Lamp Halo on the activ
 - **Danger:** Same shape as Primary. `background: var(--rust-danger)`. Used only in confirmation modals where the action is destructive. Never in primary-button position on a page.
 
 ### Inputs
-- **Style:** `background: var(--desk-surface)`, no visible border at rest, `rounded: 6px`, padding `12px 14px`. Body typography (Inter 15px / 400). Placeholder color: `var(--page-cream-faint)`.
-- **Focus:** Adds a 3px oxblood-tint focus ring. Background unchanged. No color-shift border, no glow, no scale.
+- **Style:** `background: var(--desk-surface)`, `border: 1px solid var(--hairline)`, `rounded: 6px`, padding `12px 14px`. Body typography (Inter 15px / 400). Placeholder color: `var(--page-cream-faint)`.
+- **Focus:** Border shifts to a restrained oxblood glow: `border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)`. Background unchanged.
 - **Error:** `box-shadow: 0 0 0 3px rgba(182, 90, 54, 0.25)` (rust-tint focus ring). Error message in `var(--rust-danger)` directly below the field.
 - **Search:** Same shape, with a JetBrains Mono `/` keystroke hint inside, page-cream-faint, right-aligned.
 
 ### Cards / Containers
 - **Corner Style:** `10px` (lg). No exception for "fancy" cards.
 - **Background:** `var(--desk-surface)`. No backdrop-blur. The room is already shadowed.
-- **Borders:** None at rest. A single hairline rule appears below the card's title, separating heading from body. Never wraps the card.
-- **Shadow:** Flat at rest. Hover sets `background: var(--desk-surface-hover)`, no shadow, no lift. Active (the topic being studied / focused) adds the Lamp Halo.
+- **Borders:** `1px solid var(--hairline)` at rest. The border should read as a soft edge, not a frame. A single internal hairline rule may appear below the card's title when the heading needs separation from the body.
+- **Shadow:** Flat at rest. Hover sets `background: var(--desk-surface-hover)`, no shadow, no lift. Active states use oxblood borders, state nodes, or low-opacity tints.
 - **Internal Padding:** `20px` default. `28px` for modal-class containers.
 
 ### Modals
@@ -279,7 +283,7 @@ The system is **flat by default with one exception**: the Lamp Halo on the activ
 ### Topic Card (Signature Component)
 
 The topic card in the studying timeline is the system's signature component:
-- A leading **state node** (numbered circle, 24px, `border: 1.5px solid var(--page-cream-faint)`). Completed: `background: var(--forest-success)`, white check inside. Active (currently being studied): `background: var(--oxblood)`, page-cream number, plus the **Lamp Halo** behind the entire card.
+- A leading **state node** (numbered circle, 24px, `border: 1.5px solid var(--page-cream-faint)`). Completed: `background: var(--forest-success)`, white check inside. Active (currently being studied): `background: var(--oxblood)`, page-cream number, plus a restrained oxblood border or low-opacity tint on the card.
 - The **topic title** in Newsreader Title style.
 - A **subtopic list** in Inter Body, page-cream-muted. Dot-separated when short, bulleted when long.
 - A trailing **completion checkbox** (custom, `rounded: 4px`, oxblood when checked).
@@ -288,10 +292,10 @@ The topic card in the studying timeline is the system's signature component:
 ### Chat Input (Signature Component)
 
 The bottom chat input on a topic page is the second signature surface:
-- Single multi-line textarea, Body typography, `background: var(--desk-surface)`, `rounded: 14px`, padding `14px 18px`.
-- **Lamp Halo** appears on `:focus-within`. The input is the only consistently-lit surface in the chat view; the topic card above it stays in restful shadow once the user is composing.
+- Single multi-line textarea, Body typography, `background: var(--desk-surface)`, `border: 1px solid var(--hairline)`, `rounded: 14px`, padding `14px 18px`.
+- **Focus:** `:focus-within` applies the Input Focus Glow to the composer container. The glow stays at the border so the chat view remains clean while the user is composing.
 - Send button at the right edge: oxblood circle (28px). `rounded-full` is permitted *only* here because it functions as an icon button. JetBrains Mono `↵` glyph in page-cream.
-- Above the input, a soft gradient fade (lamp-night to transparent, 24px high) so the message stream visually recedes into shadow toward the bottom: the lamp's edge.
+- Above the input, a soft gradient fade (lamp-night to transparent, 24px high) so the message stream visually recedes toward the bottom.
 
 ### Code Block
 - **Surface:** `background: var(--code-surface)` (the only cool note in the palette). Padding `16px`, `rounded: 6px`, `border: 1px solid var(--hairline)`. Code is treated like a quotation block.
@@ -319,7 +323,7 @@ The bottom chat input on a topic page is the second signature surface:
 
 ### Do
 - **Do** use Newsreader for all AI-authored prose, all topic titles, and all plan headings. Inter for everything the user clicks, types, or navigates. JetBrains Mono only for code and KaTeX.
-- **Do** apply the warm radial Lamp Halo on the single actively-focused surface per page only (the topic being studied, the focused chat input, the auth form). One lamp per room.
+- **Do** use the restrained Input Focus Glow for text inputs, textareas, and chat composers. Focus should be visible at the border and quiet everywhere else.
 - **Do** use Hairline rules at structural breaks, under section and topic headings, between chat messages and the input, between plan items. Bookish, like the rule under a chapter heading in a printed text.
 - **Do** keep oxblood under 10% of any visible screen. It is the binding of the book, not the cover.
 - **Do** warm-shift any new status color into the palette's hue family (10–80, or olive 140–155). A cool blue badge will scream against the rest.
@@ -335,7 +339,7 @@ The bottom chat input on a topic page is the second signature surface:
 - **Don't** drift into ChatGPT / Claude / Gemini lookalike. The plan and topic timeline must visibly anchor every authenticated screen. If a screen reduces to "open the app and chat," the brand line is broken.
 - **Don't** add ambient micro-animations. Existing keyframes (fade-in-up, modal-pop, jumping-dots, pulsing-dots) stay only where they confirm a state change. No idle decoration.
 - **Don't** use modals as a first thought. Inline disclosure, progressive forms, and contextual panels come first. Modals are reserved for hard interrupts (delete confirmation, payment QR).
-- **Don't** lift cards on hover. The Lamp does the lifting. Cards stay flat; hover changes background only.
+- **Don't** lift cards on hover. Cards stay flat; hover changes background only.
 - **Don't** use bright syntax-highlighting themes (Dracula, Synthwave, Monokai). Code is warm-muted with oxblood/brass/cream accents on the cool code-surface background.
 - **Don't** use cards as the lazy answer to every grouping. Most page sections need a heading and a hairline rule, nothing more.
 - **Don't** use em dashes in copy or in code comments destined for users. Commas, colons, periods, parentheses.

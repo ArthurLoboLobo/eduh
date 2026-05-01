@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n';
 import Button from '@/components/ui/Button';
@@ -31,13 +31,12 @@ const statusBadgeVariant: Record<string, 'blue' | 'muted' | 'green'> = {
 };
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { showToast } = useToast();
   const router = useRouter();
 
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
 
   // Create modal state
   const [createOpen, setCreateOpen] = useState(false);
@@ -66,12 +65,6 @@ export default function DashboardPage() {
       setLoading(false);
     }
   }
-
-  const filtered = useMemo(() => {
-    if (!search.trim()) return sections;
-    const q = search.toLowerCase();
-    return sections.filter((s) => s.name.toLowerCase().includes(q));
-  }, [sections, search]);
 
   async function handleCreate() {
     if (!createName.trim()) return;
@@ -117,7 +110,7 @@ export default function DashboardPage() {
   }
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString();
+    return new Date(dateStr).toLocaleDateString(language === 'pt-BR' ? 'pt-BR' : 'en-US');
   }
 
   if (loading) {
@@ -130,43 +123,40 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Top bar: search + create */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1">
-          <Input
-            placeholder={t.dashboard.searchPlaceholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+      {/* Page header: title + create */}
+      <div className="flex items-end justify-between gap-4 pb-4 mb-6 border-b border-hairline">
+        <h1 className="font-title text-[1.75rem] font-medium leading-[1.2] tracking-[-0.005em] text-page-cream">
+          {t.dashboard.title}
+        </h1>
         <Button onClick={() => setCreateOpen(true)}>{t.dashboard.createSection}</Button>
       </div>
 
       {/* Section grid or empty state */}
-      {filtered.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-primary-text text-sm">{t.dashboard.emptyTitle}</p>
-          <p className="text-muted-text text-sm mt-1">{t.dashboard.emptyDescription}</p>
+      {sections.length === 0 ? (
+        <div className="text-center py-24">
+          <p className="font-title text-[1.25rem] text-page-cream">{t.dashboard.emptyTitle}</p>
+          <hr className="w-12 border-0 border-t border-hairline my-3 mx-auto" />
+          <p className="font-body text-[15px] text-page-cream-muted">{t.dashboard.emptyDescription}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((section) => (
+          {sections.map((section) => (
             <Card
               key={section.id}
               clickable
               onClick={() => router.push(`/sections/${section.id}`)}
-              className="flex flex-col gap-3"
+              className="group flex flex-col gap-3"
             >
               {/* Header: name + delete */}
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="text-sm font-semibold text-primary-text truncate">{section.name}</h3>
+              <div className="flex items-start justify-between gap-2 -mr-2">
+                <h3 className="font-title text-[1.25rem] leading-[1.3] text-page-cream truncate">{section.name}</h3>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setDeleteTarget(section);
                   }}
-                  className="shrink-0 text-muted-text hover:text-danger-red cursor-pointer p-0.5"
-                  aria-label="Delete"
+                  className="shrink-0 -mt-0.5 p-2 rounded-[6px] text-page-cream-muted hover:text-rust-danger cursor-pointer transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 [@media(pointer:coarse)]:opacity-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-oxblood-tint"
+                  aria-label={t.dashboard.deleteConfirmTitle}
                 >
                   <TrashIcon />
                 </button>
@@ -174,12 +164,12 @@ export default function DashboardPage() {
 
               {/* Description */}
               {section.description && (
-                <p className="text-xs text-muted-text line-clamp-2">{section.description}</p>
+                <p className="font-body text-[14px] text-page-cream-muted line-clamp-2 mt-[-4px]">{section.description}</p>
               )}
 
               {/* Date + badge */}
-              <div className="flex items-center justify-between mt-auto">
-                <span className="text-xs text-muted-text">{formatDate(section.created_at)}</span>
+              <div className="flex items-center justify-between mt-auto pt-2">
+                <span className="font-body text-[13px] text-page-cream-faint">{formatDate(section.created_at)}</span>
                 <Badge variant={statusBadgeVariant[section.status] ?? 'muted'}>
                   {t.dashboard.status[section.status as keyof typeof t.dashboard.status] ?? section.status}
                 </Badge>
@@ -187,11 +177,11 @@ export default function DashboardPage() {
 
               {/* Progress (studying only) */}
               {section.status === 'studying' && section.total_topics > 0 && (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2 mt-2">
                   <ProgressBar
                     value={(section.completed_topics / section.total_topics) * 100}
                   />
-                  <span className="text-xs text-muted-text">
+                  <span className="font-label text-[12px] text-page-cream-faint">
                     {section.completed_topics}/{section.total_topics} {t.dashboard.topicsCompleted}
                   </span>
                 </div>
@@ -221,7 +211,7 @@ export default function DashboardPage() {
             value={createDesc}
             onChange={(e) => setCreateDesc(e.target.value)}
           />
-          {createError && <p className="text-xs text-danger-red">{createError}</p>}
+          {createError && <p className="font-label text-[13px] text-rust-danger">{createError}</p>}
           <div className="flex justify-end gap-2">
             <Button
               variant="ghost"
