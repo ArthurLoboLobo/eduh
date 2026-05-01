@@ -12,8 +12,7 @@
 
 
 ### Mobile
-- **Fix "Entenda Como Funciona" button**: The button is currently not functioning on mobile devices. Investigate and fix the click handler or link.
-- **Improve spacing in "How it works" section**: The spacing between elements in the "How it works" section on mobile is inconsistent or too tight. Review and improve the layout for better readability.
+
 
 ### Chat / AI
 - **Image uploads in chat**: Allow users to attach and send images in a chat message, so the AI can reason about visual content (e.g. problem screenshots, diagrams, handwritten notes).
@@ -28,6 +27,7 @@
 - **Page refresh resilience**: Make it possible to refresh the page without interfering with the response.
 - **Improve embedding chunking**: Ensure the text chunking algorithm never splits a word into two separate chunks — always break at word boundaries.
 - **Smarter problem-aware retrieval**: Make the embedding and retrieval process more efficient by ensuring each problem is always placed in its own chunk(s). When a chunk belonging to a problem is retrieved via similarity search, return the entire problem (and its solution, if available) rather than just the matched chunk.
+- **Topic completion flow in chat**: When a topic is finished in a chat, make it easier for the user to mark the topic as completed and navigate to the next topic — e.g. a contextual prompt or inline action at the end of the conversation. Exact UX TBD.
 
 ### Subscription / Payments
 - **Pix payment loading state**: When the user clicks to pay with Pix in the payment modal, show a spinning/loading icon while the QR code is being generated, so the UI doesn't feel frozen.

@@ -73,9 +73,9 @@ body {
   color: var(--page-cream);
   font-family: var(--font-title);
 }
-.prose-chat h1 { font-size: 1.5rem; }
-.prose-chat h2 { font-size: 1.25rem; }
-.prose-chat h3 { font-size: 1.125rem; }
+.prose-chat h1 { font-size: 1.3333em; }
+.prose-chat h2 { font-size: 1.1111em; }
+.prose-chat h3 { font-size: 1em; }
 .prose-chat p { margin-bottom: 0.5em; line-height: 1.65; }
 .prose-chat ul, .prose-chat ol { margin-bottom: 0.5em; padding-left: 1.5em; }
 .prose-chat li { margin-bottom: 0.25em; }
@@ -92,13 +92,40 @@ body {
 .prose-chat a { color: var(--oxblood); text-decoration: underline; text-decoration-color: var(--oxblood-tint); transition: all 0.2s; }
 .prose-chat a:hover { color: var(--oxblood-bright); text-decoration-color: var(--oxblood); }
 .prose-chat hr { border-color: var(--hairline); margin: 1.5em 0; border-top-width: 1px; }
-.prose-chat table { border-collapse: collapse; margin: 1em 0; font-family: var(--font-body); font-size: 0.875rem; }
-.prose-chat th, .prose-chat td {
+.prose-chat .markdown-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.15em 0 1.25em;
   border: 1px solid var(--hairline);
-  padding: 0.5em 0.75em;
-  text-align: left;
+  border-radius: 10px;
+  background: rgba(35, 29, 26, 0.52);
 }
-.prose-chat th { background: var(--desk-surface); font-weight: 500; color: var(--page-cream-muted); }
+.prose-chat table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-body-prose);
+  font-size: 0.8889em;
+  line-height: 1.45;
+  color: var(--page-cream);
+  white-space: nowrap;
+}
+.prose-chat th, .prose-chat td {
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: 0.6em 0.8em;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-chat th {
+  background: rgba(236, 229, 214, 0.055);
+  font-weight: 500;
+  color: var(--page-cream);
+}
+.prose-chat td { color: var(--page-cream-muted); }
+.prose-chat tr:last-child td { border-bottom: 0; }
+.prose-chat th:last-child, .prose-chat td:last-child { border-right: 0; }
 
 /* Allow long KaTeX display formulas to scroll horizontally inside their bubble
    instead of stretching the page. */

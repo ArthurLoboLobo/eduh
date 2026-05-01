@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import type { UIMessage } from 'ai';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -70,12 +71,19 @@ function ChatMessageItem({
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-[95%] min-w-0 overflow-hidden font-body-prose text-[1.125rem] leading-[1.65] text-page-cream prose-chat">
+      <div className="max-w-[95%] min-w-0 overflow-hidden font-body-prose text-[16px] leading-[1.65] text-page-cream prose-chat">
         {textContent && (
           <ReactMarkdown
-            remarkPlugins={[remarkMath]}
+            remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex]}
             components={{
+              table({ children }) {
+                return (
+                  <div className="markdown-table-scroll">
+                    <table>{children}</table>
+                  </div>
+                );
+              },
               code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
                 const codeString = String(children).replace(/\n$/, '');
@@ -85,14 +93,14 @@ function ChatMessageItem({
                       style={oneDark}
                       language={match[1]}
                       PreTag="div"
-                      customStyle={{ borderRadius: '0.75rem', fontSize: '0.8125rem', margin: '1rem 0', maxWidth: '100%', overflowX: 'auto' }}
+                      customStyle={{ borderRadius: '0.75rem', fontSize: '0.7222em', margin: '1rem 0', maxWidth: '100%', overflowX: 'auto' }}
                     >
                       {codeString}
                     </SyntaxHighlighter>
                   );
                 }
                 return (
-                  <code className="bg-[rgba(236,229,214,0.08)] px-1.5 py-0.5 rounded-md font-body text-[0.85rem]" {...props}>
+                  <code className="bg-[rgba(236,229,214,0.08)] px-1.5 py-0.5 rounded-md font-body text-[0.7556em]" {...props}>
                     {children}
                   </code>
                 );

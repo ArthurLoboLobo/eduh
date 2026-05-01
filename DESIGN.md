@@ -37,7 +37,7 @@ typography:
     letterSpacing: "normal"
   body-prose:
     fontFamily: "Newsreader, 'Source Serif 4', 'Iowan Old Style', Georgia, serif"
-    fontSize: "1.0625rem"
+    fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.65
     letterSpacing: "normal"
@@ -219,7 +219,7 @@ The palette is built from three materials of a university reading room: warm woo
 - **Display** (Newsreader, 400, `clamp(2.75rem, 7vw, 5rem)`, line-height 1.05, letter-spacing -0.01em): The auth/landing page hero. Light weight despite the size. The size carries the weight; the type stays elegant.
 - **Headline** (Newsreader, 500, 1.75rem, line-height 1.2): Section and topic page titles. The title bar of every authenticated page.
 - **Title** (Newsreader, 500, 1.25rem, line-height 1.3): Card titles, modal titles, topic names in plan and timeline.
-- **Body Prose** (Newsreader, 400, 1.0625rem / 17px, line-height 1.65): AI explanations in the chat stream, long-form topic content, plan descriptions. Capped at 65–75ch line length. **This is where the system feels academic.**
+- **Body Prose** (Newsreader, 400, 1rem / 16px, line-height 1.65): AI explanations in the chat stream, long-form topic content, plan descriptions. Capped at 65–75ch line length. **This is where the system feels academic.**
 - **Body** (Inter, 400, 0.9375rem / 15px, line-height 1.55): UI body text. Modal copy, descriptions, dashboard subtitles.
 - **Label** (Inter, 500, 0.8125rem / 13px, line-height 1.3, letter-spacing 0.01em): Buttons, badges, form labels, navbar, breadcrumb.
 - **Mono** (JetBrains Mono, 400, 0.875rem / 14px, line-height 1.55): Inline code, code blocks, KaTeX inline `\texttt`.
@@ -228,7 +228,7 @@ The palette is built from three materials of a university reading room: warm woo
 
 **The Two-Voice Rule.** Newsreader for *content the AI gives the student* (explanations, examples, worked solutions, topic titles, plan headings). Inter for *the affordances the student uses to navigate* (buttons, inputs, navbar, breadcrumbs, dashboard chrome). The serif makes "this is the lesson" feel like a textbook page; the sans makes "this is the tool" feel snappy. Mixing the two, sans on a topic title or serif on a button, breaks the voice.
 
-**The 75ch Rule.** Body prose is capped at 75ch (~680px at 17px). Wider lines fatigue tired students faster than any other typography failure.
+**The 75ch Rule.** Body prose is capped at 75ch (~640px at 16px). Wider lines fatigue tired students faster than any other typography failure.
 
 **The No-Gradient-Type Rule.** No `background-clip: text`. The previous "Eduh" wordmark with a page-cream-to-blue gradient is retired. Set the wordmark in solid page-cream, in Newsreader.
 

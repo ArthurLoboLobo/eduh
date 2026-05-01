@@ -13,9 +13,10 @@ export const MIN_UNSUMMARIZED_MESSAGES = 5;
 export const RATE_LIMIT_MESSAGES_PER_MINUTE = 10;
 
 // Usage limits (weighted tokens per day)
-export const DAILY_TOKEN_LIMIT_FREE_BEST = 100_000;    // ~2.5 topics (best model)
-export const DAILY_TOKEN_LIMIT_FREE_CUTOFF = 200_000;   // ~5 topics (hard cutoff)
-export const DAILY_TOKEN_LIMIT_PRO = 400_000;            // ~10 topics (best model)
+// 1 topic = ~120000
+export const DAILY_TOKEN_LIMIT_FREE_BEST = 240_000;    // ~2 topics (best model)
+export const DAILY_TOKEN_LIMIT_FREE_CUTOFF = 240_000;   // + ~2 topics (hard cutoff)
+export const DAILY_TOKEN_LIMIT_PRO = 1500000;            // ~12.5 topics (best model)
 export const TOKEN_WEIGHT_OUTPUT_MULTIPLIER = 6;         // output tokens cost 6x input
 
 // Usage warning thresholds (percentage of current phase's limit)
