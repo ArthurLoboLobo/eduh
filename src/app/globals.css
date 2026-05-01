@@ -73,9 +73,9 @@ body {
   color: var(--page-cream);
   font-family: var(--font-title);
 }
-.prose-chat h1 { font-size: 1.5rem; }
-.prose-chat h2 { font-size: 1.25rem; }
-.prose-chat h3 { font-size: 1.125rem; }
+.prose-chat h1 { font-size: 1.3333em; }
+.prose-chat h2 { font-size: 1.1111em; }
+.prose-chat h3 { font-size: 1em; }
 .prose-chat p { margin-bottom: 0.5em; line-height: 1.65; }
 .prose-chat ul, .prose-chat ol { margin-bottom: 0.5em; padding-left: 1.5em; }
 .prose-chat li { margin-bottom: 0.25em; }
@@ -106,7 +106,7 @@ body {
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-body-prose);
-  font-size: 1rem;
+  font-size: 0.8889em;
   line-height: 1.45;
   color: var(--page-cream);
   white-space: nowrap;

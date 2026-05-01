@@ -219,7 +219,7 @@
       "display": { "displayName": "Display", "purpose": "Auth and landing hero only. Newsreader at clamp display size, light weight." },
       "headline": { "displayName": "Headline", "purpose": "Section and topic page titles. Newsreader at 1.75rem." },
       "title": { "displayName": "Title", "purpose": "Card titles, modal titles, topic names. Newsreader at 1.25rem." },
-      "body-prose": { "displayName": "Body Prose", "purpose": "AI explanations and long-form topic content. Newsreader at 17px, line-height 1.65, capped at 75ch." },
+      "body-prose": { "displayName": "Body Prose", "purpose": "AI explanations and long-form topic content. Newsreader at 16px, line-height 1.65, capped at 75ch." },
       "body": { "displayName": "Body", "purpose": "UI body text — modal copy, descriptions, dashboard subtitles. Inter at 15px." },
       "label": { "displayName": "Label", "purpose": "Buttons, badges, form labels, navbar, breadcrumb. Inter at 13px / 500 / +0.01em." },
       "mono": { "displayName": "Mono", "purpose": "Inline code, code blocks, KaTeX inline. JetBrains Mono at 14px." }
@@ -333,7 +333,7 @@
       { "name": "The No-White Rule", "body": "Pure #ffffff and pure #000000 are forbidden. All neutrals carry the warm hue. Page-cream replaces white. Lamp-night replaces black.", "section": "colors" },
       { "name": "The Cool-Code Rule", "body": "The neutral-grey code surface is the only cool note in the palette. Cool tones must not leak anywhere else.", "section": "colors" },
       { "name": "The Two-Voice Rule", "body": "Newsreader for content the AI gives the student (explanations, examples, worked solutions, topic titles, plan headings). Inter for the affordances the student uses to navigate (buttons, inputs, navbar, breadcrumbs, dashboard chrome). Mixing the two breaks the voice.", "section": "typography" },
-      { "name": "The 75ch Rule", "body": "Body prose is capped at 75ch (~680px at 17px). Wider lines fatigue tired students faster than any other typography failure.", "section": "typography" },
+      { "name": "The 75ch Rule", "body": "Body prose is capped at 75ch (~640px at 16px). Wider lines fatigue tired students faster than any other typography failure.", "section": "typography" },
       { "name": "The No-Gradient-Type Rule", "body": "No background-clip: text. The previous Eduh wordmark with a page-cream-to-blue gradient is retired. Solid page-cream Newsreader.", "section": "typography" },
       { "name": "The Focus Edge Rule", "body": "Inputs, textareas, auth forms, and chat composers use a border-color shift plus a small oxblood glow that stays tight to the component edge.", "section": "elevation" },
       { "name": "The No-Lift Rule", "body": "Cards do not raise off the page on hover. Hover changes the background (desk-surface to desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add translate-y, scale, or shadow.", "section": "elevation" }
