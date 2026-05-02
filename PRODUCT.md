@@ -61,7 +61,7 @@ Eduh replaces the blank LLM chatbox with a real study flow:
 
    **How to apply:** prefer designs that surface "this came from your materials" over designs that hide it. RAG-related UI (the `searchStudentMaterials` indicator, future citation chips) gets visual weight, not stylistic noise.
 
-2. **Calm under cognitive load.** Students use Eduh tired, stressed, often the night before an exam. The app should feel like a quiet library: no animations fighting for attention, no surprise modals, no toasts that punish you, no "engagement" patterns. The harder the user is working, the calmer the surface should be.
+2. **Calm under cognitive load.** Students use Eduh tired, stressed, often the night before an exam. The app should feel like a quiet library: no lots of animations fighting for attention, no surprise modals, no toasts that punish you, no "engagement" patterns. The harder the user is working, the calmer the surface should be.
 
    **Why:** stimulation is the enemy of learning. Every UI element competing for cognitive bandwidth is bandwidth taken away from the actual work of understanding the material.
 

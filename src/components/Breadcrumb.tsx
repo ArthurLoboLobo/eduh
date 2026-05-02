@@ -68,6 +68,9 @@ export default function Breadcrumb() {
   const isOnSubscription = pathname === '/subscription';
   const isOnSection = !!sectionId;
   const isOnChat = !!chatId;
+  const canRenderSectionSegment = isOnSection && !!currentSection && (!isOnChat || !!currentChat);
+  const canRenderChatSegment = isOnChat && !!currentSection && !!currentChat;
+  const showPendingSegmentMarker = isOnSection && !canRenderSectionSegment;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -112,8 +115,12 @@ export default function Breadcrumb() {
           </>
         )}
 
+        {showPendingSegmentMarker && (
+          <span className="text-page-cream-faint select-none">›</span>
+        )}
+
         {/* Section segment */}
-        {isOnSection && (
+        {canRenderSectionSegment && (
           <>
             <span className="text-page-cream-faint select-none">›</span>
             <div className="relative" ref={sectionDropdownRef}>
@@ -127,7 +134,7 @@ export default function Breadcrumb() {
                 }`}
                 aria-expanded={sectionOpen}
               >
-                <span className="truncate">{currentSection?.name ?? sectionId}</span>
+                <span className="truncate">{currentSection.name}</span>
                 <ChevronDownIcon />
               </button>
 
@@ -151,7 +158,7 @@ export default function Breadcrumb() {
         )}
 
         {/* Chat segment */}
-        {isOnChat && (
+        {canRenderChatSegment && (
           <>
             <span className="text-page-cream-faint select-none">›</span>
             <div className="relative" ref={chatDropdownRef}>
@@ -163,7 +170,7 @@ export default function Breadcrumb() {
                 className="flex items-center gap-1 min-w-0 max-w-[10rem] sm:max-w-xs text-page-cream hover:text-page-cream-muted transition-colors cursor-pointer"
                 aria-expanded={chatOpen}
               >
-                <span className="truncate">{currentChat?.name ?? chatId}</span>
+                <span className="truncate">{currentChat.name}</span>
                 <ChevronDownIcon />
               </button>
 

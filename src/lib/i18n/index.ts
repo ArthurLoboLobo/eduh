@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { createContext, createElement, useCallback, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import ptBR from './pt-BR';
 import type { Translations } from './pt-BR';
 import en from './en';
@@ -15,6 +16,14 @@ const translations: Record<Language, Translations> = {
   en,
 };
 
+type I18nContextValue = {
+  t: Translations;
+  language: Language;
+  setLanguage: (lang: Language) => void;
+};
+
+const I18nContext = createContext<I18nContextValue | null>(null);
+
 export function getLanguageFromCookie(): Language {
   if (typeof document === 'undefined') return 'pt-BR';
   const match = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_NAME}=([^;]*)`));
@@ -28,15 +37,16 @@ export function setLanguageCookie(language: Language): void {
 
 const LANGUAGE_EVENT = 'eduh:language-change';
 
-export function useTranslation() {
-  // Always start with 'pt-BR' so SSR and client initial render match.
-  // Sync to the actual cookie value after hydration.
-  const [language, setLang] = useState<Language>('pt-BR');
+export function I18nProvider({
+  initialLanguage,
+  children,
+}: {
+  initialLanguage: Language;
+  children: ReactNode;
+}) {
+  const [language, setLang] = useState<Language>(initialLanguage);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional hydration sync: start with 'pt-BR' for SSR match, then update to cookie value after mount
-    setLang(getLanguageFromCookie());
-
     function handleChange(e: Event) {
       setLang((e as CustomEvent<Language>).detail);
     }
@@ -50,9 +60,27 @@ export function useTranslation() {
     window.dispatchEvent(new CustomEvent<Language>(LANGUAGE_EVENT, { detail: lang }));
   }, []);
 
+  return createElement(
+    I18nContext.Provider,
+    {
+      value: {
+        t: translations[language],
+        language,
+        setLanguage,
+      },
+    },
+    children,
+  );
+}
+
+export function useTranslation() {
+  const context = useContext(I18nContext);
+  if (context) return context;
+
+  const language = getLanguageFromCookie();
   return {
     t: translations[language],
     language,
-    setLanguage,
+    setLanguage: setLanguageCookie,
   };
 }

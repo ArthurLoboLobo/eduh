@@ -254,7 +254,7 @@ Custom colors are defined as CSS variables in `src/app/globals.css` and exposed 
 ## Design Constraints
 
 - **Dark mode only** — no light mode.
-- **No animations** — static UI only.
+- **No lots of animations** — mostly static UI.
 - **Flat design** with subtle hover effects and slightly rounded corners.
 - **i18n**: default `pt-BR`, secondary English. LLM language priority: last user message language > materials language > user preference.
 
