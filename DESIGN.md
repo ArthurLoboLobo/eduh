@@ -14,6 +14,7 @@ colors:
   forest-success: "#5e8c6f"
   rust-danger: "#cf5a52"
   confirm-danger: "#bd5045"
+  confirm-danger-hover: "#cf5a52"
   brass-warning: "#d6a85a"
   hairline: "#ece5d629"
   code-surface: "#262a2c"
@@ -105,18 +106,20 @@ components:
     typography: "{typography.label}"
     rounded: "{rounded.md}"
     padding: "10px 20px"
+  button-danger-hover:
+    backgroundColor: "{colors.confirm-danger-hover}"
+    textColor: "{colors.page-cream}"
+    typography: "{typography.label}"
+    rounded: "{rounded.md}"
+    padding: "10px 20px"
   input-field:
     backgroundColor: "{colors.desk-surface}"
-    borderColor: "{colors.hairline}"
-    focusBorderColor: "rgba(157, 67, 55, 0.58)"
-    focusShadow: "0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)"
     textColor: "{colors.page-cream}"
     typography: "{typography.body}"
     rounded: "{rounded.md}"
     padding: "12px 14px"
   card:
     backgroundColor: "{colors.desk-surface}"
-    borderColor: "{colors.hairline}"
     textColor: "{colors.page-cream}"
     rounded: "{rounded.lg}"
     padding: "20px"
@@ -158,7 +161,7 @@ components:
 
 A carrel is the private study desk in a university library: a small wooden booth with a green-shaded reading lamp, surrounded by silence and the spines of borrowed books. Eduh is what that carrel looks like when a Unicamp student logs in to study at 11pm the night before a P1. Warm, dim, focused, structured by the rhythm of reading. The kind of room where you can sit for two hours without your eyes burning out.
 
-The room is built from three materials. **Warm-dark wood-tone surfaces** (deep, slightly red-brown, never charcoal-cool) for the page and desk. **Warm-cream paper-tone text** (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, **oxblood**, the leather binding of the textbook resting on the desk. Focus is shown through precise oxblood borders and hairlines.
+The room is built from three materials. **Warm-dark wood-tone surfaces** (deep, slightly red-brown, never charcoal-cool) for the page and desk. **Warm-cream paper-tone text** (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, **oxblood**, the leather binding of the textbook resting on the desk. Focus is shown through precise oxblood borders and hairlines. The page may carry a nearly invisible fixed lamp wash from oxblood and brass radial gradients, but the effect stays below the threshold of decoration.
 
 Type does the academic work. **Newsreader serif** sets every heading, every topic title, every paragraph the AI hands back to you, the long-form "this is the lesson" register. **Inter sans** handles UI chrome (buttons, fields, labels) cleanly and unobtrusively. **JetBrains Mono** appears only where it should: code blocks and KaTeX inline. **Hairline cream rules** separate sections of the page the way a chapter rule separates chapters of a book.
 
@@ -169,7 +172,7 @@ This system explicitly rejects:
 - **ChatGPT / Claude / Gemini lookalike.** The plan and topic timeline must visibly anchor the experience. The surface must never collapse to "another chat app."
 
 **Key Characteristics:**
-- Warm-dark only. Background is `oklch(0.155 0.008 30)`, a deep warm sepia near-black. No pure or cool charcoal.
+- Warm-dark only. Background is `oklch(0.155 0.008 30)`, a deep warm sepia near-black, with only a low-opacity lamp wash. No pure or cool charcoal.
 - Single chromatic voice: oxblood (`oklch(0.46 0.13 20)`), used on under 10% of any visible screen.
 - Newsreader serif for long-form and structural type, Inter for UI chrome, JetBrains Mono for code.
 - Hairline cream rules at structural breaks. Otherwise borderless surface separation by tonal layering.
@@ -197,6 +200,7 @@ The palette is built from three materials of a university reading room: warm woo
 - **Forest Success** (`#5e8c6f` / `oklch(0.62 0.09 150)`): Topic completion marks, progress fills, success toasts. Olive-leaning so it does not read as Gemini-pastel green.
 - **Rust Danger** (`#cf5a52` / `oklch(0.61 0.15 28)`): Delete affordances, error toasts, validation errors. Clear red signal, still warm enough to sit with the library palette and distinguishable from oxblood (hue 20).
 - **Confirm Danger** (`#bd5045` / `oklch(0.57 0.143 28)`): Destructive confirmation buttons. Slightly darker than rust-danger, with a clearer red signal.
+- **Confirm Danger Hover** (`#cf5a52`): Hover state for destructive confirmation buttons. It aliases Rust Danger in CSS through `--confirm-danger-hover`.
 - **Brass Warning** (`#d6a85a` / `oklch(0.78 0.12 80)`): Usage warnings (75% / 90% caps), intermediate states. The lamp's brass fitting.
 - **Code Surface** (`#262a2c` / `oklch(0.22 0.005 240)`): Background for code blocks and KaTeX displays only. The single cool note in the room, by design, to mark "this is verbatim, not prose."
 
@@ -215,13 +219,13 @@ The palette is built from three materials of a university reading room: warm woo
 **Long-Form Prose Font:** Newsreader, used specifically for AI explanations and topic content
 **Mono Font:** JetBrains Mono (with ui-monospace, monospace fallback)
 
-**Character:** Newsreader is a screen-designed serif with the warmth of a printed book: humanist, slightly modulated, comfortable at long reading lengths. Inter is the most-tested UI sans available; here, it disappears into the chrome and lets Newsreader carry the brand personality. JetBrains Mono is the code voice, technical and even-width, made for STEM students.
+**Character:** Newsreader is a screen-designed serif with the warmth of a printed book: humanist, slightly modulated, comfortable at long reading lengths. Inter is the most-tested UI sans available; here, it disappears into the chrome and lets Newsreader carry the brand personality. JetBrains Mono is the code voice, technical and even-width, made for STEM students. The CSS tokens name these families directly; the app shell currently loads Geist variables for Tailwind's default `font-sans` and `font-mono`, so production font loading must explicitly provide Newsreader, Inter, and JetBrains Mono or accept the documented fallbacks.
 
 ### Hierarchy
 - **Display** (Newsreader, 400, `clamp(2.75rem, 7vw, 5rem)`, line-height 1.05, letter-spacing -0.01em): The auth/landing page hero. Light weight despite the size. The size carries the weight; the type stays elegant.
 - **Headline** (Newsreader, 500, 1.75rem, line-height 1.2): Section and topic page titles. The title bar of every authenticated page.
 - **Title** (Newsreader, 500, 1.25rem, line-height 1.3): Card titles, modal titles, topic names in plan and timeline.
-- **Body Prose** (Newsreader, 400, 1rem / 16px, line-height 1.65): AI explanations in the chat stream, long-form topic content, plan descriptions. Capped at 65–75ch line length. **This is where the system feels academic.**
+- **Body Prose** (Newsreader, 400, 1rem / 16px, line-height 1.65): AI explanations in the chat stream, long-form topic content, plan descriptions. Capped at 65-75ch line length. **This is where the system feels academic.**
 - **Body** (Inter, 400, 0.9375rem / 15px, line-height 1.55): UI body text. Modal copy, descriptions, dashboard subtitles.
 - **Label** (Inter, 500, 0.8125rem / 13px, line-height 1.3, letter-spacing 0.01em): Buttons, badges, form labels, navbar, breadcrumb.
 - **Mono** (JetBrains Mono, 400, 0.875rem / 14px, line-height 1.55): Inline code, code blocks, KaTeX inline `\texttt`.
@@ -242,19 +246,20 @@ The system is **flat by default**. Surfaces do not lift physically; they are sep
 - **Input Focus Glow** (`border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)`): The standard focus treatment for text inputs, textareas, and input-like containers. It keeps focus visible at the component edge.
 - **Modal Lift** (`box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--hairline)`): Modal surfaces over the dimmed page. Soft, deep, low-chroma. The modal sits on the desk under the lamp; the rest of the room dims behind.
 - **Focus Ring** (`box-shadow: 0 0 0 3px var(--oxblood-tint)`): Keyboard focus on buttons, checkboxes, and compact controls. Replaces the browser default outline. Text entry fields use the Input Focus Glow instead.
+- **Lamp Halo** (`box-shadow: 0 0 60px -12px rgba(196, 120, 66, 0.20)` plus a low-opacity warm radial overlay): Reserved for rare payment or subscription emphasis. It should read like a reading lamp catching an active surface, not a general card shadow.
 
 ### Named Rules
 
 **The Focus Edge Rule.** Inputs, textareas, auth forms, and chat composers use a border-color shift plus a small oxblood glow that stays tight to the component edge.
 
-**The No-Lift Rule.** Cards do not raise off the page on hover. Hover changes the background (desk-surface → desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add `translate-y`, scale, or shadow. Cards stay flat.
+**The No-Lift Rule.** Cards do not raise off the page on hover. Hover changes the background (desk-surface → desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add `translate-y` or scale. A small `shadow-sm` or `shadow-md` appears in a few current emphasis surfaces, but it is transitional drift, not a pattern to extend.
 
 ## 5. Components
 
 ### Buttons
 - **Shape:** Rectangular with mild rounding (`6px`, the `md` token). No pill shapes. Pills are Material/Gemini-coded, not library-coded. Padding `10px 20px`, height ~38px at default size. Label typography (Inter 13px / 500 / +0.01em).
 - **Primary (Oxblood):** `background: var(--oxblood)`, `color: var(--page-cream)`. The only chromatic button. Used once per page, on the dominant action ("Send code", "Start Planning", "Subscribe"). Hover shifts to `var(--oxblood-bright)`. Active applies a subtle inset shadow. No scale animation.
-- **Secondary (Ghost):** `background: transparent`, `color: var(--page-cream)`, `border: 1px solid var(--hairline)`. Used for "Cancel", "Back", "Logout", and low-priority actions. Hover: `background: var(--desk-surface-hover)`.
+- **Secondary (Ghost):** `background: transparent`, `color: var(--page-cream)`, `border: 1px solid transparent` in the shared Button component. Page-local ghost controls may use a hairline border when they need a physical boundary. Hover: `background: var(--desk-surface-hover)`.
 - **Tertiary (Bare text):** `background: transparent`, `color: var(--page-cream-muted)`, no border. Used for inline navigation links and dropdown items. Hover: `color: var(--page-cream)`.
 - **Danger:** Same shape as Primary. `background: var(--confirm-danger)`. Used only in confirmation modals where the action is destructive. Never in primary-button position on a page.
 
@@ -285,23 +290,30 @@ The system is **flat by default**. Surfaces do not lift physically; they are sep
 ### Topic Card (Signature Component)
 
 The topic card in the studying timeline is the system's signature component:
-- A leading **state node** (numbered circle, 24px, `border: 1.5px solid var(--page-cream-faint)`). Completed: `background: var(--forest-success)`, white check inside. Active (currently being studied): `background: var(--oxblood)`, page-cream number, plus a restrained oxblood border or low-opacity tint on the card.
+- A leading **state node**. In the current studying view this is a 48px desktop circle with a 3px lamp-night cutout border, plus a 40px mobile circle. Completed: `background: var(--forest-success)` with a check. Active (currently being studied): desk-surface node with an oxblood ring on desktop, oxblood-tint node on mobile, plus a restrained oxblood ring on the card.
 - The **topic title** in Newsreader Title style.
-- A **subtopic list** in Inter Body, page-cream-muted. Dot-separated when short, bulleted when long.
-- A trailing **completion checkbox** (custom, `rounded: 4px`, oxblood when checked).
-- A hairline rule between cards in the timeline, replacing the previous vertical connector. Bookish.
+- A **subtopic list** in Inter Body, page-cream-muted, with small hairline or forest dots. Long items clamp to two lines inside the card.
+- A trailing **completion checkbox** (custom, `rounded: 4px`, oxblood when checked). The hover label expands only on pointer hover and stays hidden on touch by default.
+- A vertical 1px hairline connector is currently used on desktop. It is acceptable because it represents sequence, not decoration, and it must stay quiet.
 
 ### Chat Input (Signature Component)
 
 The bottom chat input on a topic page is the second signature surface:
-- Single multi-line textarea, Body typography, `background: var(--desk-surface)`, `border: 1px solid var(--hairline)`, `rounded: 14px`, padding `14px 18px`.
+- Single multi-line textarea, Body typography, `background: var(--desk-surface)`, `border: 1px solid var(--hairline)`, `rounded: 14px`, container padding `8px 12px 8px 8px`, textarea padding `8px 16px`.
 - **Focus:** `:focus-within` applies the Input Focus Glow to the composer container. The glow stays at the border so the chat view remains clean while the user is composing.
-- Send button at the right edge: oxblood circle (28px). `rounded-full` is permitted *only* here because it functions as an icon button. JetBrains Mono `↵` glyph in page-cream.
-- Above the input, a soft gradient fade (lamp-night to transparent, 24px high) so the message stream visually recedes toward the bottom.
+- Send button at the right edge: oxblood icon button, currently `rounded: 6px`, 40px visual size, with a paper-plane icon. Do not switch it to a text button. A circular send button is allowed only if the rest of the composer also changes to support it.
+- Above the input, a fixed soft gradient fade (lamp-night to transparent, about 48px high including padding) so the message stream visually recedes toward the bottom.
+
+### Chat Messages and Markdown
+- **Assistant prose:** Newsreader Body Prose at 16px / 1.65, max-width 95%, with markdown headings in Newsreader Title. This is the core reading surface.
+- **User bubble:** Desk-surface rounded 14px bubble, max-width 85%, Inter body text. It may use a small existing shadow, but should not become glossy or elevated.
+- **Tool indicator:** When the assistant is searching materials, show an inline label with an oxblood search icon and small jumping dots. This is provenance feedback, not decoration.
+- **Tables:** Markdown tables sit inside a horizontally scrollable table well with a hairline border, 10px radius, desk-surface at roughly 52% alpha, cream header tint, and no wrapping by default.
+- **Inline code:** Small page-cream tint, Inter body at reduced size. Fenced code should use Code Surface and the mono token when next touched, even though the current React syntax highlighter still uses `oneDark` styles internally.
 
 ### Code Block
 - **Surface:** `background: var(--code-surface)` (the only cool note in the palette). Padding `16px`, `rounded: 6px`, `border: 1px solid var(--hairline)`. Code is treated like a quotation block.
-- **Type:** JetBrains Mono 14px / 400. Syntax highlighting uses muted warm tones (oxblood for keywords, brass for strings, page-cream for identifiers, page-cream-faint for comments).
+- **Type:** JetBrains Mono 14px / 400. Syntax highlighting uses muted warm tones (oxblood for keywords, brass for strings, page-cream for identifiers, page-cream-faint for comments). Do not introduce bright off-the-shelf themes into new code surfaces.
 
 ### Badges
 - **Style:** Padding `2px 10px`, `rounded: 9999px` (small inline label, the pill is functional, not decorative). Label typography. Variants by tinted background:
@@ -312,14 +324,14 @@ The bottom chat input on a topic page is the second signature surface:
 
 ### Toasts
 - **Position:** Bottom-right, max-width 360px.
-- **Surface:** `background: var(--desk-surface)`, `rounded: 10px`, padding `14px 18px`, `border: 1px solid var(--hairline)`. No backdrop-blur, no transparency.
-- **Variants:** Communicate state through a leading 16px icon (forest checkmark, rust alert, brass info-i) and a tinted background (forest-tint, rust-tint, brass-tint at ~12%). Never via a colored side stripe.
+- **Surface:** Current implementation uses `rounded: 10px`, padding `14px 20px`, Label typography, max-width `sm`, and variant-tinted borders/backgrounds (`rust/10 + rust/30`, `forest/10 + forest/30`, `brass/10 + brass/30`). Info uses desk-surface with hairline border.
+- **Variants:** Communicate state through tinted background, border, and text color. Leading icons are preferred for future expansion, but side stripes remain forbidden.
 
 ### Progress Bar
 - **Style:** Height `6px` default, `8px` in studying view. `background: rgba(236, 229, 214, 0.08)`, `rounded: 9999px`. Fill: `var(--forest-success)`, `rounded: 9999px`. No animated stripes, no shimmer.
 
 ### Checkbox
-- **Style:** 18px square, `rounded: 4px`, `border: 1.5px solid var(--page-cream-faint)`, `background: var(--desk-surface)`. Checked: `background: var(--oxblood)`, white check icon (inline SVG). Focus: oxblood-tint focus ring.
+- **Style:** 20px square, `rounded: 4px`, `border: 1px solid var(--hairline)`, `background: var(--lamp-night)`. Hover shifts to desk-surface and page-cream-faint border. Checked: `background: var(--oxblood)`, oxblood border, white check icon via inline SVG data URL. Focus: oxblood-tint ring.
 
 ## 6. Do's and Don'ts
 
@@ -328,8 +340,8 @@ The bottom chat input on a topic page is the second signature surface:
 - **Do** use the restrained Input Focus Glow for text inputs, textareas, and chat composers. Focus should be visible at the border and quiet everywhere else.
 - **Do** use Hairline rules at structural breaks, under section and topic headings, between chat messages and the input, between plan items. Bookish, like the rule under a chapter heading in a printed text.
 - **Do** keep oxblood under 10% of any visible screen. It is the binding of the book, not the cover.
-- **Do** warm-shift any new status color into the palette's hue family (10–80, or olive 140–155). A cool blue badge will scream against the rest.
-- **Do** test layouts with real Brazilian Portuguese strings; pt-BR runs 15–25% longer than English. Layouts that feel tight in English break in pt-BR.
+- **Do** warm-shift any new status color into the palette's hue family (10-80, or olive 140-155). A cool blue badge will scream against the rest.
+- **Do** test layouts with real Brazilian Portuguese strings; pt-BR runs 15-25% longer than English. Layouts that feel tight in English break in pt-BR.
 - **Do** cap body prose at 75ch.
 
 ### Don't

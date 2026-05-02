@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-04-29T00:00:00Z",
+  "generatedAt": "2026-05-02T00:00:00Z",
   "title": "Design System: Eduh",
   "extensions": {
     "colorMeta": {
@@ -184,6 +184,21 @@
           "oklch(0.92 0.04 28)"
         ]
       },
+      "confirm-danger-hover": {
+        "role": "tertiary",
+        "displayName": "Confirm Danger Hover",
+        "canonical": "#cf5a52",
+        "tonalRamp": [
+          "oklch(0.22 0.07 28)",
+          "oklch(0.34 0.1 28)",
+          "oklch(0.46 0.13 28)",
+          "oklch(0.54 0.14 28)",
+          "oklch(0.61 0.15 28)",
+          "oklch(0.72 0.13 28)",
+          "oklch(0.84 0.09 28)",
+          "oklch(0.94 0.04 28)"
+        ]
+      },
       "brass-warning": {
         "role": "tertiary",
         "displayName": "Brass Warning",
@@ -235,19 +250,21 @@
       "headline": { "displayName": "Headline", "purpose": "Section and topic page titles. Newsreader at 1.75rem." },
       "title": { "displayName": "Title", "purpose": "Card titles, modal titles, topic names. Newsreader at 1.25rem." },
       "body-prose": { "displayName": "Body Prose", "purpose": "AI explanations and long-form topic content. Newsreader at 16px, line-height 1.65, capped at 75ch." },
-      "body": { "displayName": "Body", "purpose": "UI body text — modal copy, descriptions, dashboard subtitles. Inter at 15px." },
+      "body": { "displayName": "Body", "purpose": "UI body text: modal copy, descriptions, dashboard subtitles. Inter at 15px." },
       "label": { "displayName": "Label", "purpose": "Buttons, badges, form labels, navbar, breadcrumb. Inter at 13px / 500 / +0.01em." },
       "mono": { "displayName": "Mono", "purpose": "Inline code, code blocks, KaTeX inline. JetBrains Mono at 14px." }
     },
+    "fontLoading": "CSS tokens name Newsreader, Inter, and JetBrains Mono directly. The app shell currently loads Geist variables for Tailwind defaults, so production font loading must explicitly provide the documented families or accept their fallbacks.",
     "shadows": [
       { "name": "input-focus-glow", "value": "0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64)", "purpose": "Border-edge focus glow for text inputs, textareas, and input-like containers. Pair with border-color rgba(157, 67, 55, 0.58)." },
       { "name": "modal-lift", "value": "0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(236, 229, 214, 0.16)", "purpose": "Modal surfaces over the dimmed page. Soft, deep, low-chroma." },
-      { "name": "focus-ring", "value": "0 0 0 3px rgba(126, 49, 40, 0.32)", "purpose": "Keyboard focus on buttons, checkboxes, and compact controls. Text entry fields use input-focus-glow instead." }
+      { "name": "focus-ring", "value": "0 0 0 3px rgba(126, 49, 40, 0.32)", "purpose": "Keyboard focus on buttons, checkboxes, and compact controls. Text entry fields use input-focus-glow instead." },
+      { "name": "lamp-halo", "value": "0 0 60px -12px rgba(196, 120, 66, 0.20)", "purpose": "Rare payment or subscription emphasis, paired with a low-opacity warm radial overlay. It reads as a reading lamp catching an active surface, not a general card shadow." }
     ],
     "motion": [
-      { "name": "fade-in-up", "value": "0.4s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Initial render of new messages and page sections. Translate Y 16px → 0, opacity 0 → 1." },
-      { "name": "modal-pop", "value": "0.3s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Modal open. Scale 0.96 → 1, opacity 0 → 1." },
-      { "name": "backdrop-fade", "value": "0.3s ease-out", "purpose": "Modal backdrop opacity 0 → 1." },
+      { "name": "fade-in-up", "value": "0.4s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Initial render of new messages and page sections. Translate Y 16px to 0, opacity 0 to 1." },
+      { "name": "modal-pop", "value": "0.3s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Modal open. Scale 0.96 to 1, opacity 0 to 1." },
+      { "name": "backdrop-fade", "value": "0.3s ease-out", "purpose": "Modal backdrop opacity 0 to 1." },
       { "name": "jumping-dots", "value": "1s infinite ease-in-out", "purpose": "Tool-use indicator while the AI is searching student materials." },
       { "name": "pulsing-dots", "value": "1.4s infinite", "purpose": "Loading and typing indicators." }
     ],
@@ -272,9 +289,9 @@
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Ghost button bordered by the cream hairline. For Cancel, Back, and low-priority actions.",
+      "description": "Ghost button. The shared Button component uses a transparent border; page-local ghost controls may use a cream hairline when they need a physical boundary.",
       "html": "<button class=\"ds-btn-secondary\" type=\"button\">Cancel</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background: transparent; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.3; letter-spacing: 0.01em; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 6px; cursor: pointer; transition: background-color 200ms ease-out, border-color 200ms ease-out; } .ds-btn-secondary:hover { background: #2c2421; border-color: rgba(236, 229, 214, 0.24); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background: transparent; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.3; letter-spacing: 0.01em; border: 1px solid transparent; border-radius: 6px; cursor: pointer; transition: background-color 200ms ease-out, border-color 200ms ease-out; } .ds-btn-secondary:hover { background: #2c2421; } .ds-btn-secondary--bounded { border-color: rgba(236, 229, 214, 0.16); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
     },
     {
       "name": "Input Field",
@@ -296,17 +313,25 @@
       "name": "Topic Card (Active)",
       "kind": "custom",
       "refersTo": "card",
-      "description": "Signature component: a topic in the studying timeline, in its active state with an oxblood state node and subtle active border.",
-      "html": "<article class=\"ds-topic-card ds-topic-card--active\"><div class=\"ds-topic-node\">3</div><div class=\"ds-topic-body\"><h4 class=\"ds-topic-title\">Limites e continuidade</h4><p class=\"ds-topic-subs\">definição formal · regras de cálculo · teorema do confronto</p></div><label class=\"ds-topic-check\"><input type=\"checkbox\" /><span class=\"ds-topic-check-box\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M2.5 6.5l2.5 2.5 4.5-5\" fill=\"none\" stroke=\"#ece5d6\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span></label></article>",
-      "css": ".ds-topic-card { position: relative; display: flex; align-items: center; gap: 16px; padding: 20px; background: #231d1a; color: #ece5d6; border: 1px solid transparent; border-radius: 10px; transition: background-color 200ms ease-out, border-color 200ms ease-out; } .ds-topic-card--active { background: #2c2421; border-color: rgba(157, 67, 55, 0.42); } .ds-topic-node { width: 28px; height: 28px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; background: #7e3128; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1; } .ds-topic-body { flex: 1; min-width: 0; } .ds-topic-title { margin: 0 0 4px; font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 1.25rem; font-weight: 500; line-height: 1.3; color: #ece5d6; } .ds-topic-subs { margin: 0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; line-height: 1.4; color: #c4baa6; } .ds-topic-check { display: inline-flex; cursor: pointer; } .ds-topic-check input { position: absolute; opacity: 0; pointer-events: none; } .ds-topic-check-box { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; background: #231d1a; border: 1.5px solid #9a8f7e; border-radius: 4px; transition: background-color 150ms ease-out, border-color 150ms ease-out; } .ds-topic-check input:checked + .ds-topic-check-box { background: #7e3128; border-color: #7e3128; }"
+      "description": "Signature component: a topic in the studying timeline. The current implementation uses a large sequence node, quiet vertical connector, oxblood active ring, subtopic dot list, and a completion checkbox with an expanding hover label.",
+      "html": "<article class=\"ds-topic-card ds-topic-card--active\"><div class=\"ds-topic-node\">3</div><div class=\"ds-topic-body\"><h4 class=\"ds-topic-title\">Limites e continuidade</h4><ul class=\"ds-topic-subs\"><li>definição formal</li><li>regras de cálculo</li><li>teorema do confronto</li></ul><p class=\"ds-topic-meta\">Nenhuma mensagem</p></div><label class=\"ds-topic-check\"><input type=\"checkbox\" /><span class=\"ds-topic-check-box\"></span></label></article>",
+      "css": ".ds-topic-card { position: relative; display: flex; align-items: flex-start; gap: 24px; padding: 24px; background: #231d1a; color: #ece5d6; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 10px; transition: background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out; } .ds-topic-card--active { border-color: #7e3128; box-shadow: 0 0 0 1px #7e3128; } .ds-topic-node { width: 48px; height: 48px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; background: #231d1a; color: #7e3128; border: 3px solid #1a1614; box-shadow: 0 0 0 2px #7e3128; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 700; line-height: 1; } .ds-topic-body { flex: 1; min-width: 0; padding-right: 40px; } .ds-topic-title { margin: 0 0 12px; font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 1.25rem; font-weight: 500; line-height: 1.3; color: #7e3128; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-topic-subs { display: grid; gap: 10px; margin: 0 0 20px; padding: 0; list-style: none; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 1.55; color: #c4baa6; } .ds-topic-subs li { display: flex; gap: 12px; } .ds-topic-subs li::before { content: ''; width: 6px; height: 6px; margin-top: 0.65em; flex-shrink: 0; border-radius: 9999px; background: rgba(236, 229, 214, 0.16); } .ds-topic-meta { display: inline-flex; align-items: center; padding: 6px 12px; background: #1a1614; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 6px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 12px; color: #c4baa6; } .ds-topic-check { position: absolute; top: 20px; right: 20px; display: inline-flex; cursor: pointer; } .ds-topic-check input { position: absolute; opacity: 0; pointer-events: none; } .ds-topic-check-box { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; background: #1a1614; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 4px; transition: background-color 150ms ease-out, border-color 150ms ease-out; } .ds-topic-check input:checked + .ds-topic-check-box { background: #7e3128; border-color: #7e3128; }"
     },
     {
       "name": "Chat Input",
       "kind": "input",
       "refersTo": "input-field",
-      "description": "Signature component: bottom-of-screen multi-line chat input. Border-only focus glow on focus-within, oxblood send button.",
-      "html": "<form class=\"ds-chat-input\" autocomplete=\"off\"><textarea class=\"ds-chat-textarea\" rows=\"1\" placeholder=\"Type your message...\"></textarea><button class=\"ds-chat-send\" type=\"submit\" aria-label=\"Send message\"><span aria-hidden=\"true\">↵</span></button></form>",
-      "css": ".ds-chat-input { position: relative; display: flex; align-items: flex-end; gap: 10px; padding: 14px 14px 14px 18px; background: #231d1a; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 14px; transition: border-color 200ms ease-out, box-shadow 200ms ease-out; } .ds-chat-input:focus-within { border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64); } .ds-chat-textarea { flex: 1; min-height: 24px; max-height: 200px; padding: 0; background: transparent; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 1.55; border: none; outline: none; resize: none; } .ds-chat-textarea::placeholder { color: #9a8f7e; } .ds-chat-send { width: 32px; height: 32px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #7e3128; color: #ece5d6; border: none; border-radius: 9999px; cursor: pointer; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; transition: background-color 200ms ease-out; } .ds-chat-send:hover { background: #9d4337; } .ds-chat-send:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
+      "description": "Signature component: bottom-of-screen multi-line chat input. Current implementation uses an 8px/12px padded surface, border-only focus glow, 200px max textarea height, and a 40px oxblood paper-plane icon button.",
+      "html": "<form class=\"ds-chat-input\" autocomplete=\"off\"><textarea class=\"ds-chat-textarea\" rows=\"1\" placeholder=\"Type your message...\"></textarea><button class=\"ds-chat-send\" type=\"submit\" aria-label=\"Send message\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M22 2 11 13\"/><path d=\"m22 2-7 20-4-9-9-4 20-7Z\"/></svg></button></form>",
+      "css": ".ds-chat-input { position: relative; display: flex; align-items: flex-end; gap: 0; padding: 8px 12px 8px 8px; background: #231d1a; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 14px; box-shadow: 0 24px 48px -16px rgba(26, 22, 20, 0.6), 0 0 0 1px rgba(236, 229, 214, 0.16); transition: border-color 200ms ease-out, box-shadow 200ms ease-out; } .ds-chat-input:focus-within { border-color: rgba(157, 67, 55, 0.58); box-shadow: 0 0 0 1px rgba(157, 67, 55, 0.28), 0 0 12px -8px rgba(157, 67, 55, 0.64); } .ds-chat-textarea { flex: 1; min-height: 24px; max-height: 200px; padding: 8px 16px; background: transparent; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 1.55; border: none; outline: none; resize: none; } .ds-chat-textarea::placeholder { color: #9a8f7e; } .ds-chat-send { width: 40px; height: 40px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #7e3128; color: #ece5d6; border: none; border-radius: 6px; cursor: pointer; transition: background-color 200ms ease-out; } .ds-chat-send:hover { background: #9d4337; } .ds-chat-send:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(126, 49, 40, 0.32); }"
+    },
+    {
+      "name": "Chat Messages and Markdown",
+      "kind": "custom",
+      "refersTo": "body-prose",
+      "description": "Core study reading surface. Assistant prose uses Newsreader Body Prose; user messages use restrained desk-surface bubbles; material-search tool indicators make provenance visible.",
+      "html": "<article class=\"ds-chat-assistant\"><p>Vamos resolver pelo mesmo método dos seus slides.</p><div class=\"ds-markdown-table-scroll\"><table><thead><tr><th>Conceito</th><th>Uso</th></tr></thead><tbody><tr><td>Limite</td><td>Aproximação</td></tr></tbody></table></div></article>",
+      "css": ".ds-chat-assistant { max-width: 95%; min-width: 0; overflow: hidden; color: #ece5d6; font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; } .ds-chat-user { max-width: 85%; padding: 14px 20px; background: #231d1a; border-radius: 14px; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 1.55; } .ds-tool-indicator { display: inline-flex; align-items: center; gap: 10px; color: #c4baa6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; } .ds-markdown-table-scroll { max-width: 100%; overflow-x: auto; margin: 1.15em 0 1.25em; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 10px; background: rgba(35, 29, 26, 0.52); } .ds-markdown-table-scroll table { width: 100%; min-width: max-content; border-collapse: separate; border-spacing: 0; white-space: nowrap; font-family: Newsreader, 'Source Serif 4', Georgia, serif; font-size: 0.8889em; line-height: 1.45; } .ds-markdown-table-scroll th, .ds-markdown-table-scroll td { padding: 0.6em 0.8em; border-right: 1px solid rgba(236, 229, 214, 0.16); border-bottom: 1px solid rgba(236, 229, 214, 0.16); text-align: left; vertical-align: top; } .ds-markdown-table-scroll th { background: rgba(236, 229, 214, 0.055); color: #ece5d6; font-weight: 500; } .ds-markdown-table-scroll td { color: #c4baa6; }"
     },
     {
       "name": "Navbar",
@@ -328,16 +353,16 @@
       "name": "Toast (Success)",
       "kind": "custom",
       "refersTo": "card",
-      "description": "Bottom-right ephemeral notification. Tinted background plus leading icon — no side stripe.",
-      "html": "<div class=\"ds-toast ds-toast--success\" role=\"status\"><span class=\"ds-toast-icon\" aria-hidden=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><path d=\"M3.5 8.5l3 3 6-7\" fill=\"none\" stroke=\"#5e8c6f\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><span class=\"ds-toast-body\">Credits added to your balance.</span></div>",
-      "css": ".ds-toast { display: inline-flex; align-items: center; gap: 12px; padding: 14px 18px; background: #231d1a; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; line-height: 1.5; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 10px; max-width: 360px; } .ds-toast--success { background: rgba(94, 140, 111, 0.12); border-color: rgba(94, 140, 111, 0.32); } .ds-toast-icon { display: inline-flex; flex-shrink: 0; } .ds-toast-body { flex: 1; }"
+      "description": "Bottom-right ephemeral notification. Current implementation uses tinted background, border, and text color. Leading icons are preferred for future expansion; side stripes remain forbidden.",
+      "html": "<div class=\"ds-toast ds-toast--success\" role=\"status\"><span class=\"ds-toast-body\">Credits added to your balance.</span><button class=\"ds-toast-dismiss\" type=\"button\" aria-label=\"Dismiss\">x</button></div>",
+      "css": ".ds-toast { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: #1a1614; color: #ece5d6; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.3; border: 1px solid rgba(236, 229, 214, 0.16); border-radius: 10px; max-width: 24rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); } .ds-toast--success { background: rgba(94, 140, 111, 0.10); border-color: rgba(94, 140, 111, 0.30); color: #5e8c6f; } .ds-toast--error { background: rgba(207, 90, 82, 0.10); border-color: rgba(207, 90, 82, 0.30); color: #cf5a52; } .ds-toast--warning { background: rgba(214, 168, 90, 0.10); border-color: rgba(214, 168, 90, 0.30); color: #d6a85a; } .ds-toast--info { background: #231d1a; border-color: rgba(236, 229, 214, 0.16); color: #c4baa6; } .ds-toast-dismiss { flex-shrink: 0; opacity: 0.7; color: currentColor; background: transparent; border: 0; cursor: pointer; } .ds-toast-dismiss:hover { opacity: 1; }"
     }
   ],
   "narrative": {
     "northStar": "The Carrel After Hours",
-    "overview": "A carrel is the private study desk in a university library: a small wooden booth with a green-shaded reading lamp, surrounded by silence and the spines of borrowed books. Eduh is what that carrel looks like when a Unicamp student logs in to study at 11pm the night before a P1. Warm, dim, focused, structured by the rhythm of reading.\n\nThe room is built from three materials. Warm-dark wood-tone surfaces (deep, slightly red-brown, never charcoal-cool) for the page and desk. Warm-cream paper-tone text (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, oxblood, the leather binding of the textbook resting on the desk. Focus is shown through precise oxblood borders and hairlines.\n\nType does the academic work. Newsreader serif sets every heading, every topic title, every paragraph the AI hands back to you. Inter sans handles UI chrome cleanly and unobtrusively. JetBrains Mono appears only for code and KaTeX. Hairline cream rules separate sections of the page the way a chapter rule separates chapters of a book.",
+    "overview": "A carrel is the private study desk in a university library: a small wooden booth with a green-shaded reading lamp, surrounded by silence and the spines of borrowed books. Eduh is what that carrel looks like when a Unicamp student logs in to study at 11pm the night before a P1. Warm, dim, focused, structured by the rhythm of reading.\n\nThe room is built from three materials. Warm-dark wood-tone surfaces (deep, slightly red-brown, never charcoal-cool) for the page and desk. Warm-cream paper-tone text (off-white shifted toward old-page yellow, never pure white). And a single quiet color of authority, oxblood, the leather binding of the textbook resting on the desk. Focus is shown through precise oxblood borders and hairlines. The page may carry a nearly invisible fixed lamp wash from oxblood and brass radial gradients, but the effect stays below the threshold of decoration.\n\nType does the academic work. Newsreader serif sets every heading, every topic title, every paragraph the AI hands back to you. Inter sans handles UI chrome cleanly and unobtrusively. JetBrains Mono appears only for code and KaTeX. Hairline cream rules separate sections of the page the way a chapter rule separates chapters of a book.",
     "keyCharacteristics": [
-      "Warm-dark only. Background is oklch(0.155 0.008 30), a deep warm sepia near-black. No pure or cool charcoal.",
+      "Warm-dark only. Background is oklch(0.155 0.008 30), a deep warm sepia near-black, with only a low-opacity lamp wash. No pure or cool charcoal.",
       "Single chromatic voice: oxblood (oklch(0.46 0.13 20)), used on under 10% of any visible screen.",
       "Newsreader serif for long-form and structural type, Inter for UI chrome, JetBrains Mono for code.",
       "Hairline cream rules at structural breaks. Otherwise borderless surface separation by tonal layering.",
@@ -351,15 +376,15 @@
       { "name": "The 75ch Rule", "body": "Body prose is capped at 75ch (~640px at 16px). Wider lines fatigue tired students faster than any other typography failure.", "section": "typography" },
       { "name": "The No-Gradient-Type Rule", "body": "No background-clip: text. The previous Eduh wordmark with a page-cream-to-blue gradient is retired. Solid page-cream Newsreader.", "section": "typography" },
       { "name": "The Focus Edge Rule", "body": "Inputs, textareas, auth forms, and chat composers use a border-color shift plus a small oxblood glow that stays tight to the component edge.", "section": "elevation" },
-      { "name": "The No-Lift Rule", "body": "Cards do not raise off the page on hover. Hover changes the background (desk-surface to desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add translate-y, scale, or shadow.", "section": "elevation" }
+      { "name": "The No-Lift Rule", "body": "Cards do not raise off the page on hover. Hover changes the background (desk-surface to desk-surface-hover) and may bring an oxblood-tinted hairline. It does not add translate-y or scale. A small shadow-sm or shadow-md appears in a few current emphasis surfaces, but it is transitional drift, not a pattern to extend.", "section": "elevation" }
     ],
     "dos": [
       "Do use Newsreader for all AI-authored prose, all topic titles, and all plan headings. Inter for everything the user clicks, types, or navigates. JetBrains Mono only for code and KaTeX.",
       "Do use the restrained Input Focus Glow for text inputs, textareas, and chat composers. Focus should be visible at the border and quiet everywhere else.",
       "Do use Hairline rules at structural breaks, under section and topic headings, between chat messages and the input, between plan items.",
       "Do keep oxblood under 10% of any visible screen. It is the binding of the book, not the cover.",
-      "Do warm-shift any new status color into the palette's hue family (10–80, or olive 140–155).",
-      "Do test layouts with real Brazilian Portuguese strings; pt-BR runs 15–25% longer than English.",
+      "Do warm-shift any new status color into the palette's hue family (10-80, or olive 140-155).",
+      "Do test layouts with real Brazilian Portuguese strings; pt-BR runs 15-25% longer than English.",
       "Do cap body prose at 75ch."
     ],
     "donts": [
