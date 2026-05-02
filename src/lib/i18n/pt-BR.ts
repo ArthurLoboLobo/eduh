@@ -47,8 +47,6 @@ export interface Translations {
       title: string;
       nameLabel: string;
       namePlaceholder: string;
-      descriptionLabel: string;
-      descriptionPlaceholder: string;
       create: string;
     };
     maxSectionsError: string;
@@ -262,8 +260,6 @@ const ptBR: Translations = {
       title: 'Criar nova Seção',
       nameLabel: 'Nome',
       namePlaceholder: 'Ex: Cálculo II',
-      descriptionLabel: 'Descrição (opcional)',
-      descriptionPlaceholder: 'Uma breve descrição da seção',
       create: 'Criar',
     },
     maxSectionsError: 'Você atingiu o limite de 10 seções.',

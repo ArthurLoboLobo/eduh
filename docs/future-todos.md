@@ -4,7 +4,6 @@
 ## Actual TODOs
 
 ### UX / Aesthetics
-- **Remove section descriptions**: Section descriptions serve no real purpose and add visual noise. Remove them from the UI and all related forms. _Note: requires a database migration to drop the `description` column from the sections table._
 - **Fix breadcrumb flash**: Breadcrumbs briefly show the raw ID instead of the section/chat name on initial load. Fix by either passing the name through the route state or showing a skeleton placeholder until the name is available. 
 - **Use real links for navigation**: Ensure all clickable elements that navigate (e.g. sections in the dashboard, topics in the sidebar) use proper `<a>` tags (or Next.js `<Link>`) instead of just `onClick` handlers. This allows users to middle-click to open in a new tab, right-click for the context menu, or drag the link.
 
@@ -84,7 +83,7 @@ Additional issues identified through a codebase analysis that should be addresse
 - **Centralize environment variable validation**: Each file checks its own env vars at runtime independently. If `GOOGLE_GENERATIVE_AI_API_KEY` or `DATABASE_URL` is missing, the app starts successfully but crashes on first use. Create a `src/lib/env.ts` that validates all required vars at startup.
   - _Why it matters:_ Fail-fast validation catches misconfiguration immediately at deploy time rather than letting the app run in a broken state. This is especially important on Vercel where env vars are configured per-environment — a missing var in production that exists in development is a common mistake.
 
-- **Add input length validation on all API routes**: Section names, descriptions, chat messages, and plan regeneration guidance accept arbitrarily large strings. No max-length checks exist.
+- **Add input length validation on all API routes**: Section names, chat messages, and plan regeneration guidance accept arbitrarily large strings. No max-length checks exist.
   - _Why it matters:_ Unbounded input can cause multiple problems: database bloat (storing megabytes of text in a single field), excessive LLM costs (sending huge prompts to Gemini), and potential denial-of-service (a single request consuming disproportionate resources). Reasonable limits (e.g., 100 chars for names, 5000 for messages) prevent abuse while being invisible to normal users.
 
 - **Add error tracking/monitoring (e.g., Sentry)**: The only logging is `console.error`, which goes to Vercel's ephemeral function logs. There's no alerting, no error grouping, and no way to proactively know when things break.
@@ -123,4 +122,3 @@ Additional issues identified through a codebase analysis that should be addresse
 
 - **Paginate chat messages**: All messages are loaded at once. Long conversations will become slow.
   - _Why it matters:_ Loading hundreds of messages in a single query and sending them all to the client increases response time and memory usage on both sides. Pagination loads only the most recent messages and fetches older ones on demand (e.g., "scroll to load more").
-

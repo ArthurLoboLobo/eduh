@@ -30,14 +30,14 @@ Stored in a cookie (`eduh_language`), not in the database. Default: `pt-BR`. Upd
 
 ### API
 - `GET /api/sections` — lists all sections for the user with `total_topics` and `completed_topics` counts.
-- `POST /api/sections` — creates a section (max 10 per user, error: `MAX_SECTIONS_REACHED`). Requires `name`, optional `description`. Section starts in `uploading` status.
+- `POST /api/sections` — creates a section (max 10 per user, error: `MAX_SECTIONS_REACHED`). Requires `name`. Section starts in `uploading` status.
 - `GET /api/sections/:id` — returns section details (ownership verified).
 - `DELETE /api/sections/:id` — deletes section, removes all files from Vercel Blob, cascades DB delete.
 
 ### Page (`src/app/(main)/dashboard/page.tsx`)
 - Top bar: search input (client-side name filtering) + "Create new Section" button.
-- Grid of section cards (3 columns on desktop, responsive). Each card shows: name, description, creation date, status badge, progress (studying only), delete button with confirmation dialog.
-- Create section opens a modal with name and description fields.
+- Grid of section cards (3 columns on desktop, responsive). Each card shows: name, creation date, status badge, progress (studying only), delete button with confirmation dialog.
+- Create section opens a modal with a name field.
 - Clicking a card navigates to `/sections/[id]`.
 
 ---
@@ -359,7 +359,7 @@ API routes call the ownership check first, return 404 if it fails, then proceed 
 |-------|-------------|-------|
 | `users` | email (unique), plan, plan_expires_at, balance | `plan` = `free`/`pro`, `balance` in BRL cents (`CHECK >= 0`) |
 | `otp_codes` | user_id FK, code, attempts, expires_at | Max 3 attempts, 10-min expiry |
-| `sections` | user_id FK, name, description, status | Status: uploading/planning/studying |
+| `sections` | user_id FK, name, status | Status: uploading/planning/studying |
 | `files` | section_id FK, blob_url, original_name, file_type, size_bytes, status, extracted_text | Status: uploading/processing/processed/error |
 | `plan_drafts` | section_id FK, plan_json (JSONB) | Newest = current draft |
 | `topics` | section_id FK, title, order, is_completed | |

@@ -17,7 +17,6 @@ import { useToast } from '@/components/ui/Toast';
 interface Section {
   id: string;
   name: string;
-  description: string | null;
   status: string;
   created_at: string;
   total_topics: number;
@@ -41,7 +40,6 @@ export default function DashboardPage() {
   // Create modal state
   const [createOpen, setCreateOpen] = useState(false);
   const [createName, setCreateName] = useState('');
-  const [createDesc, setCreateDesc] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
 
@@ -74,7 +72,7 @@ export default function DashboardPage() {
       const res = await fetch('/api/sections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: createName.trim(), description: createDesc.trim() || null }),
+        body: JSON.stringify({ name: createName.trim() }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -162,11 +160,6 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              {/* Description */}
-              {section.description && (
-                <p className="font-body text-[14px] text-page-cream-muted line-clamp-2 mt-[-4px]">{section.description}</p>
-              )}
-
               {/* Date + badge */}
               <div className="flex items-center justify-between mt-auto pt-2">
                 <span className="font-body text-[13px] text-page-cream-faint">{formatDate(section.created_at)}</span>
@@ -204,12 +197,6 @@ export default function DashboardPage() {
             value={createName}
             onChange={(e) => setCreateName(e.target.value)}
             autoFocus
-          />
-          <Input
-            label={t.dashboard.createModal.descriptionLabel}
-            placeholder={t.dashboard.createModal.descriptionPlaceholder}
-            value={createDesc}
-            onChange={(e) => setCreateDesc(e.target.value)}
           />
           {createError && <p className="font-label text-[13px] text-rust-danger">{createError}</p>}
           <div className="flex justify-end gap-2">

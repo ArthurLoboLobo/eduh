@@ -11,7 +11,6 @@ import StudyingView from '@/components/StudyingView';
 interface Section {
   id: string;
   name: string;
-  description: string | null;
   status: string;
 }
 

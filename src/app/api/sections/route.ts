@@ -26,13 +26,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => null);
     const name = body?.name?.trim();
-    const description = body?.description?.trim() || null;
 
     if (!name) {
       return NextResponse.json({ error: 'NAME_MISSING' }, { status: 400 });
     }
 
-    const section = await createSection(userId, name, description);
+    const section = await createSection(userId, name);
     return NextResponse.json({ section }, { status: 201 });
   } catch (err) {
     if (err instanceof Error && err.message === 'MAX_SECTIONS_REACHED') {

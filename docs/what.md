@@ -24,13 +24,13 @@ The dashboard shows all sections the user has created in a responsive grid (3 co
 
 - **Top bar**: Search input to filter sections by name + "Create new Section" button.
 - **Each section card** shows:
-  - Section name and description.
+  - Section name.
   - Creation date.
   - Status badge: Uploading, Planning, or Studying.
   - Progress indicator (e.g., "3/8 topics completed") — only when status is Studying.
   - Delete button (trash icon) that opens a confirmation dialog.
 - **Empty state**: A centered message guiding the user to create their first section.
-- **Create section**: Opens a modal with name and description fields.
+- **Create section**: Opens a modal with a name field.
 - Clicking a card navigates to the section page.
 
 ### Section Page

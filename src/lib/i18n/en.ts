@@ -53,8 +53,6 @@ const en: Translations = {
       title: 'Create new Section',
       nameLabel: 'Name',
       namePlaceholder: 'E.g. Calculus II',
-      descriptionLabel: 'Description (optional)',
-      descriptionPlaceholder: 'A short description of the section',
       create: 'Create',
     },
     maxSectionsError: 'You have reached the limit of 10 sections.',

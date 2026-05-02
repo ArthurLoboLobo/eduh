@@ -4,7 +4,6 @@ export type Section = {
   id: string;
   user_id: string;
   name: string;
-  description: string | null;
   status: string;
   created_at: Date;
 };
@@ -32,7 +31,6 @@ export async function listSections(userId: string): Promise<SectionWithProgress[
 export async function createSection(
   userId: string,
   name: string,
-  description: string | null,
 ): Promise<Section> {
   const countRows = await sql`
     SELECT COUNT(*)::int AS count FROM sections WHERE user_id = ${userId}
@@ -43,8 +41,8 @@ export async function createSection(
   }
 
   const rows = await sql`
-    INSERT INTO sections (user_id, name, description, status, created_at)
-    VALUES (${userId}, ${name}, ${description}, 'uploading', now())
+    INSERT INTO sections (user_id, name, status, created_at)
+    VALUES (${userId}, ${name}, 'uploading', now())
     RETURNING *
   `;
   return rows[0] as Section;
