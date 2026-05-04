@@ -25,7 +25,9 @@ const MAX_TEXTAREA_HEIGHT = 200;
 
 function resizeTextarea(el: HTMLTextAreaElement) {
   el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT) + 'px';
+  const nextHeight = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT);
+  el.style.height = `${nextHeight}px`;
+  el.style.overflowY = el.scrollHeight > MAX_TEXTAREA_HEIGHT ? 'auto' : 'hidden';
 }
 
 const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
@@ -81,6 +83,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
       setInputValue('');
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.overflowY = 'hidden';
       }
       onSend(trimmed);
     }, [inputValue, disabled, onSend]);
@@ -109,7 +112,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
             placeholder={placeholder}
             disabled={disabled}
             rows={1}
-            className="flex-1 resize-none bg-transparent px-4 mt-2 mb-2 font-body text-[15px] leading-relaxed text-page-cream placeholder:text-page-cream-faint focus:outline-none disabled:opacity-50"
+            className="flex-1 resize-none overflow-y-hidden bg-transparent px-4 mt-2 mb-2 font-body text-[15px] leading-relaxed text-page-cream placeholder:text-page-cream-faint focus:outline-none disabled:opacity-50"
             style={{ maxHeight: '200px' }}
           />
           <button
