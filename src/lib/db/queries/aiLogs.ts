@@ -1,5 +1,11 @@
 import { sql } from '@/lib/db/connection';
 
+function nullableInteger(value: number | null | undefined): number | null {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.trunc(value)
+    : null;
+}
+
 export async function insertAiCallLog(params: {
   label: string;
   model: string;
@@ -13,19 +19,23 @@ export async function insertAiCallLog(params: {
 }): Promise<void> {
   try {
     const id = crypto.randomUUID();
+    const inputTokens = nullableInteger(params.inputTokens);
+    const outputTokens = nullableInteger(params.outputTokens);
+    const durationMs = nullableInteger(params.durationMs) ?? 0;
+
     await sql`
       INSERT INTO ai_call_logs (id, label, model, input_tokens, output_tokens, input_text, output_text, user_id, section_id, duration_ms)
       VALUES (
         ${id},
         ${params.label},
         ${params.model},
-        ${params.inputTokens ?? null},
-        ${params.outputTokens ?? null},
+        ${inputTokens},
+        ${outputTokens},
         ${params.inputText ?? null},
         ${params.outputText ?? null},
         ${params.userId ?? null},
         ${params.sectionId ?? null},
-        ${params.durationMs}
+        ${durationMs}
       )
     `;
   } catch (err) {
