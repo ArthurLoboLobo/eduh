@@ -1,4 +1,5 @@
 import { sql } from '@/lib/db/connection';
+import { normalizeEmail } from '@/lib/email';
 
 export type User = {
   id: string;
@@ -19,13 +20,13 @@ export type OtpCode = {
 };
 
 export async function findUserByEmail(email: string): Promise<User | null> {
-  const normalized = email.toLowerCase();
+  const normalized = normalizeEmail(email);
   const rows = await sql`SELECT * FROM users WHERE email = ${normalized} LIMIT 1`;
   return (rows[0] as User) ?? null;
 }
 
 export async function createUser(email: string): Promise<User> {
-  const normalized = email.toLowerCase();
+  const normalized = normalizeEmail(email);
   const rows = await sql`INSERT INTO users (email) VALUES (${normalized}) RETURNING *`;
   return rows[0] as User;
 }

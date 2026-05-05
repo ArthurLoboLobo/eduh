@@ -1,10 +1,32 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { getTestSql, cleanDatabase, createTestUser } from '../helpers';
-import { getUserById, activateProPlan, updateUserBalance } from '@/lib/db/queries/users';
+import {
+  getUserById,
+  activateProPlan,
+  updateUserBalance,
+  createUser,
+  findUserByEmail,
+} from '@/lib/db/queries/users';
 
 describe('User plan & balance queries', () => {
   beforeEach(async () => {
     await cleanDatabase();
+  });
+
+  describe('email query normalization', () => {
+    it('should store normalized emails when creating users', async () => {
+      const user = await createUser('User+promo@Example.com');
+
+      expect(user.email).toBe('user@example.com');
+    });
+
+    it('should find existing users through aliased emails', async () => {
+      const testUser = await createTestUser('user@example.com');
+      const user = await findUserByEmail('User+other@Example.com');
+
+      expect(user?.id).toBe(testUser.id);
+      expect(user?.email).toBe('user@example.com');
+    });
   });
 
   describe('getUserById', () => {

@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { findUserByEmail, createUser, createOtpCode, getLatestOtpCode, deleteOtpCodes } from '@/lib/db/queries/users';
+import {
+  findUserByEmail,
+  createUser,
+  createOtpCode,
+  getLatestOtpCode,
+  deleteOtpCodes,
+} from '@/lib/db/queries/users';
+import { normalizeEmail } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json().catch(() => null);
-    const email = body?.email?.trim().toLowerCase();
+    const email = typeof body?.email === 'string' ? normalizeEmail(body.email) : '';
     const language: Language = body?.language === 'en' ? 'en' : 'pt-BR';
 
     if (!email || !EMAIL_REGEX.test(email)) {

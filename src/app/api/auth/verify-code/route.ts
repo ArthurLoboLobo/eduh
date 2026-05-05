@@ -6,13 +6,14 @@ import {
   deleteOtpCodes,
 } from '@/lib/db/queries/users';
 import { signToken, setAuthCookie } from '@/lib/auth';
+import { normalizeEmail } from '@/lib/email';
 
 const MAX_ATTEMPTS = 3;
 
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => null);
-    const email = body?.email?.trim().toLowerCase();
+    const email = typeof body?.email === 'string' ? normalizeEmail(body.email) : '';
     const code = body?.code?.trim();
 
     if (!email) return NextResponse.json({ error: 'EMAIL_MISSING' }, { status: 400 });
