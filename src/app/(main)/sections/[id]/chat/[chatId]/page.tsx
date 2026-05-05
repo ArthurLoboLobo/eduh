@@ -112,6 +112,8 @@ export default function ChatPage() {
   const composerRef = useRef<ChatComposerHandle>(null);
   const inputHeightRef = useRef(0);
   const initialMessagesRef = useRef<UIMessage[]>([]);
+  const initialGreetingStartedRef = useRef(false);
+  const initialBottomScrollPendingRef = useRef(false);
   const warningStateRef = useRef<string | null>(null);
   const lastFetchDataRef = useRef<{ phase: 'best' | 'degraded' | 'blocked'; usagePercent: number } | null>(null);
   const initialWarningShownRef = useRef(false);
@@ -153,7 +155,9 @@ export default function ChatPage() {
         showToast(t.chat.streamError, 'error');
       }
     },
-    async onFinish() {
+    async onFinish({ isAbort, isError }) {
+      if (isAbort || isError) return;
+
       // Refetch messages to sync DB IDs for undo
       try {
         const res = await fetch(`/api/chats/${chatId}/messages`);
@@ -252,6 +256,7 @@ export default function ChatPage() {
 
         if (!cancelled) {
           initialMessagesRef.current = uiMessages;
+          initialBottomScrollPendingRef.current = uiMessages.length > 0;
           setMessages(uiMessages);
           lastFetchDataRef.current = { phase: data.phase, usagePercent: data.usagePercent };
           setInitialLoading(false);
@@ -267,6 +272,34 @@ export default function ChatPage() {
     load();
     return () => { cancelled = true; };
   }, [chatId, setMessages]);
+
+  useLayoutEffect(() => {
+    if (
+      !initialBottomScrollPendingRef.current ||
+      initialLoading ||
+      messages.length === 0 ||
+      inputHeight <= 0
+    ) {
+      return;
+    }
+
+    initialBottomScrollPendingRef.current = false;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: getMaxScrollY(), behavior: 'auto' });
+      });
+    });
+  }, [initialLoading, inputHeight, messages.length]);
+
+  // Empty chats stream their initial assistant greeting through the normal chat transport.
+  useEffect(() => {
+    if (initialLoading || loadError || !chatId || messages.length > 0 || initialGreetingStartedRef.current) {
+      return;
+    }
+
+    initialGreetingStartedRef.current = true;
+    void sendMessage(undefined, { body: { initialGreeting: true } });
+  }, [chatId, initialLoading, loadError, messages.length, sendMessage]);
 
   // Show warning toast on initial load (once both user data and messages are ready)
   useEffect(() => {
@@ -450,6 +483,12 @@ export default function ChatPage() {
             </div>
           );
         })}
+
+        {isLoading && messages.length === 0 && (
+          <div className="flex justify-start">
+            <Spinner size={18} />
+          </div>
+        )}
 
         {(isLoading || isRetrying) && messages[messages.length - 1]?.role === 'user' && (
           <div className="flex justify-start">

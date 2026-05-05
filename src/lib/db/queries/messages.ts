@@ -40,6 +40,26 @@ export async function createMessage(chatId: string, role: string, content: strin
   return rows[0] as Message;
 }
 
+export async function createMessageIfChatEmpty(
+  chatId: string,
+  role: string,
+  content: string,
+): Promise<Message | null> {
+  const results = await sql.transaction((tx) => [
+    tx`SELECT pg_advisory_xact_lock(hashtext(${chatId}))`,
+    tx`
+      INSERT INTO messages (chat_id, role, content)
+      SELECT ${chatId}, ${role}, ${content}
+      WHERE NOT EXISTS (
+        SELECT 1 FROM messages WHERE chat_id = ${chatId}
+      )
+      RETURNING *
+    `,
+  ]);
+  const rows = results[1] as Message[];
+  return rows[0] ?? null;
+}
+
 export async function deleteMessagesFrom(chatId: string, messageId: number): Promise<void> {
   await sql`
     DELETE FROM messages WHERE chat_id = ${chatId} AND id >= ${messageId}

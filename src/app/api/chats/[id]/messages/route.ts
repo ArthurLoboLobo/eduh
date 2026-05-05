@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { streamText, generateText, stepCountIs, smoothStream } from 'ai';
+import { streamText, stepCountIs, smoothStream } from 'ai';
 import { google } from '@ai-sdk/google';
 import { getUserIdFromRequest } from '@/lib/auth';
 import { verifyChatOwnership, getChat } from '@/lib/db/queries/chats';
-import { getMessages, getMessagesAfterSummary, createMessage, deleteMessagesFrom, getMessageCountLastMinute } from '@/lib/db/queries/messages';
+import { getMessages, getMessagesAfterSummary, createMessage, createMessageIfChatEmpty, deleteMessagesFrom, getMessageCountLastMinute } from '@/lib/db/queries/messages';
 import { getSummary, upsertSummary } from '@/lib/db/queries/summaries';
 import { listTopics } from '@/lib/db/queries/topics';
 import { createSearchStudentMaterialsTool, summarizeChat } from '@/lib/ai';
@@ -44,6 +44,26 @@ function buildSystemPrompt(
   });
 }
 
+function getInitialGreetingSeedMessage(chatType: string, language: string): string {
+  if (chatType === 'topic') {
+    return language === 'en' ? TOPIC_CHAT_INITIAL_USER_MESSAGE_EN : TOPIC_CHAT_INITIAL_USER_MESSAGE_PT;
+  }
+
+  return language === 'en' ? REVISION_CHAT_INITIAL_USER_MESSAGE_EN : REVISION_CHAT_INITIAL_USER_MESSAGE_PT;
+}
+
+async function buildChatContext(chatId: string) {
+  const chat = await getChat(chatId);
+  if (!chat) return null;
+
+  const allTopics = await listTopics(chat.section_id);
+  const currentTopic = allTopics.find((t) => t.id === chat.topic_id);
+  const currentSubtopics = currentTopic?.subtopics.map((s) => s.text) ?? [];
+  const systemPrompt = buildSystemPrompt(chat, allTopics, currentSubtopics);
+
+  return { chat, systemPrompt };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -61,60 +81,6 @@ export async function GET(
     }
 
     const messages = await getMessages(chatId);
-
-    if (messages.length === 0) {
-      // First load — generate initial AI greeting
-      const cookieStore = await cookies();
-      const lang = cookieStore.get('eduh_language')?.value ?? 'pt-BR';
-
-      const chat = await getChat(chatId);
-      if (!chat) {
-        return NextResponse.json({ error: 'CHAT_NOT_FOUND' }, { status: 404 });
-      }
-
-      const allTopics = await listTopics(chat.section_id);
-      const currentTopic = allTopics.find((t) => t.id === chat.topic_id);
-      const currentSubtopics = currentTopic?.subtopics.map((s) => s.text) ?? [];
-
-      const systemPrompt = buildSystemPrompt(chat, allTopics, currentSubtopics);
-
-      let initialMessage: string;
-      if (chat.type === 'topic') {
-        initialMessage = lang === 'en' ? TOPIC_CHAT_INITIAL_USER_MESSAGE_EN : TOPIC_CHAT_INITIAL_USER_MESSAGE_PT;
-      } else {
-        initialMessage = lang === 'en' ? REVISION_CHAT_INITIAL_USER_MESSAGE_EN : REVISION_CHAT_INITIAL_USER_MESSAGE_PT;
-      }
-
-      const greetingStart = Date.now();
-      const { text, usage: greetingUsage } = await generateText({
-        model: google(TEACHING_CHAT_MODEL),
-        system: systemPrompt,
-        messages: [{ role: 'user', content: initialMessage }],
-        tools: { searchStudentMaterials: createSearchStudentMaterialsTool(chat.section_id) },
-        stopWhen: stepCountIs(3),
-      });
-      insertAiCallLog({
-        label: 'chat-initial-greeting',
-        model: TEACHING_CHAT_MODEL,
-        inputTokens: greetingUsage?.inputTokens ?? null,
-        outputTokens: greetingUsage?.outputTokens ?? null,
-        inputText: systemPrompt + '\n' + initialMessage,
-        outputText: text,
-        userId,
-        sectionId: chat.section_id,
-        durationMs: Date.now() - greetingStart,
-      });
-
-      const saved = await createMessage(chatId, 'assistant', text);
-
-      // Usage phase (initial greeting does NOT count towards usage)
-      const user = await getUserById(userId);
-      const dailyUsage = await getDailyUsage(userId);
-      const { phase, usagePercent } = getUsagePhase(dailyUsage, user.plan);
-
-      return NextResponse.json({ messages: [saved], summarizedUpToMessageId: 0, phase, usagePercent });
-    }
-
     const summary = await getSummary(chatId);
 
     // Usage phase
@@ -152,6 +118,57 @@ export async function POST(
       return NextResponse.json({ error: 'CHAT_NOT_FOUND' }, { status: 404 });
     }
 
+    const body = await request.json();
+    const isInitialGreeting = body.initialGreeting === true;
+
+    if (isInitialGreeting) {
+      const existingMessages = await getMessages(chatId);
+      if (existingMessages.length > 0) {
+        return NextResponse.json({ error: 'CHAT_ALREADY_STARTED' }, { status: 409 });
+      }
+
+      const context = await buildChatContext(chatId);
+      if (!context) {
+        return NextResponse.json({ error: 'CHAT_NOT_FOUND' }, { status: 404 });
+      }
+
+      const cookieStore = await cookies();
+      const lang = cookieStore.get('eduh_language')?.value ?? 'pt-BR';
+      const initialMessage = getInitialGreetingSeedMessage(context.chat.type, lang);
+      const greetingStart = Date.now();
+
+      const result = streamText({
+        model: google(TEACHING_CHAT_MODEL),
+        system: context.systemPrompt,
+        messages: [{ role: 'user', content: initialMessage }],
+        tools: { searchStudentMaterials: createSearchStudentMaterialsTool(context.chat.section_id) },
+        stopWhen: stepCountIs(3),
+        experimental_transform: smoothStream({
+          delayInMs: 20,
+          chunking: 'word',
+        }),
+        async onFinish({ text, usage: greetingUsage }) {
+          if (request.signal.aborted) return;
+
+          insertAiCallLog({
+            label: 'chat-initial-greeting',
+            model: TEACHING_CHAT_MODEL,
+            inputTokens: greetingUsage?.inputTokens ?? null,
+            outputTokens: greetingUsage?.outputTokens ?? null,
+            inputText: context.systemPrompt + '\n' + initialMessage,
+            outputText: text,
+            userId,
+            sectionId: context.chat.section_id,
+            durationMs: Date.now() - greetingStart,
+          });
+
+          await createMessageIfChatEmpty(chatId, 'assistant', text);
+        },
+      });
+
+      return result.toUIMessageStreamResponse();
+    }
+
     // Rate limit
     const recentCount = await getMessageCountLastMinute(userId);
     if (recentCount >= RATE_LIMIT_MESSAGES_PER_MINUTE) {
@@ -168,7 +185,6 @@ export async function POST(
     const modelToUse = phase === 'degraded' ? DEGRADED_CHAT_MODEL : TEACHING_CHAT_MODEL;
 
     // Extract user message from useChat request body (UIMessage format with parts)
-    const body = await request.json();
     const userMessages = body.messages?.filter((m: { role: string }) => m.role === 'user') ?? [];
     const lastUserMessage = userMessages[userMessages.length - 1];
     if (!lastUserMessage) {
@@ -192,15 +208,10 @@ export async function POST(
     savedUserMessage = await createMessage(chatId, 'user', content);
 
     // Build LLM context
-    const chat = await getChat(chatId);
-    if (!chat) {
+    const context = await buildChatContext(chatId);
+    if (!context) {
       return NextResponse.json({ error: 'CHAT_NOT_FOUND' }, { status: 404 });
     }
-
-    const allTopics = await listTopics(chat.section_id);
-    const currentTopic = allTopics.find((t) => t.id === chat.topic_id);
-    const currentSubtopics = currentTopic?.subtopics.map((s) => s.text) ?? [];
-    const systemPrompt = buildSystemPrompt(chat, allTopics, currentSubtopics);
 
     const summary = await getSummary(chatId);
     const unsummarizedMessages = await getMessagesAfterSummary(chatId);
@@ -218,9 +229,9 @@ export async function POST(
     const streamStart = Date.now();
     const result = streamText({
       model: google(modelToUse),
-      system: systemPrompt,
+      system: context.systemPrompt,
       messages: llmMessages,
-      tools: { searchStudentMaterials: createSearchStudentMaterialsTool(chat.section_id) },
+      tools: { searchStudentMaterials: createSearchStudentMaterialsTool(context.chat.section_id) },
       stopWhen: stepCountIs(3),
       experimental_transform: smoothStream({
         delayInMs: 20,
@@ -232,10 +243,10 @@ export async function POST(
           model: modelToUse,
           inputTokens: streamUsage?.inputTokens ?? null,
           outputTokens: streamUsage?.outputTokens ?? null,
-          inputText: systemPrompt + '\n' + JSON.stringify(llmMessages),
+          inputText: context.systemPrompt + '\n' + JSON.stringify(llmMessages),
           outputText: text,
           userId,
-          sectionId: chat.section_id,
+          sectionId: context.chat.section_id,
           durationMs: Date.now() - streamStart,
         });
         // Track usage
