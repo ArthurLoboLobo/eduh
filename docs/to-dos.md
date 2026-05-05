@@ -47,7 +47,6 @@
     - Number of topics and subtopics (very high, just to prevent spam)
     - Size of a message (very high, since since we will have a usage limit)
     - Size and number of tokens in the uploaded files (not very high, think of something reasonable)
-- **Email Alias Loophole**: Normalize emails by stripping "plus" aliases (e.g., `user+test@gmail.com` -> `user@gmail.com`). Currently, aliases create separate accounts, which allows users to bypass limits and claim promotions multiple times.
 
 
 

@@ -35,6 +35,8 @@ Eduh is an AI-powered exam preparation platform for university students. Users u
 
 ## Build, Test, and Development Commands
 
+Do not run `npm run dev` by default. Assume the user likely already has the Next.js dev server running, and only start it if the user explicitly asks.
+
 ```bash
 npm run dev             # Start the Next.js dev server
 npm run build           # Build for production
