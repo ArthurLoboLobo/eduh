@@ -112,7 +112,7 @@ const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             rows={1}
-            className="flex-1 resize-none overflow-y-hidden bg-transparent px-4 mt-2 mb-2 font-body text-[15px] leading-relaxed text-page-cream placeholder:text-page-cream-faint focus:outline-none"
+            className="flex-1 resize-none overflow-y-hidden bg-transparent px-4 mt-2 mb-2 font-body text-[14px] sm:text-[15px] leading-relaxed text-page-cream placeholder:text-page-cream-faint focus:outline-none"
             style={{ maxHeight: '200px' }}
           />
           <button

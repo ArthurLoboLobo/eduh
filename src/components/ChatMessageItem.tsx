@@ -128,7 +128,7 @@ function ChatMessageItem({
         >
           <p
             data-user-message-body
-            className="font-body text-[15px] leading-relaxed text-page-cream whitespace-pre-wrap"
+            className="font-body text-[14px] sm:text-[15px] leading-relaxed text-page-cream whitespace-pre-wrap"
           >
             {textContent}
           </p>
@@ -152,7 +152,7 @@ function ChatMessageItem({
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-[95%] min-w-0 overflow-hidden font-body-prose text-[16px] leading-[1.65] text-page-cream prose-chat">
+      <div className="max-w-[95%] min-w-0 overflow-hidden font-body-prose text-[14px] sm:text-[16px] leading-[1.65] text-page-cream prose-chat">
         {textContent && (
           isStreaming
             ? <StreamingMarkdown content={textContent} />
