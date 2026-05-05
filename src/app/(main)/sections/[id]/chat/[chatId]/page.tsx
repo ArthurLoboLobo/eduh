@@ -319,6 +319,8 @@ export default function ChatPage() {
             !isRetrying &&
             !Number.isNaN(numericId) &&
             numericId > summarizedUpToMessageId;
+          const isStreaming =
+            isLast && message.role === 'assistant' && status === 'streaming';
           return (
             <div key={message.id}>
               <ChatMessageItem
@@ -330,6 +332,7 @@ export default function ChatPage() {
                   !isLoading &&
                   !isOrphan
                 }
+                isStreaming={isStreaming}
                 onHoverChange={setHoveredMessageId}
                 onRequestUndo={setUndoTargetId}
                 t={t}
